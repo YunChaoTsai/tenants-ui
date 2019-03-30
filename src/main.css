@@ -1,0 +1,13 @@
+a {
+  color: #00bcd4;
+}
+a[aria-current="page"] {
+  color: #013c44;
+}
+[role="status"] {
+  color: orangered;
+}
+
+[hidden] {
+  display: none;
+}
