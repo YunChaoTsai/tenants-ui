@@ -1,5 +1,4 @@
 import { createAsyncAction, getType, ActionType } from "typesafe-actions"
-import { AnyAction } from "redux"
 
 import { IBaseItem, IBaseState, model, init } from "./../model"
 import { IRole } from "./../Roles/store"
@@ -84,11 +83,11 @@ export function selectors<State extends IStateWithKey>(state: State) {
       return this.state.isFetching
     },
     get users(): IUser[] {
-      return model(this.state.users).get()
+      return model<IUser>(this.state.users).get()
     },
     getUser(id?: string | number): IUser | undefined {
       if (!id) return
-      return model(this.state.users).getItem(id)
+      return model<IUser>(this.state.users).getItem(id)
     },
   }
 }

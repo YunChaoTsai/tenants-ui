@@ -1,14 +1,15 @@
-import React, { useEffect, useState, Fragment } from "react"
+import React, { useEffect, Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
+import { Omit } from "utility-types"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { RedirectUnlessAuthenticated } from "./../Auth"
 import { IRole, IPermission, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
-import { Select } from "./../Shared/Select"
+import { Async, AsyncProps } from "./../Shared/Select"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -88,72 +89,27 @@ export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
   })
 )(Roles)
 
-interface SelectRolesProps extends XHRProps {
+interface SelectRolesProps extends XHRProps, Omit<AsyncProps, "fetch"> {
   value?: IRole[]
   onChange: (roles: IRole[]) => void
-  name?: string
-  multiple?: boolean
 }
 
 export const SelectRoles = withXHR<SelectRolesProps>(function SelectRoles({
-  onChange,
-  value = [],
-  multiple = false,
-  name = "select[]",
   xhr,
+  ...otherProps
 }: SelectRolesProps) {
-  const [query, setQuery] = useState<string>("")
-  const [roles, setRoles] = useState<IRole[]>([])
-  return (
-    <Select
-      value={value}
-      onChange={onChange}
-      name={name}
-      options={roles}
-      query={query}
-      multiple
-      onQuery={query => {
-        XHR(xhr)
-          .getRoles()
-          .then(setRoles)
-        setQuery(query)
-      }}
-    />
-  )
+  return <Async multiple fetch={q => XHR(xhr).getRoles()} {...otherProps} />
 })
 
-interface SelectPermissionsProps extends XHRProps {
+interface SelectPermissionsProps extends XHRProps, Omit<AsyncProps, "fetch"> {
   value?: IPermission[]
   onChange: (permissions: IPermission[]) => void
-  name?: string
-  multiple?: boolean
 }
 
 export const SelectPermissions = withXHR<SelectPermissionsProps>(
-  function SelectPermissions({
-    onChange,
-    value = [],
-    multiple = false,
-    name = "select[]",
-    xhr,
-  }: SelectPermissionsProps) {
-    const [query, setQuery] = useState<string>("")
-    const [permissions, setPermissions] = useState<IPermission[]>([])
+  function SelectPermissions({ xhr, ...otherProps }: SelectPermissionsProps) {
     return (
-      <Select
-        value={value}
-        onChange={onChange}
-        name={name}
-        options={permissions}
-        query={query}
-        multiple
-        onQuery={query => {
-          XHR(xhr)
-            .getPermissions()
-            .then(setPermissions)
-          setQuery(query)
-        }}
-      />
+      <Async multiple fetch={q => XHR(xhr).getPermissions()} {...otherProps} />
     )
   }
 )

@@ -1,6 +1,7 @@
-import React, { useState, Fragment } from "react"
+import React, { useState } from "react"
+import { Subtract, Omit } from "utility-types"
 
-interface SelectProps {
+export interface SelectProps {
   multiple?: boolean
   name?: string
   onChange: (value?: any[] | any) => void
@@ -9,6 +10,7 @@ interface SelectProps {
   placeholder?: string
   query?: string
   value?: any | any[]
+  label?: React.ReactNode
 }
 
 export function Select({
@@ -20,10 +22,12 @@ export function Select({
   placeholder = "Type to search...",
   query,
   value,
+  label,
 }: SelectProps) {
   name = name || (multiple ? "select[]" : "select")
   return (
-    <Fragment>
+    <div>
+      {label ? <label>{label}</label> : null}
       <input
         value={query}
         onChange={e => {
@@ -35,7 +39,7 @@ export function Select({
         <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {options.map(option => (
             <li key={option.id} style={{ display: "inline-block" }}>
-              <label>
+              <label title={option.title || option.description}>
                 <input
                   type={multiple ? "checkbox" : "radio"}
                   name={name}
@@ -63,8 +67,28 @@ export function Select({
           ))}
         </ol>
       ) : null}
-    </Fragment>
+    </div>
   )
 }
 
+export interface AsyncProps
+  extends Omit<SelectProps, "onQuery" | "options" | "query"> {
+  fetch: (query: string) => Promise<any[]>
+}
+
+export function Async({ fetch, ...otherProps }: AsyncProps) {
+  const [query, setQuery] = useState<string>("")
+  const [options, setOptions] = useState<any[]>([])
+  return (
+    <Select
+      {...otherProps}
+      options={options}
+      query={query}
+      onQuery={query => {
+        fetch(query).then(setOptions)
+        setQuery(query)
+      }}
+    />
+  )
+}
 export default Select
