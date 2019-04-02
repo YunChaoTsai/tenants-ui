@@ -8,8 +8,10 @@ import { withXHR, XHRProps } from "./../xhr"
 import { InputField } from "./../Shared/InputField"
 
 const initialValues = {
-  name: "",
-  description: "",
+  city: "",
+  state: "",
+  country: "",
+  country_short_name: "",
 }
 type NewItemCredentials = typeof initialValues
 
@@ -19,7 +21,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
   return (
     <Fragment>
       <Helmet>
-        <title>New Meal Plan</title>
+        <title>New Location</title>
       </Helmet>
       <Formik
         initialValues={initialValues}
