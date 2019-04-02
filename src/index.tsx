@@ -11,6 +11,10 @@ import configureStore from "./configureStore"
 import { store as authStore } from "./Auth"
 import { store as roleStore } from "./Roles"
 import { store as userStore } from "./Users"
+import { store as mealPlanStore } from "./MealPlans"
+import { store as roomTypeStore } from "./RoomTypes"
+import { store as locationStore } from "./Locations"
+import { store as hotelStore } from "./Hotels"
 import { IAppState } from "./types"
 import xhr, { XHRContext } from "./xhr"
 import "./main.css"
@@ -19,6 +23,10 @@ const rootReducer = combineReducers<IAppState>({
   [authStore.key]: authStore.reducer,
   [roleStore.key]: roleStore.reducer,
   [userStore.key]: userStore.reducer,
+  [mealPlanStore.key]: mealPlanStore.reducer,
+  [roomTypeStore.key]: roomTypeStore.reducer,
+  [locationStore.key]: locationStore.reducer,
+  [hotelStore.key]: hotelStore.reducer,
 })
 
 const store = configureStore<IAppState>(rootReducer, {
