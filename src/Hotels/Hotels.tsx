@@ -13,7 +13,7 @@ export default function HotelsModule(props: RouteComponentProps) {
       <Link to="new">New Hotel</Link>
       <Router>
         <NewItem path="new" />
-        <Item path=":hotelId" />
+        <Item path=":hotelId/*" />
         <List path="/" />
       </Router>
     </RedirectUnlessAuthenticated>

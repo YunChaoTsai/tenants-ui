@@ -95,9 +95,9 @@ export default connectWithList(List)
 interface SelectMealPlanProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 
 export const SelectMealPlans = withXHR<SelectMealPlanProps>(
-  function SelectPermissions({ xhr, ...otherProps }: SelectMealPlanProps) {
+  function SelectMealPlans({ xhr, ...otherProps }: SelectMealPlanProps) {
     return (
-      <Async multiple fetch={q => XHR(xhr).getMealPlans()} {...otherProps} />
+      <Async multiple {...otherProps} fetch={q => XHR(xhr).getMealPlans()} />
     )
   }
 )

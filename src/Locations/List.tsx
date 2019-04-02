@@ -101,8 +101,8 @@ export const SelectLocations = withXHR<SelectLocationsProps>(
     return (
       <Async
         multiple
-        fetch={q => XHR(xhr).getLocations({ q })}
         {...otherProps}
+        fetch={q => XHR(xhr).getLocations({ q })}
       />
     )
   }
