@@ -61,7 +61,11 @@ export const connectWithList = connect<
   })
 )
 
-interface ListProps extends OwnProps, StateProps, DispatchProps, RouteComponentProps {}
+interface ListProps
+  extends OwnProps,
+    StateProps,
+    DispatchProps,
+    RouteComponentProps {}
 function List({ getRoomTypes, roomTypes, isFetching }: ListProps) {
   useEffect(() => {
     getRoomTypes()
@@ -91,9 +95,9 @@ export default connectWithList(List)
 interface SelectRoomTypesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 
 export const SelectRoomTypes = withXHR<SelectRoomTypesProps>(
-  function SelectPermissions({ xhr, ...otherProps }: SelectRoomTypesProps) {
+  function SelectRoomTypes({ xhr, ...otherProps }: SelectRoomTypesProps) {
     return (
-      <Async multiple fetch={q => XHR(xhr).getRoomTypes()} {...otherProps} />
+      <Async multiple {...otherProps} fetch={q => XHR(xhr).getRoomTypes()} />
     )
   }
 )

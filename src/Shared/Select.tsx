@@ -11,6 +11,7 @@ export interface SelectProps {
   query?: string
   value?: any | any[]
   label?: React.ReactNode
+  searchable?: boolean
 }
 
 export function Select({
@@ -23,18 +24,21 @@ export function Select({
   query,
   value,
   label,
+  searchable = true,
 }: SelectProps) {
   name = name || (multiple ? "select[]" : "select")
   return (
     <div>
       {label ? <label>{label}</label> : null}
-      <input
-        value={query}
-        onChange={e => {
-          onQuery(e.target.value)
-        }}
-        placeholder={placeholder}
-      />
+      {searchable ? (
+        <input
+          value={query}
+          onChange={e => {
+            onQuery(e.target.value)
+          }}
+          placeholder={placeholder}
+        />
+      ) : null}
       {options.length ? (
         <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {options.map(option => (
@@ -72,7 +76,8 @@ export function Select({
 }
 
 export interface AsyncProps
-  extends Omit<SelectProps, "onQuery" | "options" | "query"> {
+  extends Omit<SelectProps, "onQuery" | "options" | "query">,
+    Partial<Pick<SelectProps, "onQuery" | "options" | "query">> {
   fetch: (query: string) => Promise<any[]>
 }
 
@@ -81,13 +86,13 @@ export function Async({ fetch, ...otherProps }: AsyncProps) {
   const [options, setOptions] = useState<any[]>([])
   return (
     <Select
-      {...otherProps}
       options={options}
       query={query}
       onQuery={query => {
         fetch(query).then(setOptions)
         setQuery(query)
       }}
+      {...otherProps}
     />
   )
 }

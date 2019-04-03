@@ -1,10 +1,12 @@
 import React, { useEffect, Fragment } from "react"
-import { RouteComponentProps, Link, Redirect } from "@reach/router"
+import { RouteComponentProps, Link, Redirect, Router } from "@reach/router"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 
 import { IHotel, IStateWithKey, selectors, actions } from "./store"
 import { ThunkDispatch, ThunkAction } from "./../types"
+import Prices from "./Prices"
+import AddPrices from "./AddPrices"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -94,6 +96,7 @@ export function Item({
           return null
         }
         const {
+          id,
           name,
           eb_child_age_end,
           eb_child_age_start,
@@ -126,6 +129,14 @@ export function Item({
               {locations.map(location => (
                 <span key={location.id}>{location.name}</span>
               ))}
+            </div>
+            <div>
+              <h4>Prices</h4>
+              <Link to="add-prices">Add Prices</Link>
+              <Router>
+                <AddPrices path="add-prices" hotel={hotel} />
+                <Prices path="/" hotel={hotel} />
+              </Router>
             </div>
           </div>
         )

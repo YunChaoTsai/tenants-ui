@@ -11,3 +11,20 @@ a[aria-current="page"] {
 [hidden] {
   display: none;
 }
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid silver;
+  vertical-align: top;
+}
+th {
+  border-bottom: 1px solid black;
+}
+
+.text--right {
+  text-align: right;
+}
