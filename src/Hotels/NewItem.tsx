@@ -1,6 +1,13 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import { Formik, FormikActions, FormikProps, Form, FieldArray } from "formik"
+import {
+  Formik,
+  FormikActions,
+  FormikProps,
+  Form,
+  FieldArray,
+  ErrorMessage,
+} from "formik"
 import * as Validator from "yup"
 import Helmet from "react-helmet-async"
 import Button from "@tourepedia/button"
@@ -13,10 +20,17 @@ import { store as locationStore, SelectLocations } from "./../Locations"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
-  eb_child_age_start: Validator.number().required(
-    "Child start age is required"
-  ),
-  eb_child_age_end: Validator.number().required("Child end age is required"),
+  eb_child_age_start: Validator.number()
+    .positive("Child start age should be a positive number")
+    .integer("Child start age should be an integer")
+    .required("Child start age is required"),
+  eb_child_age_end: Validator.number()
+    .positive("Child end age should be a positive number")
+    .integer("Child end age should be an integer")
+    .required("Child end age is required"),
+  meal_plans: Validator.array().min(1, "Please select atleast one meal plan"),
+  room_types: Validator.array().min(1, "Please select atleast one room type"),
+  locations: Validator.array().min(1, "Please select atleast one location"),
 })
 interface NewItemCredentials {
   name: string
@@ -87,29 +101,57 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 label="Extra bed child start age"
                 name="eb_child_age_start"
                 required
+                type="number"
+                min={1}
               />
               <InputField
                 label="Extra bed child end age"
                 name="eb_child_age_end"
                 required
+                type="number"
+                min={1}
               />
-              <SelectMealPlans
-                label="Meal Plan(s) served"
+              <FieldArray
                 name="meal_plans"
-                value={values.meal_plans}
-                onChange={values => setFieldValue("meal_plans", values)}
+                render={({ name }) => (
+                  <div>
+                    <SelectMealPlans
+                      label="Meal Plan(s) served"
+                      name={name}
+                      value={values.meal_plans}
+                      onChange={values => setFieldValue("meal_plans", values)}
+                    />
+                    <ErrorMessage name={name} />
+                  </div>
+                )}
               />
-              <SelectRoomTypes
-                label="Room Types available"
+              <FieldArray
                 name="room_types"
-                value={values.room_types}
-                onChange={values => setFieldValue("room_types", values)}
+                render={({ name }) => (
+                  <div>
+                    <SelectRoomTypes
+                      label="Room Types available"
+                      name="room_types"
+                      value={values.room_types}
+                      onChange={values => setFieldValue("room_types", values)}
+                    />
+                    <ErrorMessage name={name} />
+                  </div>
+                )}
               />
-              <SelectLocations
-                label="Locations"
+              <FieldArray
                 name="locations"
-                value={values.locations}
-                onChange={values => setFieldValue("locations", values)}
+                render={({ name }) => (
+                  <div>
+                    <SelectLocations
+                      label="Locations"
+                      name="locations"
+                      value={values.locations}
+                      onChange={values => setFieldValue("locations", values)}
+                    />
+                    <ErrorMessage name={name} />
+                  </div>
+                )}
               />
               <Button type="submit">Save</Button> <Link to="..">Cancel</Link>
             </Form>

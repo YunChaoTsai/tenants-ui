@@ -2,9 +2,12 @@ import React, { useEffect, Fragment } from "react"
 import { connect } from "react-redux"
 import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
+import { Omit } from "utility-types"
 
 import { IHotel, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
+import { withXHR, XHRProps } from "./../xhr"
+import { Async, AsyncProps } from "./../Shared/Select"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -109,3 +112,13 @@ function List({ isFetching, getHotels, hotels }: ListProps) {
 }
 
 export default connectWithList(List)
+
+interface SelectLocationsProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
+
+export const SelectHotels = withXHR<SelectLocationsProps>(
+  function SelectHotels({ xhr, ...otherProps }: SelectLocationsProps) {
+    return (
+      <Async multiple {...otherProps} fetch={q => XHR(xhr).getHotels({ q })} />
+    )
+  }
+)

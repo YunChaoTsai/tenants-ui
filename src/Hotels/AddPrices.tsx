@@ -139,9 +139,16 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                           prices.push({
                             ...otherValues,
                             start_date: moment(start_date)
+                              .hours(12)
+                              .minutes(0)
+                              .seconds(1)
                               .utc()
                               .format("YYYY-MM-DD HH:mm:ss"),
                             end_date: moment(start_date)
+                              .add(1, "day")
+                              .hours(12)
+                              .minutes(0)
+                              .seconds(0)
                               .utc()
                               .format("YYYY-MM-DD HH:mm:ss"),
                             location_id: location.id,

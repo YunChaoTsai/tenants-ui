@@ -38,6 +38,7 @@ function contentTypeXWWWFormUrlencodedInterceptor(
   config: AxiosRequestConfig
 ): AxiosRequestConfig {
   const data = config.data
+  const params = config.params
   config.headers["Content-Type"] = "application/x-www-form-urlencoded"
   // if it is already FormData, nothing is required
   if (data instanceof FormData) {
@@ -45,6 +46,8 @@ function contentTypeXWWWFormUrlencodedInterceptor(
   }
   // else stringify the data and update it
   config.data = qs.stringify(data)
+  config.url = config.url + qs.stringify(params, { addQueryPrefix: true })
+  config.params = undefined
   return config
 }
 
