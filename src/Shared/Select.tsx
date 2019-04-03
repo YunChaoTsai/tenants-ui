@@ -11,7 +11,7 @@ export interface SelectProps {
   query?: string
   value?: any | any[]
   label?: React.ReactNode
-  searable?: boolean
+  searchable?: boolean
 }
 
 export function Select({
@@ -24,13 +24,13 @@ export function Select({
   query,
   value,
   label,
-  searable = true,
+  searchable = true,
 }: SelectProps) {
   name = name || (multiple ? "select[]" : "select")
   return (
     <div>
       {label ? <label>{label}</label> : null}
-      {searable ? (
+      {searchable ? (
         <input
           value={query}
           onChange={e => {

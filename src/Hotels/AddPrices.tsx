@@ -281,7 +281,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                               <div>
                                 <SelectMealPlans
                                   name={name}
-                                  searable={false}
+                                  searchable={false}
                                   options={hotel.meal_plans}
                                   onChange={values =>
                                     setFieldValue(name, values)
@@ -299,7 +299,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                             render={({ name }) => (
                               <div>
                                 <SelectRoomTypes
-                                  searable={false}
+                                  searchable={false}
                                   options={hotel.room_types}
                                   onChange={values =>
                                     setFieldValue(name, values)
@@ -317,7 +317,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                             render={({ name }) => (
                               <div>
                                 <SelectLocations
-                                  searable={false}
+                                  searchable={false}
                                   options={hotel.locations}
                                   onChange={values =>
                                     setFieldValue(name, values)
