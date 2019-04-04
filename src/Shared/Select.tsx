@@ -27,6 +27,7 @@ export function Select({
   searchable = true,
 }: SelectProps) {
   name = name || (multiple ? "select[]" : "select")
+  value = value || (multiple ? [] : undefined)
   return (
     <div>
       {label ? <label>{label}</label> : null}
@@ -49,9 +50,11 @@ export function Select({
                   name={name}
                   value={JSON.stringify(option)}
                   checked={
-                    Array.isArray(value)
-                      ? value.some(v => v.id === option.id)
-                      : value.id === option.id
+                    value
+                      ? Array.isArray(value)
+                        ? value.some(v => v.id === option.id)
+                        : value.id === option.id
+                      : false
                   }
                   onChange={e => {
                     onChange(
