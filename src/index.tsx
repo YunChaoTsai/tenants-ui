@@ -15,6 +15,8 @@ import { store as mealPlanStore } from "./MealPlans"
 import { store as roomTypeStore } from "./RoomTypes"
 import { store as locationStore } from "./Locations"
 import { store as hotelStore } from "./Hotels"
+import { store as cabTypeStore } from "./CabTypes"
+import { store as cabStore } from "./Cabs"
 import { IAppState } from "./types"
 import xhr, { XHRContext } from "./xhr"
 import "./main.css"
@@ -27,6 +29,8 @@ const rootReducer = combineReducers<IAppState>({
   [roomTypeStore.key]: roomTypeStore.reducer,
   [locationStore.key]: locationStore.reducer,
   [hotelStore.key]: hotelStore.reducer,
+  [cabTypeStore.key]: cabTypeStore.reducer,
+  [cabStore.key]: cabStore.reducer,
 })
 
 const store = configureStore<IAppState>(rootReducer, {
