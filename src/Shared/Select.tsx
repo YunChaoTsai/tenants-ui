@@ -12,6 +12,10 @@ export interface SelectProps {
   value?: any | any[]
   label?: React.ReactNode
   searchable?: boolean
+  creatable?: boolean
+  onBlur?: (e: any) => void
+  onFocus?: (e: any) => void
+  required?: boolean
 }
 
 export function Select({
@@ -25,9 +29,34 @@ export function Select({
   value,
   label,
   searchable = true,
+  creatable = false,
+  onBlur,
+  onFocus,
+  required,
 }: SelectProps) {
   name = name || (multiple ? "select[]" : "select")
   value = value || (multiple ? [] : undefined)
+  if (value) {
+    let moreOptions = []
+    if (Array.isArray(value)) {
+      moreOptions = value
+    } else {
+      moreOptions = [value]
+    }
+    // only push the more options if they are not already present in
+    // the options list
+    moreOptions = moreOptions.filter(
+      moreOption => !options.some(option => option.id === moreOption.id)
+    )
+    options = options.concat(moreOptions)
+  }
+  if (creatable && options.length === 0 && query && query.trim()) {
+    options = options.concat({
+      id: query,
+      name: query,
+      created: true,
+    })
+  }
   return (
     <div>
       {label ? <label>{label}</label> : null}
@@ -37,6 +66,9 @@ export function Select({
           onChange={e => {
             onQuery(e.target.value)
           }}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          required={required}
           placeholder={placeholder}
         />
       ) : null}
