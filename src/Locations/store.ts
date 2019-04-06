@@ -3,6 +3,24 @@ import { IBaseItem, IBaseState, init, model } from "./../model"
 
 export const key = "LOCATIONS_STATE"
 
+export interface ICountry {
+  id: number
+  name: string
+  short_name: string
+}
+
+export interface ICountryState {
+  id: number
+  name: string
+  country_id: number
+}
+
+export interface ICity {
+  id: number
+  name: string
+  state_id: number
+}
+
 export interface ILocation extends IBaseItem {
   id: number
   name: string
@@ -10,6 +28,16 @@ export interface ILocation extends IBaseItem {
   city_id: number
   state_id: number
   country_id: number
+  city?: ICity
+  state?: ICountryState
+  country?: ICountry
+}
+
+export interface IService {
+  id: number
+  distance: number
+  name: string
+  locations: ILocation[]
 }
 
 export interface ILocations extends IBaseState<ILocation> {}
