@@ -5,7 +5,15 @@ import { AxiosInstance } from "axios"
 import { RouteComponentProps, Link } from "@reach/router"
 import { Omit } from "utility-types"
 
-import { ILocation, actions, IStateWithKey, selectors } from "./store"
+import {
+  ILocation,
+  ICountry,
+  ICountryState,
+  ICity,
+  actions,
+  IStateWithKey,
+  selectors,
+} from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { Async, AsyncProps } from "./../Shared/Select"
 import { withXHR, XHRProps } from "./../xhr"
@@ -16,6 +24,21 @@ export function XHR(xhr: AxiosInstance) {
       return xhr
         .get("/locations", { params })
         .then(({ data }) => data.locations)
+    },
+    getCountries(params?: any): Promise<ICountry[]> {
+      return xhr
+        .get("/locations/countries", { params })
+        .then(({ data }) => data.countries)
+    },
+    getStates(params?: any): Promise<ICountryState[]> {
+      return xhr
+        .get("/locations/states", { params })
+        .then(({ data }) => data.states)
+    },
+    getCities(params?: any): Promise<ICity[]> {
+      return xhr
+        .get("/locations/cities", { params })
+        .then(({ data }) => data.cities)
     },
   }
 }
@@ -70,7 +93,7 @@ interface ListProps
     RouteComponentProps {}
 function List({ getLocations, locations, isFetching }: ListProps) {
   useEffect(() => {
-    getLocations()
+    getLocations({ limit: 1000 })
   }, [])
   return (
     <Fragment>
@@ -94,16 +117,40 @@ function List({ getLocations, locations, isFetching }: ListProps) {
 
 export default connectWithList(List)
 
-interface SelectLocationsProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
+interface SelectProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 
-export const SelectLocations = withXHR<SelectLocationsProps>(
-  function SelectLocations({ xhr, ...otherProps }: SelectLocationsProps) {
-    return (
-      <Async
-        multiple
-        {...otherProps}
-        fetch={q => XHR(xhr).getLocations({ q })}
-      />
-    )
-  }
-)
+export const SelectLocations = withXHR<SelectProps>(function SelectLocations({
+  xhr,
+  ...otherProps
+}: SelectProps) {
+  return (
+    <Async multiple {...otherProps} fetch={q => XHR(xhr).getLocations({ q })} />
+  )
+})
+
+export const SelectCountries = withXHR<SelectProps>(function SelectCountries({
+  xhr,
+  ...otherProps
+}: SelectProps) {
+  return (
+    <Async multiple {...otherProps} fetch={q => XHR(xhr).getCountries({ q })} />
+  )
+})
+
+export const SelectStates = withXHR<SelectProps>(function SelectStates({
+  xhr,
+  ...otherProps
+}: SelectProps) {
+  return (
+    <Async multiple {...otherProps} fetch={q => XHR(xhr).getStates({ q })} />
+  )
+})
+
+export const SelectCities = withXHR<SelectProps>(function SelectCities({
+  xhr,
+  ...otherProps
+}: SelectProps) {
+  return (
+    <Async multiple {...otherProps} fetch={q => XHR(xhr).getCities({ q })} />
+  )
+})
