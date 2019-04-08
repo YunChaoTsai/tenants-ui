@@ -17,16 +17,19 @@ import { InputField } from "./../Shared/InputField"
 import { SelectCabTypes, store as cabTypeStore } from "./../CabTypes"
 
 export interface NewCabCredentials {
+  name: string
   number_plate: string
   cab_type?: cabTypeStore.ICabType
 }
 const newCabSchema = Validator.object().shape({
+  name: Validator.string().required("Name for the cab is required."),
   number_plate: Validator.string()
     .required("Number Plate is required")
     .max(299, "Maximum 299 characters allowed"),
   cab_type: Validator.object().required("Cab type is required"),
 })
 const initialValues = {
+  name: "",
   number_plate: "",
   cab_type: undefined,
 }
@@ -43,11 +46,12 @@ export function NewCab({ xhr, navigate }: NewCabProps) {
           values: NewCabCredentials,
           actions: FormikActions<NewCabCredentials>
         ) => {
-          const { number_plate, cab_type } = values
-          if (number_plate && cab_type) {
+          const { number_plate, cab_type, name } = values
+          if (number_plate && cab_type && name) {
             actions.setStatus()
             return xhr
               .post("/cabs", {
+                name,
                 number_plate,
                 cab_type_id: cab_type.id,
               })
@@ -75,6 +79,12 @@ export function NewCab({ xhr, navigate }: NewCabProps) {
         }: FormikProps<NewCabCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
+            <InputField
+              label="Name"
+              name="name"
+              required
+              placeholder="Suzuki Wagon R"
+            />
             <Field
               name="cab_type"
               render={({ field }: FieldProps<NewCabCredentials>) => (

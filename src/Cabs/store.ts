@@ -8,6 +8,7 @@ import { store as cabTypeStore } from "./../CabTypes"
 
 export interface ICab extends IBaseItem {
   id: number
+  name: string
   number_plate: string
   created_at: string
   updated_at: string
