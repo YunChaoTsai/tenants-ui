@@ -77,7 +77,7 @@ function List({ getCabTypes, cabTypes, isFetching }: ListProps) {
   return (
     <Fragment>
       <Helmet>
-        <title>Meal Plans</title>
+        <title>Cab Types</title>
       </Helmet>
       {!isFetching ? `Total: ${cabTypes.length}` : ""}
       {isFetching ? (
