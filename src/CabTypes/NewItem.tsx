@@ -57,7 +57,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             <InputField
               label="Name"
               name="name"
-              placeholder="Suzuki Wagon R"
+              placeholder="Medium"
               required
             />
             <InputField

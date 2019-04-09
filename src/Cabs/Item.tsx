@@ -109,7 +109,7 @@ export default function Cab({
               "Loading..."
             ) : cab ? (
               <div>
-                {cab.cab_type.name} - {cab.number_plate}
+                {cab.name} - {cab.cab_type.name} - {cab.number_plate}
                 <br />
                 Created at:{" "}
                 {moment

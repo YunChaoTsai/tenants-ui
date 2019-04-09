@@ -63,7 +63,7 @@ export function Cabs({ getCabs, cabs, isFetching }: CabsProps) {
           cabs.map(r => (
             <li key={r.id}>
               <Link to={r.id.toString()}>
-                {r.cab_type.name} - {r.number_plate}
+                {r.name} - {r.number_plate}
               </Link>
             </li>
           ))

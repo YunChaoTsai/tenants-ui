@@ -12,8 +12,8 @@ export default function CabsModule(props: RouteComponentProps) {
       <h2>Cabs</h2>
       <Link to="new">New Cab</Link>
       <Router>
-        <Item path=":cabId" />
         <NewItem path="/new" />
+        <Item path=":cabId" />
         <List path="/" />
       </Router>
     </RedirectUnlessAuthenticated>
