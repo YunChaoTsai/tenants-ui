@@ -1,5 +1,6 @@
 import { createAsyncAction, getType, ActionType } from "typesafe-actions"
 import { IBaseItem, IBaseState, init, model } from "./../model"
+import { store as locationStore } from "./../Locations"
 
 export const key = "CAB_TYPES_STATE"
 
@@ -7,6 +8,20 @@ export interface ICabType extends IBaseItem {
   id: number
   name: string
   capacity: number
+}
+
+export interface ICabPrice {
+  id: number
+  start_date: string
+  end_date: string
+  cab_type_id: number
+  cab_type: ICabType
+  location_service_id: number
+  location_service: locationStore.IService
+  price?: number
+  per_km_charges?: number
+  minimum_km_per_day?: number
+  other_charges: number
 }
 
 export interface ICabTypes extends IBaseState<ICabType> {}
