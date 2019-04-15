@@ -38,7 +38,9 @@ function Prices({ xhr }: PricesProps) {
             <td>Price</td>
             <td>/km Charges</td>
             <td>Minimum Km/Day</td>
-            <td>Other Charges</td>
+            <td>Toll Charges</td>
+            <td>Parking Charges</td>
+            <td>Night Charges</td>
           </tr>
         </thead>
         <tbody>
@@ -52,7 +54,9 @@ function Prices({ xhr }: PricesProps) {
               price,
               per_km_charges,
               minimum_km_per_day,
-              other_charges,
+              night_charges,
+              parking_charges,
+              toll_charges,
             }) => (
               <tr key={id}>
                 <td>
@@ -72,7 +76,9 @@ function Prices({ xhr }: PricesProps) {
                 <td>{price}</td>
                 <td>{per_km_charges}</td>
                 <td>{minimum_km_per_day}</td>
-                <td>{other_charges}</td>
+                <td>{toll_charges}</td>
+                <td>{parking_charges}</td>
+                <td>{night_charges}</td>
               </tr>
             )
           )}

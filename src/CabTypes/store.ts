@@ -21,7 +21,9 @@ export interface ICabPrice {
   price?: number
   per_km_charges?: number
   minimum_km_per_day?: number
-  other_charges: number
+  toll_charges: number
+  parking_charges: number
+  night_charges: number
 }
 
 export interface ICabTypes extends IBaseState<ICabType> {}
