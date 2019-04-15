@@ -23,10 +23,8 @@ import { withXHR, XHRProps } from "./../xhr"
 
 type NewPriceCredentials = {
   prices: {
-    intervals: {
-      start_date: string
-      end_date: string
-    }[]
+    start_date: string
+    end_date: string
     base_price: number
     a_w_e_b: number
     c_w_e_b: number
@@ -40,12 +38,8 @@ type NewPriceCredentials = {
 const initialValues: NewPriceCredentials = {
   prices: [
     {
-      intervals: [
-        {
-          start_date: "",
-          end_date: "",
-        },
-      ],
+      start_date: "",
+      end_date: "",
       base_price: 0,
       persons: 2,
       a_w_e_b: 0,
@@ -61,14 +55,8 @@ const initialValues: NewPriceCredentials = {
 const validationSchema = Validator.object().shape({
   prices: Validator.array().of(
     Validator.object().shape({
-      intervals: Validator.array().of(
-        Validator.object().shape({
-          start_date: Validator.string().required(
-            "Start date field is required"
-          ),
-          end_date: Validator.string().required("End date field is required"),
-        })
-      ),
+      start_date: Validator.string().required("Start date field is required"),
+      end_date: Validator.string().required("End date field is required"),
       base_price: Validator.number()
         .required("Base price field is required")
         .positive("Price should be positive"),
@@ -127,7 +115,8 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                     locations,
                     meal_plans,
                     room_types,
-                    intervals,
+                    start_date,
+                    end_date,
                     ...otherValues
                   }
                 ) => {
@@ -135,26 +124,23 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                   locations.forEach(location => {
                     meal_plans.forEach(mealPlan => {
                       room_types.forEach(roomType => {
-                        intervals.forEach(({ start_date, end_date }) => {
-                          prices.push({
-                            ...otherValues,
-                            start_date: moment(start_date)
-                              .hours(12)
-                              .minutes(0)
-                              .seconds(1)
-                              .utc()
-                              .format("YYYY-MM-DD HH:mm:ss"),
-                            end_date: moment(start_date)
-                              .add(1, "day")
-                              .hours(12)
-                              .minutes(0)
-                              .seconds(0)
-                              .utc()
-                              .format("YYYY-MM-DD HH:mm:ss"),
-                            location_id: location.id,
-                            meal_plan_id: mealPlan.id,
-                            room_type_id: roomType.id,
-                          })
+                        prices.push({
+                          ...otherValues,
+                          start_date: moment(start_date)
+                            .hours(0)
+                            .minutes(0)
+                            .seconds(0)
+                            .utc()
+                            .format("YYYY-MM-DD HH:mm:ss"),
+                          end_date: moment(end_date)
+                            .hours(23)
+                            .minutes(59)
+                            .seconds(59)
+                            .utc()
+                            .format("YYYY-MM-DD HH:mm:ss"),
+                          location_id: location.id,
+                          meal_plan_id: mealPlan.id,
+                          room_type_id: roomType.id,
                         })
                       })
                     })
@@ -188,25 +174,18 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                 <table>
                   <thead>
                     <tr>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>Locations</th>
+                      <th>Meal Plans</th>
+                      <th>Room Types</th>
                       <th>Base Price</th>
                       <th title="Number of persons this base price is applicable to">
                         Persons
                       </th>
-                      <th>
-                        <abbr title="Adult with extra bed price">A.W.E.B.</abbr>
-                      </th>
-                      <th>
-                        <abbr title="Child with extra bed price">C.W.E.B.</abbr>
-                      </th>
-                      <th>
-                        <abbr title="Child without extra bed price">
-                          C.Wo.E.B.
-                        </abbr>
-                      </th>
-                      <th>Intervals (from - to)</th>
-                      <th>Meal Plans</th>
-                      <th>Room Types</th>
-                      <th>Locations</th>
+                      <th title="Adult with extra bed price">A.W.E.B.</th>
+                      <th title="Child with extra bed price">C.W.E.B.</th>
+                      <th title="Child without extra bed price">C.Wo.E.B.</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -214,70 +193,33 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                       <tr key={index}>
                         <td>
                           <InputField
-                            name={`${name}.${index}.base_price`}
-                            type="number"
+                            name={`${name}.${index}.start_date`}
+                            type="date"
                           />
                         </td>
                         <td>
                           <InputField
-                            name={`${name}.${index}.persons`}
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.a_w_e_b`}
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.c_w_e_b`}
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.c_wo_e_b`}
-                            type="number"
+                            name={`${name}.${index}.end_date`}
+                            type="date"
                           />
                         </td>
                         <td>
                           <FieldArray
-                            name={`${name}.${index}.intervals`}
-                            render={({ name, push, remove }) => (
-                              <Fragment>
-                                {values.prices[index].intervals.map(
-                                  (interval, intervalIndex) => (
-                                    <div key={intervalIndex}>
-                                      <InputField
-                                        name={`${name}.${intervalIndex}.start_date`}
-                                        type="date"
-                                      />
-                                      <InputField
-                                        name={`${name}.${intervalIndex}.end_date`}
-                                        type="date"
-                                      />
-                                      <br />
-                                      {values.prices[index].intervals.length >
-                                      1 ? (
-                                        <Button
-                                          onClick={e => remove(intervalIndex)}
-                                        >
-                                          Remove Interval
-                                        </Button>
-                                      ) : null}
-                                    </div>
-                                  )
-                                )}
-                                <Button
-                                  onClick={e =>
-                                    push(values.prices[index].intervals[0])
+                            name={`prices.${index}.locations`}
+                            render={({ name }) => (
+                              <div>
+                                <SelectLocations
+                                  searchable={false}
+                                  options={hotel.locations}
+                                  onChange={values =>
+                                    setFieldValue(name, values)
                                   }
-                                >
-                                  Add More Interval
-                                </Button>
-                              </Fragment>
+                                  labelKey="short_name"
+                                  value={values.prices[index].locations}
+                                  name={name}
+                                />
+                                <ErrorMessage name={name} />
+                              </div>
                             )}
                           />
                         </td>
@@ -319,22 +261,33 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                           />
                         </td>
                         <td>
-                          <FieldArray
-                            name={`prices.${index}.locations`}
-                            render={({ name }) => (
-                              <div>
-                                <SelectLocations
-                                  searchable={false}
-                                  options={hotel.locations}
-                                  onChange={values =>
-                                    setFieldValue(name, values)
-                                  }
-                                  value={values.prices[index].locations}
-                                  name={name}
-                                />
-                                <ErrorMessage name={name} />
-                              </div>
-                            )}
+                          <InputField
+                            name={`${name}.${index}.base_price`}
+                            type="number"
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.persons`}
+                            type="number"
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.a_w_e_b`}
+                            type="number"
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.c_w_e_b`}
+                            type="number"
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.c_wo_e_b`}
+                            type="number"
                           />
                         </td>
                         <td>

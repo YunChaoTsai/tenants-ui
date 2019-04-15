@@ -16,6 +16,7 @@ export interface SelectProps {
   onBlur?: (e: any) => void
   onFocus?: (e: any) => void
   required?: boolean
+  labelKey?: string
 }
 
 export function Select({
@@ -33,6 +34,7 @@ export function Select({
   onBlur,
   onFocus,
   required,
+  labelKey = "name",
 }: SelectProps) {
   name = name || (multiple ? "select[]" : "select")
   value = value || (multiple ? [] : undefined)
@@ -100,7 +102,7 @@ export function Select({
                     )
                   }}
                 />
-                {option.name}
+                {option[labelKey]}
               </label>
             </li>
           ))}

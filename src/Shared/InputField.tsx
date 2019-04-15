@@ -1,6 +1,13 @@
 import React from "react"
 import { ErrorMessage, FieldProps, Field } from "formik"
 
+export function Input({
+  type = "text",
+  ...otherProps
+}: React.HTMLProps<HTMLInputElement>) {
+  return <input {...otherProps} type={type} />
+}
+
 export function InputField({
   label,
   name,
@@ -19,7 +26,7 @@ export function InputField({
       render={({ field }: FieldProps) => (
         <div className={className}>
           {label ? <label htmlFor="name">{label}</label> : null}
-          <input {...otherProps} type={type} {...field} />
+          <Input {...otherProps} type={type} {...field} />
           <ErrorMessage name={field.name} />
         </div>
       )}

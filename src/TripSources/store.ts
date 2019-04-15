@@ -1,36 +1,19 @@
 import { createAsyncAction, getType, ActionType } from "typesafe-actions"
 import { IBaseItem, IBaseState, init, model } from "./../model"
-import { store as locationStore } from "./../Locations"
 
-export const key = "CAB_TYPES_STATE"
+export const key = "TRIP_SOURCES_STATE"
 
-export interface ICabType extends IBaseItem {
+export interface ITripSource extends IBaseItem {
   id: number
   name: string
-  capacity: number
+  short_name: string
 }
 
-export interface ICabPrice {
-  id: number
-  start_date: string
-  end_date: string
-  cab_type_id: number
-  cab_type: ICabType
-  location_service_id: number
-  location_service: locationStore.IService
-  price?: number
-  per_km_charges?: number
-  minimum_km_per_day?: number
-  toll_charges: number
-  parking_charges: number
-  night_charges: number
-}
-
-export interface ICabTypes extends IBaseState<ICabType> {}
+export interface ITripSources extends IBaseState<ITripSource> {}
 
 export interface IState {
   readonly isFetching: boolean
-  readonly cabTypes: ICabTypes
+  readonly tripSources: ITripSources
 }
 
 export interface IStateWithKey {
@@ -39,15 +22,15 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  cabTypes: init<ICabType>(),
+  tripSources: init<ITripSource>(),
 }
 
 export const actions = {
   list: createAsyncAction(
-    "@CAB_TYPES/LIST_FETCH_REQUEST",
-    "@CAB_TYPES/LIST_FETCH_SUCCESS",
-    "@CAB_TYPES/LIST_FETCH_FAILED"
-  )<any, ICabType[], Error>(),
+    "@TRIP_SOURCES/LIST_FETCH_REQUEST",
+    "@TRIP_SOURCES/LIST_FETCH_SUCCESS",
+    "@TRIP_SOURCES/LIST_FETCH_FAILED"
+  )<any, ITripSource[], Error>(),
 }
 
 export type TActions = ActionType<typeof actions>
@@ -62,7 +45,7 @@ export function reducer(
     case getType(actions.list.success):
       return {
         ...state,
-        cabTypes: model(state.cabTypes).insert(action.payload),
+        tripSources: model(state.tripSources).insert(action.payload),
         isFetching: false,
       }
     case getType(actions.list.failure):
@@ -80,12 +63,12 @@ export function selectors<State extends IStateWithKey>(state: State) {
     get isFetching(): boolean {
       return this.state.isFetching
     },
-    get cabTypes(): ICabType[] {
-      return model<ICabType>(this.state.cabTypes).get()
+    get tripSources(): ITripSource[] {
+      return model<ITripSource>(this.state.tripSources).get()
     },
-    getCabType(id?: string | number): ICabType | undefined {
+    getTripSource(id?: string | number): ITripSource | undefined {
       if (!id) return
-      return model<ICabType>(this.state.cabTypes).getItem(id)
+      return model<ITripSource>(this.state.tripSources).getItem(id)
     },
   }
 }

@@ -13,6 +13,8 @@ import { store as locationStore } from "./Locations"
 import { store as hotelStore } from "./Hotels"
 import { store as cabTypeStore } from "./CabTypes"
 import { store as cabStore } from "./Cabs"
+import { store as tripStore } from "./Trips"
+import { store as tripSourceStore } from "./TripSources"
 
 export interface IAppState
   extends authStore.IStateWithKey,
@@ -23,7 +25,9 @@ export interface IAppState
     locationStore.IStateWithKey,
     hotelStore.IStateWithKey,
     cabTypeStore.IStateWithKey,
-    cabStore.IStateWithKey {}
+    cabStore.IStateWithKey,
+    tripStore.IStateWithKey,
+    tripSourceStore.IStateWithKey {}
 
 export interface IExtraThunkArgument {
   xhr: AxiosInstance
@@ -39,6 +43,8 @@ export type TRootAction =
   | hotelStore.TActions
   | cabTypeStore.TActions
   | cabStore.TActions
+  | tripStore.TActions
+  | tripSourceStore.TActions
 
 export type ThunkAction<Response> = ThunkActionWithExtraAgrument<
   Response,
