@@ -18,6 +18,8 @@ import { RoomTypes } from "./RoomTypes"
 import { Locations } from "./Locations"
 import { CabTypes } from "./CabTypes"
 import { Cabs } from "./Cabs"
+import { Trips } from "./Trips"
+import { TripSources } from "./TripSources"
 
 interface HeaderProps extends AuthProps {}
 
@@ -32,8 +34,14 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
       <nav>
         <ul>
           <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/users">Users</NavLink>
-          <NavLink to="/roles">Roles</NavLink>
+          <NavLink to="/trips">Trips</NavLink>
+          <li>
+            Accounts
+            <ul>
+              <NavLink to="/users">Users</NavLink>
+              <NavLink to="/roles">Roles</NavLink>
+            </ul>
+          </li>
           <li>
             Others
             <ul>
@@ -43,6 +51,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
               <NavLink to="/locations">Locations</NavLink>
               <NavLink to="/cabs">Cabs</NavLink>
               <NavLink to="/cab-types">Cab Types</NavLink>
+              <NavLink to="/trip-sources">Trip Sources</NavLink>
             </ul>
           </li>
 
@@ -85,6 +94,8 @@ export default function App() {
         <Locations path="/locations/*" />
         <CabTypes path="/cab-types/*" />
         <Cabs path="/cabs/*" />
+        <Trips path="/trips/*" />
+        <TripSources path="/trip-sources/*" />
         <NotFound default />
       </Router>
     </Fragment>
