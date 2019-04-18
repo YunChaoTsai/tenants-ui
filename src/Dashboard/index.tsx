@@ -28,7 +28,7 @@ function Dashboard({ xhr }: DashboardProps) {
       <Helmet>
         <title>Dashboard</title>
       </Helmet>
-      <div>Dashboard</div>
+      <h2>Dashboard</h2>
       Users: {userCount === undefined ? "Loading..." : userCount}
       <br />
       Roles: {roleCount === undefined ? "Loading..." : roleCount}

@@ -19,6 +19,7 @@ import { store as cabTypeStore } from "./CabTypes"
 import { store as cabStore } from "./Cabs"
 import { store as tripStore } from "./Trips"
 import { store as tripSourceStore } from "./TripSources"
+import { store as tripStageStore } from "./TripStages"
 import { IAppState } from "./types"
 import xhr, { XHRContext } from "./xhr"
 import "./main.css"
@@ -35,6 +36,7 @@ const rootReducer = combineReducers<IAppState>({
   [cabStore.key]: cabStore.reducer,
   [tripStore.key]: tripStore.reducer,
   [tripSourceStore.key]: tripSourceStore.reducer,
+  [tripStageStore.key]: tripStageStore.reducer,
 })
 
 const store = configureStore<IAppState>(rootReducer, {
