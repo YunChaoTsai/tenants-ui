@@ -37,7 +37,7 @@ function NewQuote({ xhr, navigate, trip }: NewQuoteProps) {
         comments,
       })
       .then(resp => {
-        navigate && navigate("..")
+        navigate && navigate("../quotes")
       })
   }
   return (
