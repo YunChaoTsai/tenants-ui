@@ -20,6 +20,7 @@ import { CabTypes } from "./CabTypes"
 import { Cabs } from "./Cabs"
 import { Trips } from "./Trips"
 import { TripSources } from "./TripSources"
+import { TripStages } from "./TripStages"
 
 interface HeaderProps extends AuthProps {}
 
@@ -27,50 +28,52 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
   if (!user) return null
   const { name } = user
   return (
-    <div>
-      <nav>
-        <Link to="/">Tourepedia</Link>
-      </nav>
-      <nav>
-        <ul>
-          <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/trips">Trips</NavLink>
-          <li>
+    <nav>
+      <Link to="/">Tourepedia</Link>
+      <ul className="list--inline">
+        <NavLink to="/">Dashboard</NavLink>
+        <NavLink to="/trips">Trips</NavLink>
+        <NavLink to="/hotels">Hotels</NavLink>
+        <NavLink to="/cab-types">Cab Types</NavLink>
+        <li className="drop-down">
+          <a className="toggler" href="#">
+            Analyst
+          </a>
+          <ul className="menu">
+            <NavLink to="/meal-plans">Meal Plans</NavLink>
+            <NavLink to="/room-types">Room Types</NavLink>
+            <NavLink to="/locations">Locations</NavLink>
+            <NavLink to="/cabs">Cabs</NavLink>
+            <NavLink to="/trip-sources">Trip Sources</NavLink>
+            <NavLink to="/trip-stages">Trip Stages</NavLink>
+          </ul>
+        </li>
+        <li className="drop-down">
+          <a className="toggler" href="#">
             Accounts
-            <ul>
-              <NavLink to="/users">Users</NavLink>
-              <NavLink to="/roles">Roles</NavLink>
-            </ul>
-          </li>
-          <li>
-            Others
-            <ul>
-              <NavLink to="/hotels">Hotels</NavLink>
-              <NavLink to="/meal-plans">Meal Plans</NavLink>
-              <NavLink to="/room-types">Room Types</NavLink>
-              <NavLink to="/locations">Locations</NavLink>
-              <NavLink to="/cabs">Cabs</NavLink>
-              <NavLink to="/cab-types">Cab Types</NavLink>
-              <NavLink to="/trip-sources">Trip Sources</NavLink>
-            </ul>
-          </li>
-
-          <li>
+          </a>
+          <ul className="menu">
+            <NavLink to="/users">Users</NavLink>
+            <NavLink to="/roles">Roles</NavLink>
+          </ul>
+        </li>
+        <li className="drop-down pull--right">
+          <a className="toggler" href="#">
             Hi {name}
-            <ul>
-              <NavLink to="/settings">Settings</NavLink>
-              <Location>
-                {({ location }) => (
-                  <NavLink to={`/logout?from=${location.pathname}`}>
-                    Logout
-                  </NavLink>
-                )}
-              </Location>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-    </div>
+          </a>
+          <ul className="menu">
+            <NavLink to="/settings">Settings</NavLink>
+            <Location>
+              {({ location }) => (
+                <NavLink to={`/logout?from=${location.pathname}`}>
+                  Logout
+                </NavLink>
+              )}
+            </Location>
+          </ul>
+        </li>
+      </ul>
+    </nav>
   )
 })
 
@@ -96,6 +99,7 @@ export default function App() {
         <Cabs path="/cabs/*" />
         <Trips path="/trips/*" />
         <TripSources path="/trip-sources/*" />
+        <TripStages path="/trip-stages/*" />
         <NotFound default />
       </Router>
     </Fragment>

@@ -63,6 +63,7 @@ export interface IGivenQuote {
   given_price: number
   comments?: string
   created_by: userStore.IUser
+  created_at: string
 }
 
 export interface ITrip extends IBaseItem {
@@ -77,6 +78,8 @@ export interface ITrip extends IBaseItem {
   created_at: string
   updated_at: string
   quotes: IQuote[]
+  latest_given_quote?: IGivenQuote
+  given_quotes?: IGivenQuote[]
 }
 
 export interface ITrips extends IBaseState<ITrip> {}

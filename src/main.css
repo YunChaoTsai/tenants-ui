@@ -1,9 +1,27 @@
-a {
-  color: #00bcd4;
+@import url("https://fonts.googleapis.com/css?family=Lato:400,700");
+
+html {
+  font-size: 16px;
+  background: black;
 }
+
+html,
+body {
+  height: 100%;
+  overflow: auto;
+  background: white;
+}
+
+body {
+  font-family: "Lato", serif;
+  font-weight: 400;
+  margin: 0;
+}
+
 a[aria-current="page"] {
-  color: #013c44;
+  color: orangered;
 }
+
 [role="status"] {
   color: orangered;
 }
@@ -22,9 +40,83 @@ td {
   vertical-align: top;
 }
 th {
-  border-bottom: 1px solid black;
+  background: whitesmoke;
+  padding: 5px;
 }
 
 .text--right {
   text-align: right;
+}
+
+.display--inline-block {
+  display: inline-block;
+}
+.display--inline {
+  display: inline;
+}
+.vertical-align--top {
+  vertical-align: top;
+}
+.list {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.list > li {
+  display: block;
+  padding: 10px;
+}
+.list > li + li {
+  border-top: 1px solid silver;
+}
+.list--inline {
+  display: inline-block;
+  vertical-align: top;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.list--inline > li {
+  display: inline-block;
+  vertical-align: top;
+  border: none;
+  padding: 0;
+}
+.list--inline > li > a {
+  display: inline-block;
+  padding: 0 5px;
+}
+
+.drop-down {
+  display: inline-block;
+  position: relative;
+}
+.drop-down > .toggler {
+  cursor: pointer;
+}
+.drop-down > .toggler:after {
+  content: "\005E";
+  display: inline-block;
+  margin-left: 3px;
+  transition: transform 0.15s ease-in;
+  transform: rotateX(180deg);
+  transform-origin: center;
+}
+.drop-down > .menu {
+  position: absolute;
+  top: 100%;
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 100px;
+}
+.drop-down:hover > .menu {
+  display: block;
+  border: 1px solid silver;
+  background: white;
+}
+.drop-down:hover > .toggler:after {
+  transform: rotateX(0);
 }
