@@ -2,15 +2,9 @@ import React, { useEffect, useState } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
 import Button from "@tourepedia/button"
-import {
-  Formik,
-  FormikActions,
-  FormikProps,
-  Form,
-  Field,
-  FieldProps,
-} from "formik"
+import { Formik, Form } from "formik"
 import * as Validator from "yup"
+import moment from "moment"
 
 import { ITrip, IQuote, IGivenQuote } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
@@ -82,7 +76,11 @@ export const Quote = withXHR(function Quote({
             given_price,
           }) => (
             <li key={id}>
-              {date} - {hotel.name} {location.short_name} - {meal_plan.name} -{" "}
+              {moment
+                .utc(date)
+                .local()
+                .format("DD MMM, YYYY")}{" "}
+              - {hotel.name} {location.short_name} - {meal_plan.name} -{" "}
               {room_type.name} - {no_of_rooms} rooms - Rs: {given_price} /-
               {comments ? <p>Comments: {comments}</p> : null}
             </li>
@@ -102,8 +100,12 @@ export const Quote = withXHR(function Quote({
             given_price,
           }) => (
             <li key={id}>
-              {date} - {cab_type.name} - {location_service.name} - {no_of_cabs}{" "}
-              cabs - Rs: {given_price} /-
+              {moment
+                .utc(date)
+                .local()
+                .format("DD MMM, YYYY")}{" "}
+              - {cab_type.name} - {location_service.name} - {no_of_cabs} cabs -
+              Rs: {given_price} /-
               {comments ? <p>Comments: {comments}</p> : null}
             </li>
           )

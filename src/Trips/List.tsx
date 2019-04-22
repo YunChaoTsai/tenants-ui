@@ -74,11 +74,11 @@ function List({ isFetching, trips, getTrips }: ListProps) {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Start Date</th>
-            <th>End Date</th>
+            <th>Dates</th>
+            <th>Stage</th>
             <th>Destinations</th>
-            <th>Adults</th>
-            <th>Children</th>
+            <th>Traveler</th>
+            <th>Persons</th>
           </tr>
         </thead>
         <tbody>
@@ -92,6 +92,8 @@ function List({ isFetching, trips, getTrips }: ListProps) {
               locations,
               no_of_adults,
               children,
+              primary_contact,
+              latest_stage,
             }) => (
               <tr key={id}>
                 <td>
@@ -104,16 +106,27 @@ function List({ isFetching, trips, getTrips }: ListProps) {
                     .utc(start_date)
                     .local()
                     .format("DD MMM, YYYY")}
-                </td>
-                <td>
+                  {" to "}
                   {moment
                     .utc(end_date)
                     .local()
                     .format("DD MMM, YYYY")}
                 </td>
+                <td>{latest_stage ? latest_stage.name : "Initiated"}</td>
                 <td>{locations.map(l => l.short_name).join(" • ")}</td>
-                <td>{no_of_adults}</td>
-                <td>{children}</td>
+                <td>
+                  {primary_contact ? (
+                    <div>
+                      {primary_contact.name}
+                      <br />
+                      {primary_contact.phone_number}&lt;{primary_contact.email}
+                      &gt;
+                    </div>
+                  ) : null}
+                </td>
+                <td>
+                  {no_of_adults} Adults{children ? " with " + children : ""}
+                </td>
               </tr>
             )
           )}

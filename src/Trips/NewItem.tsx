@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import {
   Formik,
@@ -18,6 +18,8 @@ import { InputField } from "./../Shared/InputField"
 import { SelectLocations, store as locationStore } from "./../Locations"
 import { SelectTripSources, store as tripSourceStore } from "./../TripSources"
 import { withXHR, XHRProps } from "./../xhr"
+import { ICountryDialCode } from "../CountryDialCodes/store"
+import { SelectCountryDialCodes } from "../CountryDialCodes"
 
 const validationSchema = Validator.object().shape({
   trip_id: Validator.string(),
@@ -46,6 +48,16 @@ const validationSchema = Validator.object().shape({
     })
   ),
   trip_source: Validator.object().required("Trip Source Type is required"),
+  contact: Validator.object()
+    .shape({
+      name: Validator.string().required("Contact name is required."),
+      email: Validator.string().email("Contact email address in invalid"),
+      phone_number: Validator.number()
+        .typeError("Phone number is invalid")
+        .positive("Phone number should be an positive integer")
+        .required("Phone number is required"),
+    })
+    .required(),
 })
 
 interface NewItemSchema {
@@ -56,6 +68,12 @@ interface NewItemSchema {
   no_of_adults: number
   trip_source?: tripSourceStore.ITripSource
   children: { count: number; age: number }[]
+  contact: {
+    name: string
+    email: string
+    phone_number?: number
+    phone_number_country_dial_code?: ICountryDialCode
+  }
 }
 
 const initialValues: NewItemSchema = {
@@ -66,6 +84,12 @@ const initialValues: NewItemSchema = {
   no_of_adults: 1,
   children: [],
   trip_source: undefined,
+  contact: {
+    name: "",
+    email: "",
+    phone_number: undefined,
+    phone_number_country_dial_code: undefined,
+  },
 }
 
 interface NewItemProps extends XHRProps, RouteComponentProps {}
@@ -87,13 +111,16 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           destinations,
           trip_source,
           trip_id,
+          contact,
         } = values
         if (
           start_date &&
           no_of_nights &&
           no_of_adults &&
           destinations &&
-          destinations.length
+          destinations.length &&
+          contact.phone_number &&
+          contact.phone_number_country_dial_code
         ) {
           const data = {
             start_date: moment(start_date)
@@ -116,12 +143,28 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             locations: destinations.map(destination => destination.id),
             trip_id,
             trip_source_id: trip_source ? trip_source.id : undefined,
+            contact: {
+              name: contact.name,
+              email: contact.email,
+              phone_number: contact.phone_number,
+              phone_number_country_dial_code_id:
+                contact.phone_number_country_dial_code.id,
+            },
           }
-          xhr.post("/trips", data).then(resp => {
-            const { trip } = resp.data
-            navigate && navigate(`../${trip.id}`)
-            actions.setSubmitting(false)
-          })
+          xhr
+            .post("/trips", data)
+            .then(resp => {
+              const { trip } = resp.data
+              navigate && navigate(`../${trip.id}`)
+              actions.setSubmitting(false)
+            })
+            .catch(error => {
+              actions.setStatus(error.message)
+              if (error.formikErrors) {
+                actions.setErrors(error.formikErrors)
+              }
+              actions.setSubmitting(false)
+            })
         } else {
           actions.setStatus("Please fill the required attributes")
           actions.setSubmitting(false)
@@ -161,6 +204,43 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             type="number"
             min={1}
             required
+          />
+          <FieldArray
+            name="contact"
+            render={({ name }) => (
+              <Fragment>
+                <InputField
+                  name={`${name}.name`}
+                  label="Contact Name"
+                  required
+                />
+                <InputField
+                  name={`${name}.email`}
+                  label="Email"
+                  required
+                  type="email"
+                />
+                <SelectCountryDialCodes
+                  label="Country code"
+                  name={`${name}.phone_number_country_dial_code`}
+                  value={values.contact.phone_number_country_dial_code}
+                  placeholder="Type here... eg India or +91"
+                  required
+                  onChange={value =>
+                    setFieldValue(
+                      `${name}.phone_number_country_dial_code`,
+                      value
+                    )
+                  }
+                />
+                <InputField
+                  name={`${name}.phone_number`}
+                  label="Phone Number"
+                  type="number"
+                  required
+                />
+              </Fragment>
+            )}
           />
           <InputField
             name="no_of_adults"
