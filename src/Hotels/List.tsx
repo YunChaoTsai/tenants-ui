@@ -76,37 +76,45 @@ function List({ isFetching, getHotels, hotels }: ListProps) {
   return (
     <Fragment>
       {!isFetching ? `Total: ${hotels.length}` : ""}
-      <ul>
-        {isFetching
-          ? "Loading..."
-          : hotels.map(hotel => (
-              <li key={hotel.id}>
+      {isFetching ? "Loading..." : null}
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Meal Plans</th>
+            <th>Room Types</th>
+            <th>Child extra bed age</th>
+          </tr>
+        </thead>
+        <tbody>
+          {hotels.map(hotel => (
+            <tr key={hotel.id}>
+              <td>
                 <Link to={hotel.id.toString()}>{hotel.name}</Link>
-                <div>
-                  Extra bed child ages: From {hotel.eb_child_age_start} To{" "}
-                  {hotel.eb_child_age_end}
-                </div>
-                <div>
-                  Meal Plans:{" "}
-                  {hotel.meal_plans.map(mealPlan => (
-                    <span key={mealPlan.id}>{mealPlan.name}</span>
-                  ))}
-                </div>
-                <div>
-                  Room Types:{" "}
-                  {hotel.room_types.map(roomType => (
-                    <span key={roomType.id}>{roomType.name}</span>
-                  ))}
-                </div>
-                <div>
-                  Locations:{" "}
-                  {hotel.locations.map(location => (
-                    <span key={location.id}>{location.name}</span>
-                  ))}
-                </div>
-              </li>
-            ))}
-      </ul>
+              </td>
+              <td>
+                {hotel.locations.map(location => (
+                  <span key={location.id}>{location.short_name}</span>
+                ))}
+              </td>
+              <td>
+                {hotel.meal_plans.map(mealPlan => (
+                  <span key={mealPlan.id}>{mealPlan.name}</span>
+                ))}
+              </td>
+              <td>
+                {hotel.room_types.map(roomType => (
+                  <span key={roomType.id}>{roomType.name}</span>
+                ))}
+              </td>
+              <td>
+                {hotel.eb_child_age_start}yo - {hotel.eb_child_age_end}yo
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </Fragment>
   )
 }

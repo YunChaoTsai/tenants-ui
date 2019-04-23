@@ -134,6 +134,9 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
     trip_source,
     trip_id,
     latest_given_quote,
+    contacts,
+    is_converted,
+    payments,
   } = trip
   return (
     <div>
@@ -158,6 +161,45 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
           .format("DD MMM, YYYY")}{" "}
         with {no_of_adults} Adults{children ? ` and ${children} children` : ""}
       </h3>
+      <h4>{is_converted ? "Converted" : null}</h4>
+      <div>
+        Traveler Details:
+        <ul>
+          {contacts.map(contact => (
+            <li key={contact.id}>
+              {contact.name} - {contact.phone_number}
+              {contact.email ? <span>&lt;{contact.email}&gt;</span> : null}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {payments ? (
+        <div>
+          <h4>Payments from customer</h4>
+          <ul>
+            {payments.map(payment => (
+              <li key={payment.id}>
+                Amount: {payment.amount}
+                <div>
+                  Instalments:
+                  <ol>
+                    {payment.instalments.map(instalment => (
+                      <li key={instalment.id}>
+                        Amount: {instalment.amount} | Paid:{" "}
+                        {instalment.paid_amount} | Due Date:{" "}
+                        {moment
+                          .utc(instalment.due_date)
+                          .local()
+                          .format("DD MMM, YYYY")}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       {latest_given_quote ? (
         <div>
           <h3>Latest given quote </h3>

@@ -8,6 +8,9 @@ import { store as roomTypeStore } from "./../RoomTypes"
 import { store as mealPlanStore } from "./../MealPlans"
 import { store as cabTypeStore } from "./../CabTypes"
 import { store as userStore } from "./../Users"
+import { store as contactStore } from "./../Contacts"
+import { store as tripStageStore } from "./../TripStages"
+import { store as paymentStore } from "./../Payments"
 
 export const key = "TRIP_LIST_STATE"
 
@@ -80,6 +83,14 @@ export interface ITrip extends IBaseItem {
   quotes: IQuote[]
   latest_given_quote?: IGivenQuote
   given_quotes?: IGivenQuote[]
+  contacts: contactStore.IContact[]
+  primary_contact?: contactStore.IContact
+  stages: tripStageStore.ITripStage[]
+  latest_stage?: tripStageStore.ITripStage
+  is_converted: boolean
+  payments?: paymentStore.IPayment<ITrip>[]
+  hotel_payments?: paymentStore.IPayment<hotelStore.IHotel>[]
+  cab_payments?: paymentStore.IPayment<cabTypeStore.ICabType>[]
 }
 
 export interface ITrips extends IBaseState<ITrip> {}
