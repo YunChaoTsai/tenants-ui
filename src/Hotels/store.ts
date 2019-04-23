@@ -24,15 +24,22 @@ export interface IPrice {
   room_type?: roomTypeStore.IRoomType
 }
 
+export interface IHotelRoomType extends roomTypeStore.IRoomType {
+  allowed_extra_beds: number
+}
+export interface IHotelMealPlan extends mealPlanStore.IMealPlan {}
+
+export interface IHotelLocation extends locationStore.ILocation {}
+
 export interface IHotel extends IBaseItem {
   id: number
   name: string
   stars: number
   extra_bed_child_age_start: number
   extra_bed_child_age_end: number
-  meal_plans: mealPlanStore.IMealPlan[]
-  room_types: roomTypeStore.IRoomType[]
-  location: locationStore.ILocation
+  meal_plans: IHotelMealPlan[]
+  room_types: IHotelRoomType[]
+  location: IHotelLocation
   prices?: IPrice[]
   contacts?: contactStore.IContact[]
 }

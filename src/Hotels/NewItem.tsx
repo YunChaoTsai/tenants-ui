@@ -35,7 +35,18 @@ const validationSchema = Validator.object().shape({
     .integer("Child end age should be an integer")
     .required("Child end age is required"),
   meal_plans: Validator.array().min(1, "Please select atleast one meal plan"),
-  room_types: Validator.array().min(1, "Please select atleast one room type"),
+  room_types: Validator.array()
+    .of(
+      Validator.object().shape({
+        room_type: Validator.object().required("Please select a room type"),
+        allowed_extra_beds: Validator.number()
+          .typeError("Allowed extra bed must be a number")
+          .integer("Allowed extra beds should be an integer")
+          .min(0, "Allowed extra beds should not be negative")
+          .required("Allowed extra beds field is required"),
+      })
+    )
+    .min(1, "Please select atleast one room type"),
   location: Validator.object().required("Location field is required"),
 })
 interface NewItemCredentials {
@@ -44,7 +55,10 @@ interface NewItemCredentials {
   eb_child_age_start: number
   eb_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
-  room_types: roomTypeStore.IRoomType[]
+  room_types: {
+    room_type?: roomTypeStore.IRoomType
+    allowed_extra_beds: number
+  }[]
   location?: locationStore.ILocation
 }
 const initialValues: NewItemCredentials = {
@@ -53,7 +67,7 @@ const initialValues: NewItemCredentials = {
   eb_child_age_start: 6,
   eb_child_age_end: 12,
   meal_plans: [],
-  room_types: [],
+  room_types: [{ room_type: undefined, allowed_extra_beds: 1 }],
   location: undefined,
 }
 
@@ -76,7 +90,12 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             .post("/hotels", {
               ...values,
               meal_plans: values.meal_plans.map(mealPlan => mealPlan.id),
-              room_types: values.room_types.map(roomType => roomType.id),
+              room_types: values.room_types.map(
+                ({ room_type, allowed_extra_beds }) => ({
+                  room_type_id: room_type && room_type.id,
+                  allowed_extra_beds: allowed_extra_beds,
+                })
+              ),
               location_id: values.location ? values.location.id : undefined,
             })
             .then(({ data }) => {
@@ -146,15 +165,40 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               />
               <FieldArray
                 name="room_types"
-                render={({ name }) => (
+                render={({ name, push, remove }) => (
                   <div>
-                    <SelectRoomTypes
-                      label="Room Types available"
-                      name="room_types"
-                      value={values.room_types}
-                      onChange={values => setFieldValue("room_types", values)}
-                    />
-                    <ErrorMessage name={name} />
+                    <label>Room Type(s) Available</label>
+                    <ul>
+                      {values.room_types.map((room_type, index, room_types) => (
+                        <li key={index}>
+                          <SelectRoomTypes
+                            multiple={false}
+                            label="Room Type"
+                            name={`${name}.${index}.room_type`}
+                            value={room_type.room_type}
+                            onChange={value =>
+                              setFieldValue(`${name}.${index}.room_type`, value)
+                            }
+                          />
+                          <ErrorMessage name={`${name}.${index}.room_type`} />
+                          <InputField
+                            label="Allowed extra bed(s)"
+                            type="number"
+                            name={`${name}.${index}.allowed_extra_beds`}
+                            value={room_type.allowed_extra_beds}
+                            min={0}
+                          />
+                          {room_types.length > 1 ? (
+                            <Button onClick={_ => remove(index)}>Remove</Button>
+                          ) : null}
+                        </li>
+                      ))}
+                      <li>
+                        <Button onClick={_ => push(values.room_types[0])}>
+                          Add More
+                        </Button>
+                      </li>
+                    </ul>
                   </div>
                 )}
               />

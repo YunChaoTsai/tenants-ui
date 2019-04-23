@@ -135,15 +135,16 @@ export function Item({
             </div>
             <div>
               Meal Plans:{" "}
-              {meal_plans.map(mealPlan => (
-                <span key={mealPlan.id}>{mealPlan.name}</span>
-              ))}
+              {meal_plans.map(mealPlan => mealPlan.name).join(" • ")}
             </div>
             <div>
               Room Types:{" "}
-              {room_types.map(roomType => (
-                <span key={roomType.id}>{roomType.name}</span>
-              ))}
+              {room_types
+                .map(
+                  roomType =>
+                    `${roomType.name}(${roomType.allowed_extra_beds} AEBs)`
+                )
+                .join(" • ")}
             </div>
             <div>
               <h4>Contacts</h4>

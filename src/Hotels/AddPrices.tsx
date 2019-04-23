@@ -15,9 +15,9 @@ import * as Validator from "yup"
 import moment from "moment"
 
 import { InputField } from "./../Shared/InputField"
-import { IHotel } from "./store"
-import { SelectMealPlans, store as mealPlanStore } from "./../MealPlans"
-import { SelectRoomTypes, store as roomTypeStore } from "./../RoomTypes"
+import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
+import { SelectMealPlans } from "./../MealPlans"
+import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 
 type NewPriceCredentials = {
@@ -28,8 +28,8 @@ type NewPriceCredentials = {
     adult_with_extra_bed_price: number
     child_with_extra_bed_price: number
     child_without_extra_bed_price: number
-    meal_plans: mealPlanStore.IMealPlan[]
-    room_types: roomTypeStore.IRoomType[]
+    meal_plan?: IHotelMealPlan
+    room_type?: IHotelRoomType
     persons: number
   }[]
 }
@@ -43,8 +43,8 @@ const initialValues: NewPriceCredentials = {
       adult_with_extra_bed_price: 0,
       child_with_extra_bed_price: 0,
       child_without_extra_bed_price: 0,
-      meal_plans: [],
-      room_types: [],
+      meal_plan: undefined,
+      room_type: undefined,
     },
   ],
 }
@@ -63,21 +63,16 @@ const validationSchema = Validator.object().shape({
         .positive("Persons should be positive number"),
       adult_with_extra_bed_price: Validator.number()
         .required("Price for adult with extra bed is required")
-        .positive("Price should be positive"),
+        .min(0, "Price should not be negative"),
       child_with_extra_bed_price: Validator.number()
         .required("Price for child with extra bed is required")
-        .positive("Price should be positive"),
+        .min(0, "Price should not be negative"),
       child_without_extra_bed_price: Validator.number()
-        .required("Price for child without extra bed is required")
-        .positive("Price should be positive"),
-      meal_plans: Validator.array().min(
-        1,
-        "Atleast one meal plan should be selected"
-      ),
-      room_types: Validator.array().min(
-        1,
-        "Atleast one room type should be selected"
-      ),
+        .nullable(true)
+        .min(0, "Price should not be negative")
+        .required("Price for child without extra bed is required"),
+      meal_plan: Validator.object().required("Meal plan should be selected"),
+      room_type: Validator.object().required("Room type should be selected"),
     })
   ),
 })
@@ -105,34 +100,30 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                 (
                   carry,
                   {
-                    meal_plans,
-                    room_types,
+                    meal_plan: mealPlan,
+                    room_type: roomType,
                     start_date,
                     end_date,
                     ...otherValues
                   }
                 ) => {
                   const prices: any = []
-                  meal_plans.forEach(mealPlan => {
-                    room_types.forEach(roomType => {
-                      prices.push({
-                        ...otherValues,
-                        start_date: moment(start_date)
-                          .hours(0)
-                          .minutes(0)
-                          .seconds(0)
-                          .utc()
-                          .format("YYYY-MM-DD HH:mm:ss"),
-                        end_date: moment(end_date)
-                          .hours(23)
-                          .minutes(59)
-                          .seconds(59)
-                          .utc()
-                          .format("YYYY-MM-DD HH:mm:ss"),
-                        meal_plan_id: mealPlan.id,
-                        room_type_id: roomType.id,
-                      })
-                    })
+                  prices.push({
+                    ...otherValues,
+                    start_date: moment(start_date)
+                      .hours(0)
+                      .minutes(0)
+                      .seconds(0)
+                      .utc()
+                      .format("YYYY-MM-DD HH:mm:ss"),
+                    end_date: moment(end_date)
+                      .hours(23)
+                      .minutes(59)
+                      .seconds(59)
+                      .utc()
+                      .format("YYYY-MM-DD HH:mm:ss"),
+                    meal_plan_id: mealPlan && mealPlan.id,
+                    room_type_id: roomType && roomType.id,
                   })
                   return carry.concat(prices)
                 },
@@ -179,7 +170,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {values.prices.map((value, index) => (
+                    {values.prices.map((price, index) => (
                       <tr key={index}>
                         <td>
                           <InputField
@@ -195,17 +186,16 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                         </td>
                         <td>
                           <FieldArray
-                            name={`prices.${index}.meal_plans`}
+                            name={`prices.${index}.meal_plan`}
                             render={({ name }) => (
                               <div>
                                 <SelectMealPlans
                                   name={name}
                                   searchable={false}
+                                  multiple={false}
                                   options={hotel.meal_plans}
-                                  onChange={values =>
-                                    setFieldValue(name, values)
-                                  }
-                                  value={values.prices[index].meal_plans}
+                                  onChange={value => setFieldValue(name, value)}
+                                  value={price.meal_plan}
                                 />
                                 <ErrorMessage name={name} />
                               </div>
@@ -214,16 +204,27 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                         </td>
                         <td>
                           <FieldArray
-                            name={`prices.${index}.room_types`}
+                            name={`prices.${index}.room_type`}
                             render={({ name }) => (
                               <div>
                                 <SelectRoomTypes
                                   searchable={false}
+                                  multiple={false}
                                   options={hotel.room_types}
-                                  onChange={values =>
-                                    setFieldValue(name, values)
-                                  }
-                                  value={values.prices[index].room_types}
+                                  onChange={(value?: IHotelRoomType) => {
+                                    setFieldValue(name, value)
+                                    if (!value || !value.allowed_extra_beds) {
+                                      setFieldValue(
+                                        `prices.${index}.adult_with_extra_bed_price`,
+                                        0
+                                      )
+                                      setFieldValue(
+                                        `prices.${index}.child_with_extra_bed_price`,
+                                        0
+                                      )
+                                    }
+                                  }}
+                                  value={price.room_type}
                                 />
                                 <ErrorMessage name={name} />
                               </div>
@@ -246,12 +247,34 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                           <InputField
                             name={`${name}.${index}.adult_with_extra_bed_price`}
                             type="number"
+                            title={
+                              !price.room_type
+                                ? "Please select a room type"
+                                : !price.room_type.allowed_extra_beds
+                                ? "No extra bed allowed"
+                                : undefined
+                            }
+                            disabled={
+                              !price.room_type ||
+                              !price.room_type.allowed_extra_beds
+                            }
                           />
                         </td>
                         <td>
                           <InputField
                             name={`${name}.${index}.child_with_extra_bed_price`}
                             type="number"
+                            title={
+                              !price.room_type
+                                ? "Please select a room type"
+                                : !price.room_type.allowed_extra_beds
+                                ? "No extra bed allowed"
+                                : undefined
+                            }
+                            disabled={
+                              !price.room_type ||
+                              !price.room_type.allowed_extra_beds
+                            }
                           />
                         </td>
                         <td>
@@ -262,17 +285,15 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                         </td>
                         <td>
                           {values.prices.length > 1 ? (
-                            <Button onClick={e => remove(index)}>Remove</Button>
+                            <Button onClick={_ => remove(index)}>Remove</Button>
                           ) : null}
-                          <Button onClick={e => push(values.prices[index])}>
-                            Duplicate
-                          </Button>
+                          <Button onClick={_ => push(price)}>Duplicate</Button>
                         </td>
                       </tr>
                     ))}
                     <tr>
                       <td>
-                        <Button onClick={e => push(initialValues.prices[0])}>
+                        <Button onClick={_ => push(initialValues.prices[0])}>
                           Add More
                         </Button>
                       </td>

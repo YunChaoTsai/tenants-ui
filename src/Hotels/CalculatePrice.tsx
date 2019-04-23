@@ -14,14 +14,12 @@ import Button from "@tourepedia/button"
 import moment from "moment"
 import * as Validator from "yup"
 import { AxiosInstance } from "axios"
-import { $PropertyType } from "utility-types"
 
 import { InputField, Input } from "./../Shared/InputField"
 import { SelectHotels } from "./List"
-import { IHotel } from "./store"
-import { SelectLocations, store as locationStore } from "./../Locations"
-import { SelectMealPlans, store as mealPlanStore } from "./../MealPlans"
-import { SelectRoomTypes, store as roomTypeStore } from "./../RoomTypes"
+import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
+import { SelectMealPlans } from "./../MealPlans"
+import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 
 export function XHR(xhr: AxiosInstance) {
@@ -37,9 +35,9 @@ export interface CalculatePriceParams {
     start_date: string
     no_of_nights: number
     hotel?: IHotel
-    meal_plan?: mealPlanStore.IMealPlan
+    meal_plan?: IHotelMealPlan
     room_details: {
-      room_type?: roomTypeStore.IRoomType
+      room_type?: IHotelRoomType
       adults_with_extra_bed: number
       children_with_extra_bed: number
       children_without_extra_bed: number
@@ -287,6 +285,8 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           <InputField
                             name={`${name}.${index}.no_of_nights`}
                             type="number"
+                            min={1}
+                            max={1000}
                           />
                         </td>
                         <td>
@@ -343,17 +343,32 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                   {hotel.room_details.map(
                                     (roomDetail, index) => (
                                       <li key={index}>
-                                        <SelectMealPlans
+                                        <SelectRoomTypes
                                           name={`${name}.${index}.room_type`}
                                           searchable={false}
                                           multiple={false}
                                           value={roomDetail.room_type}
-                                          onChange={value =>
+                                          onChange={(
+                                            value?: IHotelRoomType
+                                          ) => {
                                             setFieldValue(
                                               `${name}.${index}.room_type`,
                                               value
                                             )
-                                          }
+                                            if (
+                                              !value ||
+                                              !value.allowed_extra_beds
+                                            ) {
+                                              setFieldValue(
+                                                `${name}.${index}.adults_with_extra_bed`,
+                                                0
+                                              )
+                                              setFieldValue(
+                                                `${name}.${index}.children_with_extra_bed`,
+                                                0
+                                              )
+                                            }
+                                          }}
                                           options={
                                             hotel.hotel
                                               ? hotel.hotel.room_types
@@ -368,20 +383,38 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                           name={`${name}.${index}.no_of_rooms`}
                                           label="Number of rooms"
                                           type="number"
+                                          min={1}
+                                          max={1000}
                                         />
                                         <InputField
                                           name={`${name}.${index}.adults_with_extra_bed`}
                                           label="Adults with extra bed"
                                           type="number"
+                                          min={0}
+                                          max={10}
+                                          disabled={
+                                            !roomDetail.room_type ||
+                                            !roomDetail.room_type
+                                              .allowed_extra_beds
+                                          }
                                         />
                                         <InputField
                                           name={`${name}.${index}.children_with_extra_bed`}
                                           label="Children with extra bed"
                                           type="number"
+                                          min={0}
+                                          max={10}
+                                          disabled={
+                                            !roomDetail.room_type ||
+                                            !roomDetail.room_type
+                                              .allowed_extra_beds
+                                          }
                                         />
                                         <InputField
                                           name={`${name}.${index}.children_without_extra_bed`}
                                           label="Children without extra bed"
+                                          min={0}
+                                          max={10}
                                           type="number"
                                         />
                                         {hotel.room_details.length > 1 ? (
