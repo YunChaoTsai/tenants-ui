@@ -4,9 +4,6 @@ import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 import moment from "moment"
 
-import { store as mealPlanStore } from "./../MealPlans"
-import { store as roomTypeStore } from "./../RoomTypes"
-import { store as locationStore } from "./../Locations"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { IPrice, IHotel, actions, selectors, IStateWithKey } from "./store"
 
@@ -66,7 +63,7 @@ function Prices({
   }, [])
   if (isFetching) return <span>Loading Prices....</span>
   if (!prices || prices.length === 0) return <span>No prices set</span>
-  const { locations, meal_plans, room_types } = hotel
+  const { meal_plans, room_types } = hotel
   function byIds<Item extends { id: number }>(
     arr: Item[]
   ): { [key: number]: Item } {
@@ -75,7 +72,6 @@ function Prices({
       return byId
     }, {})
   }
-  const locationById = byIds(locations)
   const mealPlansById = byIds(meal_plans)
   const roomTypesById = byIds(room_types)
   return (
@@ -84,14 +80,13 @@ function Prices({
         <tr>
           <th>Start Date</th>
           <th>End Date</th>
-          <th>Base Price</th>
-          <th>Persons</th>
-          <th>A.W.E.B.</th>
-          <th>C.W.E.B.</th>
-          <th>C.Wo.E.B.</th>
           <th>Meal Plan</th>
           <th>Room Type</th>
-          <th>Location</th>
+          <th>Base Price</th>
+          <th>Persons</th>
+          <th>A.W.E.B. Price</th>
+          <th>C.W.E.B. Price</th>
+          <th>C.Wo.E.B. Price</th>
         </tr>
       </thead>
       <tbody>
@@ -103,12 +98,11 @@ function Prices({
             persons,
             start_date,
             end_date,
-            a_w_e_b,
-            c_w_e_b,
-            c_wo_e_b,
+            adult_with_extra_bed_price,
+            child_with_extra_bed_price,
+            child_without_extra_bed_price,
             meal_plan_id,
             room_type_id,
-            location_id,
           }) => (
             <tr key={id}>
               <td>
@@ -123,14 +117,13 @@ function Prices({
                   .local()
                   .format("DD MMM, YYYY")}
               </td>
-              <td className="text--right">{base_price}</td>
-              <td className="text--right">{persons}</td>
-              <td className="text--right">{a_w_e_b}</td>
-              <td className="text--right">{c_w_e_b}</td>
-              <td className="text--right">{c_wo_e_b}</td>
               <td>{mealPlansById[meal_plan_id].name}</td>
               <td>{roomTypesById[room_type_id].name}</td>
-              <td>{locationById[location_id].short_name}</td>
+              <td className="text--right">{base_price}</td>
+              <td className="text--right">{persons}</td>
+              <td className="text--right">{adult_with_extra_bed_price}</td>
+              <td className="text--right">{child_with_extra_bed_price}</td>
+              <td className="text--right">{child_without_extra_bed_price}</td>
             </tr>
           )
         )}

@@ -37,13 +37,12 @@ export interface CalculatePriceParams {
     start_date: string
     no_of_nights: number
     hotel?: IHotel
-    location?: locationStore.ILocation
     meal_plan?: mealPlanStore.IMealPlan
     room_details: {
       room_type?: roomTypeStore.IRoomType
-      a_w_e_b: number
-      c_w_e_b: number
-      c_wo_e_b: number
+      adults_with_extra_bed: number
+      children_with_extra_bed: number
+      children_without_extra_bed: number
       no_of_rooms: number
     }[]
     calculated_price?: number
@@ -61,7 +60,6 @@ export const validationSchema = Validator.object().shape({
         .integer("Number of nights should be an integer")
         .positive("Number of nights should be a positive number"),
       hotel: Validator.object().required("Hotel field is required"),
-      location: Validator.object().required("Location field is required"),
       meal_plan: Validator.object().required("Meal Plan field is required"),
       room_details: Validator.array()
         .of(
@@ -69,13 +67,13 @@ export const validationSchema = Validator.object().shape({
             room_type: Validator.object().required(
               "Room type field is required"
             ),
-            a_w_e_b: Validator.number()
+            adults_with_extra_bed: Validator.number()
               .integer("Adult with extra bed should be an interger")
               .required("Adult with extra bed is required"),
-            c_w_e_b: Validator.number()
+            children_with_extra_bed: Validator.number()
               .integer("Child with extra bed should be an integer")
               .required("Child with extra bed is required"),
-            c_wo_e_b: Validator.number()
+            children_without_extra_bed: Validator.number()
               .integer("Child without extra bed should be an integer")
               .required("Child without extra bed is required"),
             no_of_rooms: Validator.number()
@@ -95,14 +93,13 @@ export const INITIAL_VALUES: CalculatePriceParams = {
       start_date: "",
       no_of_nights: 1,
       hotel: undefined,
-      location: undefined,
       meal_plan: undefined,
       room_details: [
         {
           room_type: undefined,
-          a_w_e_b: 0,
-          c_w_e_b: 0,
-          c_wo_e_b: 0,
+          adults_with_extra_bed: 0,
+          children_with_extra_bed: 0,
+          children_without_extra_bed: 0,
           no_of_rooms: 1,
         },
       ],
@@ -136,7 +133,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             no_of_nights,
             room_details,
             hotel,
-            location,
             meal_plan,
             ...otherData
           }) => {
@@ -154,7 +150,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                 .utc()
                 .format("YYYY-MM-DD HH:mm:ss"),
               hotel_id: hotel && hotel.id,
-              location_id: location && location.id,
               meal_plan_id: meal_plan && meal_plan.id,
               ...otherRoomDetails,
               room_type_id: room_type && room_type.id,
@@ -182,7 +177,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             start_date,
             no_of_nights,
             hotel,
-            location,
             meal_plan,
             room_details,
           } = values
@@ -199,9 +193,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
               if (room_detail.room_type) {
                 const {
                   room_type,
-                  a_w_e_b,
-                  c_w_e_b,
-                  c_wo_e_b,
+                  adults_with_extra_bed,
+                  children_with_extra_bed,
+                  children_without_extra_bed,
                   no_of_rooms,
                 } = room_detail
                 // create a entry for all the nights, one by one
@@ -223,12 +217,11 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       .utc()
                       .format("YYYY-MM-DD HH:mm:ss"),
                     hotel_id: hotel.id,
-                    location_id: location.id,
                     meal_plan_id: meal_plan.id,
                     room_type_id: room_type.id,
-                    a_w_e_b,
-                    c_w_e_b,
-                    c_wo_e_b,
+                    adults_with_extra_bed,
+                    children_with_extra_bed,
+                    children_without_extra_bed,
                     no_of_rooms,
                   })
                 }
@@ -271,7 +264,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                   <th>Start Date</th>
                   <th>Number of nights</th>
                   <th>Hotel</th>
-                  <th>Location</th>
                   <th>Meal Plan</th>
                   <th>Room Details</th>
                   <th>Calculated Price</th>
@@ -316,30 +308,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 </div>
                               )
                             }}
-                          />
-                        </td>
-                        <td>
-                          <Field
-                            name={`${name}.${index}.location`}
-                            render={({
-                              field,
-                            }: FieldProps<CalculatePriceParams>) => (
-                              <div>
-                                <SelectLocations
-                                  searchable={false}
-                                  multiple={false}
-                                  value={field.value}
-                                  onChange={value =>
-                                    setFieldValue(field.name, value)
-                                  }
-                                  options={
-                                    hotel.hotel ? hotel.hotel.locations : []
-                                  }
-                                  name={field.name}
-                                />
-                                <ErrorMessage name={field.name} />
-                              </div>
-                            )}
                           />
                         </td>
                         <td>
@@ -402,22 +370,22 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                           type="number"
                                         />
                                         <InputField
-                                          name={`${name}.${index}.a_w_e_b`}
-                                          label="Adult with extra bed"
+                                          name={`${name}.${index}.adults_with_extra_bed`}
+                                          label="Adults with extra bed"
                                           type="number"
                                         />
                                         <InputField
-                                          name={`${name}.${index}.c_w_e_b`}
-                                          label="Child with extra bed"
+                                          name={`${name}.${index}.children_with_extra_bed`}
+                                          label="Children with extra bed"
                                           type="number"
                                         />
                                         <InputField
-                                          name={`${name}.${index}.c_wo_e_b`}
-                                          label="Child without extra bed"
+                                          name={`${name}.${index}.children_without_extra_bed`}
+                                          label="Children without extra bed"
                                           type="number"
                                         />
                                         {hotel.room_details.length > 1 ? (
-                                          <Button onClick={e => remove(index)}>
+                                          <Button onClick={_ => remove(index)}>
                                             Remove
                                           </Button>
                                         ) : null}
@@ -432,7 +400,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                     )
                                   )}
                                   <Button
-                                    onClick={e =>
+                                    onClick={_ =>
                                       push(
                                         initialValues.hotels[0].room_details[0]
                                       )

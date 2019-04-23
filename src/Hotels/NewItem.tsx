@@ -6,6 +6,8 @@ import {
   FormikProps,
   Form,
   FieldArray,
+  Field,
+  FieldProps,
   ErrorMessage,
 } from "formik"
 import * as Validator from "yup"
@@ -30,7 +32,7 @@ const validationSchema = Validator.object().shape({
     .required("Child end age is required"),
   meal_plans: Validator.array().min(1, "Please select atleast one meal plan"),
   room_types: Validator.array().min(1, "Please select atleast one room type"),
-  locations: Validator.array().min(1, "Please select atleast one location"),
+  location: Validator.object().required("Location field is required"),
 })
 interface NewItemCredentials {
   name: string
@@ -38,7 +40,7 @@ interface NewItemCredentials {
   eb_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
   room_types: roomTypeStore.IRoomType[]
-  locations: locationStore.ILocation[]
+  location?: locationStore.ILocation
 }
 const initialValues: NewItemCredentials = {
   name: "",
@@ -46,7 +48,7 @@ const initialValues: NewItemCredentials = {
   eb_child_age_end: 12,
   meal_plans: [],
   room_types: [],
-  locations: [],
+  location: undefined,
 }
 
 interface NewItemProps extends RouteComponentProps, XHRProps {}
@@ -69,7 +71,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               ...values,
               meal_plans: values.meal_plans.map(mealPlan => mealPlan.id),
               room_types: values.room_types.map(roomType => roomType.id),
-              locations: values.locations.map(location => location.id),
+              location_id: values.location ? values.location.id : undefined,
             })
             .then(({ data }) => {
               const { hotel } = data
@@ -139,21 +141,27 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   </div>
                 )}
               />
-              <FieldArray
-                name="locations"
-                render={({ name }) => (
+              <Field
+                name="location"
+                render={({
+                  field: { name, value },
+                }: FieldProps<NewItemCredentials>) => (
                   <div>
                     <SelectLocations
-                      label="Locations"
-                      name="locations"
-                      value={values.locations}
-                      onChange={values => setFieldValue("locations", values)}
+                      label="Location"
+                      name="location"
+                      multiple={false}
+                      value={value}
+                      onChange={value => setFieldValue(name, value)}
                     />
                     <ErrorMessage name={name} />
                   </div>
                 )}
               />
-              <Button type="submit">Save</Button> <Link to="..">Cancel</Link>
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>{" "}
+              <Link to="..">Cancel</Link>
             </Form>
           )
         }}

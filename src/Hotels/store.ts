@@ -13,27 +13,25 @@ export interface IPrice {
   hotel_id: number
   base_price: number
   persons: number
-  a_w_e_b: number
-  c_w_e_b: number
-  c_wo_e_b: number
+  adult_with_extra_bed_price: number
+  child_with_extra_bed_price: number
+  child_without_extra_bed_price: number
   start_date: string
   end_date: string
   meal_plan_id: number
   room_type_id: number
-  location_id: number
   meal_plan?: mealPlanStore.IMealPlan
   room_type?: roomTypeStore.IRoomType
-  location?: locationStore.ILocation
 }
 
 export interface IHotel extends IBaseItem {
   id: number
   name: string
-  eb_child_age_start: number
-  eb_child_age_end: number
+  extra_bed_child_age_start: number
+  extra_bed_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
   room_types: roomTypeStore.IRoomType[]
-  locations: locationStore.ILocation[]
+  location: locationStore.ILocation
   prices?: IPrice[]
   contacts?: contactStore.IContact[]
 }

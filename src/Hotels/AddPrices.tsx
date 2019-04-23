@@ -18,7 +18,6 @@ import { InputField } from "./../Shared/InputField"
 import { IHotel } from "./store"
 import { SelectMealPlans, store as mealPlanStore } from "./../MealPlans"
 import { SelectRoomTypes, store as roomTypeStore } from "./../RoomTypes"
-import { SelectLocations, store as locationStore } from "./../Locations"
 import { withXHR, XHRProps } from "./../xhr"
 
 type NewPriceCredentials = {
@@ -26,13 +25,12 @@ type NewPriceCredentials = {
     start_date: string
     end_date: string
     base_price: number
-    a_w_e_b: number
-    c_w_e_b: number
-    c_wo_e_b: number
+    adult_with_extra_bed_price: number
+    child_with_extra_bed_price: number
+    child_without_extra_bed_price: number
     meal_plans: mealPlanStore.IMealPlan[]
     room_types: roomTypeStore.IRoomType[]
     persons: number
-    locations: locationStore.ILocation[]
   }[]
 }
 const initialValues: NewPriceCredentials = {
@@ -42,12 +40,11 @@ const initialValues: NewPriceCredentials = {
       end_date: "",
       base_price: 0,
       persons: 2,
-      a_w_e_b: 0,
-      c_w_e_b: 0,
-      c_wo_e_b: 0,
+      adult_with_extra_bed_price: 0,
+      child_with_extra_bed_price: 0,
+      child_without_extra_bed_price: 0,
       meal_plans: [],
       room_types: [],
-      locations: [],
     },
   ],
 }
@@ -64,13 +61,13 @@ const validationSchema = Validator.object().shape({
         .required("Persons field is required")
         .integer()
         .positive("Persons should be positive number"),
-      a_w_e_b: Validator.number()
+      adult_with_extra_bed_price: Validator.number()
         .required("Price for adult with extra bed is required")
         .positive("Price should be positive"),
-      c_w_e_b: Validator.number()
+      child_with_extra_bed_price: Validator.number()
         .required("Price for child with extra bed is required")
         .positive("Price should be positive"),
-      c_wo_e_b: Validator.number()
+      child_without_extra_bed_price: Validator.number()
         .required("Price for child without extra bed is required")
         .positive("Price should be positive"),
       meal_plans: Validator.array().min(
@@ -80,10 +77,6 @@ const validationSchema = Validator.object().shape({
       room_types: Validator.array().min(
         1,
         "Atleast one room type should be selected"
-      ),
-      locations: Validator.array().min(
-        1,
-        "Atleast one locations should be selected"
       ),
     })
   ),
@@ -112,7 +105,6 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                 (
                   carry,
                   {
-                    locations,
                     meal_plans,
                     room_types,
                     start_date,
@@ -121,27 +113,24 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                   }
                 ) => {
                   const prices: any = []
-                  locations.forEach(location => {
-                    meal_plans.forEach(mealPlan => {
-                      room_types.forEach(roomType => {
-                        prices.push({
-                          ...otherValues,
-                          start_date: moment(start_date)
-                            .hours(0)
-                            .minutes(0)
-                            .seconds(0)
-                            .utc()
-                            .format("YYYY-MM-DD HH:mm:ss"),
-                          end_date: moment(end_date)
-                            .hours(23)
-                            .minutes(59)
-                            .seconds(59)
-                            .utc()
-                            .format("YYYY-MM-DD HH:mm:ss"),
-                          location_id: location.id,
-                          meal_plan_id: mealPlan.id,
-                          room_type_id: roomType.id,
-                        })
+                  meal_plans.forEach(mealPlan => {
+                    room_types.forEach(roomType => {
+                      prices.push({
+                        ...otherValues,
+                        start_date: moment(start_date)
+                          .hours(0)
+                          .minutes(0)
+                          .seconds(0)
+                          .utc()
+                          .format("YYYY-MM-DD HH:mm:ss"),
+                        end_date: moment(end_date)
+                          .hours(23)
+                          .minutes(59)
+                          .seconds(59)
+                          .utc()
+                          .format("YYYY-MM-DD HH:mm:ss"),
+                        meal_plan_id: mealPlan.id,
+                        room_type_id: roomType.id,
                       })
                     })
                   })
@@ -176,16 +165,17 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                     <tr>
                       <th>Start Date</th>
                       <th>End Date</th>
-                      <th>Locations</th>
                       <th>Meal Plans</th>
                       <th>Room Types</th>
                       <th>Base Price</th>
                       <th title="Number of persons this base price is applicable to">
                         Persons
                       </th>
-                      <th title="Adult with extra bed price">A.W.E.B.</th>
-                      <th title="Child with extra bed price">C.W.E.B.</th>
-                      <th title="Child without extra bed price">C.Wo.E.B.</th>
+                      <th title="Adult with extra bed price">A.W.E.B. Price</th>
+                      <th title="Child with extra bed price">C.W.E.B. Price</th>
+                      <th title="Child without extra bed price">
+                        C.Wo.E.B. Price
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -201,26 +191,6 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                           <InputField
                             name={`${name}.${index}.end_date`}
                             type="date"
-                          />
-                        </td>
-                        <td>
-                          <FieldArray
-                            name={`prices.${index}.locations`}
-                            render={({ name }) => (
-                              <div>
-                                <SelectLocations
-                                  searchable={false}
-                                  options={hotel.locations}
-                                  onChange={values =>
-                                    setFieldValue(name, values)
-                                  }
-                                  labelKey="short_name"
-                                  value={values.prices[index].locations}
-                                  name={name}
-                                />
-                                <ErrorMessage name={name} />
-                              </div>
-                            )}
                           />
                         </td>
                         <td>
@@ -274,19 +244,19 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                         </td>
                         <td>
                           <InputField
-                            name={`${name}.${index}.a_w_e_b`}
+                            name={`${name}.${index}.adult_with_extra_bed_price`}
                             type="number"
                           />
                         </td>
                         <td>
                           <InputField
-                            name={`${name}.${index}.c_w_e_b`}
+                            name={`${name}.${index}.child_with_extra_bed_price`}
                             type="number"
                           />
                         </td>
                         <td>
                           <InputField
-                            name={`${name}.${index}.c_wo_e_b`}
+                            name={`${name}.${index}.child_without_extra_bed_price`}
                             type="number"
                           />
                         </td>

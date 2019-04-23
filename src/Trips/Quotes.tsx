@@ -69,7 +69,6 @@ export const Quote = withXHR(function Quote({
             hotel,
             date,
             meal_plan,
-            location,
             room_type,
             no_of_rooms,
             comments,
@@ -80,7 +79,7 @@ export const Quote = withXHR(function Quote({
                 .utc(date)
                 .local()
                 .format("DD MMM, YYYY")}{" "}
-              - {hotel.name} {location.short_name} - {meal_plan.name} -{" "}
+              - {hotel.name} {hotel.location.short_name} - {meal_plan.name} -{" "}
               {room_type.name} - {no_of_rooms} rooms - Rs: {given_price} /-
               {comments ? <p>Comments: {comments}</p> : null}
             </li>
@@ -164,7 +163,9 @@ export const Quote = withXHR(function Quote({
                   type="number"
                 />
                 <InputField name="comments" label="Any Comments" />
-                <Button type="submit">Give Quote</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  Give Quote
+                </Button>
                 <Button onClick={close}>Cancel</Button>
               </Form>
             )}
