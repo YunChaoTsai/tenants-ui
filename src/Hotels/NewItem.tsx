@@ -6,6 +6,8 @@ import {
   FormikProps,
   Form,
   FieldArray,
+  Field,
+  FieldProps,
   ErrorMessage,
 } from "formik"
 import * as Validator from "yup"
@@ -20,6 +22,10 @@ import { store as locationStore, SelectLocations } from "./../Locations"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
+  stars: Validator.number()
+    .positive("Star rating field should a positive integer.")
+    .integer("Star rating field should be positive integer")
+    .required("Stars rating field is required"),
   eb_child_age_start: Validator.number()
     .positive("Child start age should be a positive number")
     .integer("Child start age should be an integer")
@@ -30,23 +36,25 @@ const validationSchema = Validator.object().shape({
     .required("Child end age is required"),
   meal_plans: Validator.array().min(1, "Please select atleast one meal plan"),
   room_types: Validator.array().min(1, "Please select atleast one room type"),
-  locations: Validator.array().min(1, "Please select atleast one location"),
+  location: Validator.object().required("Location field is required"),
 })
 interface NewItemCredentials {
   name: string
+  stars: number
   eb_child_age_start: number
   eb_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
   room_types: roomTypeStore.IRoomType[]
-  locations: locationStore.ILocation[]
+  location?: locationStore.ILocation
 }
 const initialValues: NewItemCredentials = {
   name: "",
+  stars: 1,
   eb_child_age_start: 6,
   eb_child_age_end: 12,
   meal_plans: [],
   room_types: [],
-  locations: [],
+  location: undefined,
 }
 
 interface NewItemProps extends RouteComponentProps, XHRProps {}
@@ -69,7 +77,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               ...values,
               meal_plans: values.meal_plans.map(mealPlan => mealPlan.id),
               room_types: values.room_types.map(roomType => roomType.id),
-              locations: values.locations.map(location => location.id),
+              location_id: values.location ? values.location.id : undefined,
             })
             .then(({ data }) => {
               const { hotel } = data
@@ -97,18 +105,29 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 placeholder="Taj Hotel"
                 required
               />
-              <InputField
-                label="Extra bed child start age"
-                name="eb_child_age_start"
-                required
-                type="number"
-                min={1}
+              <Field
+                name="location"
+                render={({
+                  field: { name, value },
+                }: FieldProps<NewItemCredentials>) => (
+                  <div>
+                    <SelectLocations
+                      label="Location"
+                      name="location"
+                      multiple={false}
+                      value={value}
+                      onChange={value => setFieldValue(name, value)}
+                    />
+                    <ErrorMessage name={name} />
+                  </div>
+                )}
               />
               <InputField
-                label="Extra bed child end age"
-                name="eb_child_age_end"
-                required
+                label="Stars"
+                name="stars"
                 type="number"
+                required
+                max={5}
                 min={1}
               />
               <FieldArray
@@ -139,21 +158,24 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   </div>
                 )}
               />
-              <FieldArray
-                name="locations"
-                render={({ name }) => (
-                  <div>
-                    <SelectLocations
-                      label="Locations"
-                      name="locations"
-                      value={values.locations}
-                      onChange={values => setFieldValue("locations", values)}
-                    />
-                    <ErrorMessage name={name} />
-                  </div>
-                )}
+              <InputField
+                label="Extra bed child start age"
+                name="eb_child_age_start"
+                required
+                type="number"
+                min={1}
               />
-              <Button type="submit">Save</Button> <Link to="..">Cancel</Link>
+              <InputField
+                label="Extra bed child end age"
+                name="eb_child_age_end"
+                required
+                type="number"
+                min={1}
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>{" "}
+              <Link to="..">Cancel</Link>
             </Form>
           )
         }}

@@ -115,20 +115,23 @@ export function Item({
         const {
           id,
           name,
-          eb_child_age_end,
-          eb_child_age_start,
+          stars,
+          extra_bed_child_age_start,
+          extra_bed_child_age_end,
           meal_plans,
           room_types,
-          locations,
+          location,
           contacts,
         } = hotel
         return (
           <div>
             <Link to="..">Back</Link>
-            <h3>{name}</h3>
+            <h3>
+              {name} • {location.short_name} • {stars} stars
+            </h3>
             <div>
-              Extra bed child ages: From {eb_child_age_start} To{" "}
-              {eb_child_age_end}
+              Extra bed child ages: From {extra_bed_child_age_start} To{" "}
+              {extra_bed_child_age_end}
             </div>
             <div>
               Meal Plans:{" "}
@@ -140,12 +143,6 @@ export function Item({
               Room Types:{" "}
               {room_types.map(roomType => (
                 <span key={roomType.id}>{roomType.name}</span>
-              ))}
-            </div>
-            <div>
-              Locations:{" "}
-              {locations.map(location => (
-                <span key={location.id}>{location.name}</span>
               ))}
             </div>
             <div>

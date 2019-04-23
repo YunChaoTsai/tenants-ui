@@ -81,7 +81,6 @@ function List({ isFetching, getHotels, hotels }: ListProps) {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Location</th>
             <th>Meal Plans</th>
             <th>Room Types</th>
             <th>Child extra bed age</th>
@@ -91,25 +90,20 @@ function List({ isFetching, getHotels, hotels }: ListProps) {
           {hotels.map(hotel => (
             <tr key={hotel.id}>
               <td>
-                <Link to={hotel.id.toString()}>{hotel.name}</Link>
+                <Link to={hotel.id.toString()}>
+                  {hotel.name} • {hotel.location.short_name} • {hotel.stars}{" "}
+                  star
+                </Link>
               </td>
               <td>
-                {hotel.locations.map(location => (
-                  <span key={location.id}>{location.short_name}</span>
-                ))}
+                {hotel.meal_plans.map(mealPlan => mealPlan.name).join(" • ")}
               </td>
               <td>
-                {hotel.meal_plans.map(mealPlan => (
-                  <span key={mealPlan.id}>{mealPlan.name}</span>
-                ))}
+                {hotel.room_types.map(roomType => roomType.name).join(" • ")}
               </td>
               <td>
-                {hotel.room_types.map(roomType => (
-                  <span key={roomType.id}>{roomType.name}</span>
-                ))}
-              </td>
-              <td>
-                {hotel.eb_child_age_start}yo - {hotel.eb_child_age_end}yo
+                {hotel.extra_bed_child_age_start}-
+                {hotel.extra_bed_child_age_end}yo
               </td>
             </tr>
           ))}

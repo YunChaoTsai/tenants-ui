@@ -20,15 +20,13 @@ export interface IQuoteHotel {
   date: string
   hotel_id: number
   hotel: hotelStore.IHotel
-  location_id: number
-  location: locationStore.ILocation
   meal_plan_id: number
   meal_plan: mealPlanStore.IMealPlan
   room_type_id: number
   room_type: roomTypeStore.IRoomType
-  a_w_e_b: number
-  c_w_e_b: number
-  c_wo_e_b: number
+  adults_with_extra_bed: number
+  children_with_extra_bed: number
+  children_without_extra_bed: number
   no_of_rooms: number
   calculated_price?: number
   given_price: number
