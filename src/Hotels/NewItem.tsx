@@ -22,6 +22,10 @@ import { store as locationStore, SelectLocations } from "./../Locations"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
+  stars: Validator.number()
+    .positive("Star rating field should a positive integer.")
+    .integer("Star rating field should be positive integer")
+    .required("Stars rating field is required"),
   eb_child_age_start: Validator.number()
     .positive("Child start age should be a positive number")
     .integer("Child start age should be an integer")
@@ -36,6 +40,7 @@ const validationSchema = Validator.object().shape({
 })
 interface NewItemCredentials {
   name: string
+  stars: number
   eb_child_age_start: number
   eb_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
@@ -44,6 +49,7 @@ interface NewItemCredentials {
 }
 const initialValues: NewItemCredentials = {
   name: "",
+  stars: 1,
   eb_child_age_start: 6,
   eb_child_age_end: 12,
   meal_plans: [],
@@ -99,18 +105,29 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 placeholder="Taj Hotel"
                 required
               />
-              <InputField
-                label="Extra bed child start age"
-                name="eb_child_age_start"
-                required
-                type="number"
-                min={1}
+              <Field
+                name="location"
+                render={({
+                  field: { name, value },
+                }: FieldProps<NewItemCredentials>) => (
+                  <div>
+                    <SelectLocations
+                      label="Location"
+                      name="location"
+                      multiple={false}
+                      value={value}
+                      onChange={value => setFieldValue(name, value)}
+                    />
+                    <ErrorMessage name={name} />
+                  </div>
+                )}
               />
               <InputField
-                label="Extra bed child end age"
-                name="eb_child_age_end"
-                required
+                label="Stars"
+                name="stars"
                 type="number"
+                required
+                max={5}
                 min={1}
               />
               <FieldArray
@@ -141,22 +158,19 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   </div>
                 )}
               />
-              <Field
-                name="location"
-                render={({
-                  field: { name, value },
-                }: FieldProps<NewItemCredentials>) => (
-                  <div>
-                    <SelectLocations
-                      label="Location"
-                      name="location"
-                      multiple={false}
-                      value={value}
-                      onChange={value => setFieldValue(name, value)}
-                    />
-                    <ErrorMessage name={name} />
-                  </div>
-                )}
+              <InputField
+                label="Extra bed child start age"
+                name="eb_child_age_start"
+                required
+                type="number"
+                min={1}
+              />
+              <InputField
+                label="Extra bed child end age"
+                name="eb_child_age_end"
+                required
+                type="number"
+                min={1}
               />
               <Button type="submit" disabled={isSubmitting}>
                 Save

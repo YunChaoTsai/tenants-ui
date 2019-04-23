@@ -27,6 +27,7 @@ export interface IPrice {
 export interface IHotel extends IBaseItem {
   id: number
   name: string
+  stars: number
   extra_bed_child_age_start: number
   extra_bed_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]

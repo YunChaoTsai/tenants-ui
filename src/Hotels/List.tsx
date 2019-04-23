@@ -91,7 +91,8 @@ function List({ isFetching, getHotels, hotels }: ListProps) {
             <tr key={hotel.id}>
               <td>
                 <Link to={hotel.id.toString()}>
-                  {hotel.name} • {hotel.location.short_name}
+                  {hotel.name} • {hotel.location.short_name} • {hotel.stars}{" "}
+                  star
                 </Link>
               </td>
               <td>

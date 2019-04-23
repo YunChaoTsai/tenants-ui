@@ -115,6 +115,7 @@ export function Item({
         const {
           id,
           name,
+          stars,
           extra_bed_child_age_start,
           extra_bed_child_age_end,
           meal_plans,
@@ -126,7 +127,7 @@ export function Item({
           <div>
             <Link to="..">Back</Link>
             <h3>
-              {name} - {location.short_name}
+              {name} • {location.short_name} • {stars} stars
             </h3>
             <div>
               Extra bed child ages: From {extra_bed_child_age_start} To{" "}
