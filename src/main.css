@@ -30,6 +30,10 @@ a[aria-current="page"] {
   display: none;
 }
 
+[disabled] {
+  background: silver;
+}
+
 table {
   border-collapse: collapse;
 }
