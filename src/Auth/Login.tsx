@@ -80,7 +80,7 @@ function Login({ login, navigate, location }: LoginProps) {
       <Helmet>
         <title>Login</title>
       </Helmet>
-      <h2>Login</h2>
+      <h2>Login to Tourepdia Dashboard</h2>
       <Formik
         initialValues={initialValues}
         onSubmit={(
@@ -122,12 +122,10 @@ function Login({ login, navigate, location }: LoginProps) {
                 required
                 autoComplete="current-password"
               />
-            </fieldset>
-            <footer>
               <Button type="submit" disabled={isSubmitting}>
                 Login
               </Button>
-            </footer>
+            </fieldset>
           </Form>
         )}
       />

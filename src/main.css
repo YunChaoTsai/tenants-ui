@@ -19,7 +19,7 @@ body {
 }
 
 a[aria-current="page"] {
-  color: orangered;
+  color: #045230;
 }
 
 [role="status"] {
@@ -48,15 +48,33 @@ th {
   padding: 5px;
 }
 
+.container {
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
 .text--right {
   text-align: right;
 }
-
+.text--center {
+  text-align: center;
+}
+.text--error {
+  color: orangered;
+}
 .display--inline-block {
   display: inline-block;
 }
 .display--inline {
   display: inline;
+}
+.display--flex {
+  display: flex;
+  align-items: center;
+}
+.justify-content--space-between {
+  justify-content: space-between;
 }
 .vertical-align--top {
   vertical-align: top;

@@ -13,9 +13,7 @@ import { Async, AsyncProps } from "./../Shared/Select"
 export function XHR(xhr: AxiosInstance) {
   return {
     getCabTypes(params?: any): Promise<ICabType[]> {
-      return xhr
-        .get("/cab-types", { params })
-        .then(({ data }) => data.cab_types)
+      return xhr.get("/cab-types", { params }).then(({ data }) => data.data)
     },
   }
 }

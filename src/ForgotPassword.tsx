@@ -18,6 +18,7 @@ import { connect } from "react-redux"
 import { RedirectIfAuthenticated } from "./Auth"
 import { ThunkDispatch, ThunkAction } from "./types"
 import { searchToQuery } from "./utils"
+import { InputField } from "./Shared/InputField"
 
 // schemas
 export interface IForgotPasswordCredentials {
@@ -91,29 +92,21 @@ function ForgotPassword({
         }: FormikProps<IForgotPasswordCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <Field
-              name="email"
-              render={({ field }: FieldProps<IForgotPasswordCredentials>) => (
-                <div>
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    autoFocus
-                    id="email"
-                    placeholder="username@domain.com"
-                    autoComplete="username email"
-                    required
-                    {...field}
-                  />
-                  <ErrorMessage name="email" />
-                </div>
-              )}
-            />
-            <footer>
+            <fieldset>
+              <InputField
+                name="email"
+                label="Email"
+                placeholder="username@domain.com"
+                autoComplete="username email"
+                required
+                autoFocus
+                type="email"
+                id="email"
+              />
               <Button type="submit" disabled={isSubmitting}>
                 Send Instructions
               </Button>
-            </footer>
+            </fieldset>
           </Form>
         )}
       />

@@ -56,7 +56,7 @@ export function NewCab({ xhr, navigate }: NewCabProps) {
                 cab_type_id: cab_type.id,
               })
               .then(({ data }) => {
-                const { cab } = data
+                const cab = data.data
                 navigate && navigate(`../${cab.id}`)
                 actions.setSubmitting(false)
               })

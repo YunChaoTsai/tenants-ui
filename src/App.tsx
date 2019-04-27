@@ -73,6 +73,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
           </ul>
         </li>
       </ul>
+      <hr />
     </nav>
   )
 })
@@ -81,27 +82,29 @@ export default function App() {
   return (
     <Fragment>
       <Helmet titleTemplate="%s | Tourepedia" defaultTitle="Tourepedia" />
-      <Header />
-      <Router>
-        <Login path="/login" />
-        <ForgotPassword path="/forgot-password" />
-        <ResetPassword path="/reset-password" />
-        <Dashboard path="/" />
-        <Logout path="/logout" />
-        <Settings path="/settings/*" />
-        <Users path="/users/*" />
-        <Roles path="/roles/*" />
-        <Hotels path="/hotels/*" />
-        <MealPlans path="/meal-plans/*" />
-        <RoomTypes path="/room-types/*" />
-        <Locations path="/locations/*" />
-        <CabTypes path="/cab-types/*" />
-        <Cabs path="/cabs/*" />
-        <Trips path="/trips/*" />
-        <TripSources path="/trip-sources/*" />
-        <TripStages path="/trip-stages/*" />
-        <NotFound default />
-      </Router>
+      <div className="container">
+        <Header />
+        <Router>
+          <Login path="/login" />
+          <ForgotPassword path="/forgot-password" />
+          <ResetPassword path="/reset-password" />
+          <Dashboard path="/" />
+          <Logout path="/logout" />
+          <Settings path="/settings/*" />
+          <Users path="/users/*" />
+          <Roles path="/roles/*" />
+          <Hotels path="/hotels/*" />
+          <MealPlans path="/meal-plans/*" />
+          <RoomTypes path="/room-types/*" />
+          <Locations path="/locations/*" />
+          <CabTypes path="/cab-types/*" />
+          <Cabs path="/cabs/*" />
+          <Trips path="/trips/*" />
+          <TripSources path="/trip-sources/*" />
+          <TripStages path="/trip-stages/*" />
+          <NotFound default />
+        </Router>
+      </div>
     </Fragment>
   )
 }
