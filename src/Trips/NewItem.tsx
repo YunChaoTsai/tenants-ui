@@ -154,7 +154,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           xhr
             .post("/trips", data)
             .then(resp => {
-              const { trip } = resp.data
+              const { data: trip } = resp.data
               navigate && navigate(`../${trip.id}`)
               actions.setSubmitting(false)
             })
@@ -178,127 +178,138 @@ function NewItem({ xhr, navigate }: NewItemProps) {
       }: FormikProps<NewItemSchema>) => (
         <Form noValidate>
           {status ? <div>{status}</div> : null}
-          <FieldArray
-            name="destinations"
-            render={({ name }) => (
-              <div>
-                <SelectLocations
-                  label="Destinations"
-                  name={name}
-                  value={values.destinations}
-                  onChange={value => setFieldValue(name, value)}
-                />
-                <ErrorMessage name={name} />
-              </div>
-            )}
-          />
-          <InputField
-            name="start_date"
-            label="Start Date"
-            type="date"
-            required
-          />
-          <InputField
-            name="no_of_nights"
-            label="Number of nights"
-            type="number"
-            min={1}
-            required
-          />
-          <FieldArray
-            name="contact"
-            render={({ name }) => (
-              <Fragment>
-                <InputField
-                  name={`${name}.name`}
-                  label="Contact Name"
-                  required
-                />
-                <InputField
-                  name={`${name}.email`}
-                  label="Email"
-                  required
-                  type="email"
-                />
-                <SelectCountryDialCodes
-                  label="Country code"
-                  name={`${name}.phone_number_country_dial_code`}
-                  value={values.contact.phone_number_country_dial_code}
-                  placeholder="Type here... eg India or +91"
-                  required
-                  onChange={value =>
-                    setFieldValue(
-                      `${name}.phone_number_country_dial_code`,
-                      value
-                    )
-                  }
-                />
-                <InputField
-                  name={`${name}.phone_number`}
-                  label="Phone Number"
-                  type="number"
-                  required
-                />
-              </Fragment>
-            )}
-          />
-          <InputField
-            name="no_of_adults"
-            label="Number of adults"
-            type="number"
-            min={1}
-            required
-          />
-          <FieldArray
-            name="children"
-            render={({ name, remove, push }) => (
-              <div>
-                <label>Children</label>
-                {values.children.map((children, index) => (
-                  <div key={index}>
-                    <InputField
-                      label="Age"
-                      name={`${name}.${index}.age`}
-                      type="number"
-                      min={1}
-                      required
-                    />
-                    <InputField
-                      label="Count"
-                      name={`${name}.${index}.count`}
-                      type="number"
-                      min={1}
-                      required
-                    />
-                    <Button onClick={_ => remove(index)}>Remove</Button>
-                  </div>
-                ))}
-                <Button onClick={_ => push({ count: 1, age: 6 })}>
-                  Add More
-                </Button>
-              </div>
-            )}
-          />
-          <Field
-            name="trip_source"
-            render={({ field }: FieldProps<NewItemSchema>) => (
-              <div>
-                <SelectTripSources
-                  name={field.name}
-                  label="Trip Source"
-                  required
-                  value={values.trip_source}
-                  onChange={value => setFieldValue(field.name, value)}
-                  multiple={false}
-                />
-                <ErrorMessage name={field.name} />
-              </div>
-            )}
-          />
-          <InputField name="trip_id" label="Trip ID" placeholder="1231231" />
+          <fieldset>
+            <legend>Destination Details</legend>
+            <FieldArray
+              name="destinations"
+              render={({ name }) => (
+                <div>
+                  <SelectLocations
+                    label="Destinations"
+                    name={name}
+                    value={values.destinations}
+                    onChange={value => setFieldValue(name, value)}
+                  />
+                  <ErrorMessage name={name} />
+                </div>
+              )}
+            />
+            <InputField
+              name="start_date"
+              label="Start Date"
+              type="date"
+              required
+            />
+            <InputField
+              name="no_of_nights"
+              label="Number of nights"
+              type="number"
+              min={1}
+              required
+            />
+            <Field
+              name="trip_source"
+              render={({ field }: FieldProps<NewItemSchema>) => (
+                <div>
+                  <SelectTripSources
+                    name={field.name}
+                    label="Trip Source"
+                    required
+                    value={values.trip_source}
+                    onChange={value => setFieldValue(field.name, value)}
+                    multiple={false}
+                  />
+                  <ErrorMessage name={field.name} />
+                </div>
+              )}
+            />
+            <InputField name="trip_id" label="Trip ID" placeholder="1231231" />
+          </fieldset>
+          <fieldset>
+            <legend>Contact Details</legend>
+            <FieldArray
+              name="contact"
+              render={({ name }) => (
+                <Fragment>
+                  <InputField
+                    name={`${name}.name`}
+                    label="Contact Name"
+                    required
+                  />
+                  <InputField
+                    name={`${name}.email`}
+                    label="Email"
+                    required
+                    type="email"
+                  />
+                  <SelectCountryDialCodes
+                    label="Country code"
+                    name={`${name}.phone_number_country_dial_code`}
+                    value={values.contact.phone_number_country_dial_code}
+                    placeholder="Type here... eg India or +91"
+                    required
+                    onChange={value =>
+                      setFieldValue(
+                        `${name}.phone_number_country_dial_code`,
+                        value
+                      )
+                    }
+                  />
+                  <InputField
+                    name={`${name}.phone_number`}
+                    label="Phone Number"
+                    type="number"
+                    required
+                  />
+                </Fragment>
+              )}
+            />
+          </fieldset>
+          <fieldset>
+            <legend>Pax</legend>
+            <InputField
+              name="no_of_adults"
+              label="Number of adults"
+              type="number"
+              min={1}
+              required
+            />
+            <FieldArray
+              name="children"
+              render={({ name, remove, push }) => (
+                <fieldset>
+                  <legend>Children</legend>
+                  <ul className="list">
+                    {values.children.map((children, index) => (
+                      <li key={index}>
+                        <InputField
+                          label="Age"
+                          name={`${name}.${index}.age`}
+                          type="number"
+                          min={1}
+                          required
+                        />
+                        <InputField
+                          label="Count"
+                          name={`${name}.${index}.count`}
+                          type="number"
+                          min={1}
+                          required
+                        />
+                        <Button onClick={_ => remove(index)}>Remove</Button>
+                      </li>
+                    ))}
+                    <Button onClick={_ => push({ count: 1, age: 6 })}>
+                      Add More
+                    </Button>
+                  </ul>
+                </fieldset>
+              )}
+            />
+          </fieldset>
           <Button type="submit" disabled={isSubmitting}>
             Save
-          </Button>{" "}
+          </Button>
           <Link to="..">Cancel</Link>
         </Form>
       )}

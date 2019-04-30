@@ -11,6 +11,7 @@ export default function Trips(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h3>Trips</h3>
       <Link to="new">New Trip</Link>
+      <hr />
       <Router>
         <List path="/" />
         <NewItem path="/new" />

@@ -15,15 +15,18 @@ import Button from "@tourepedia/button"
 import * as Validator from "yup"
 import moment from "moment"
 
-import { ICabPrice, ICabType } from "./store"
-import { store as locationServiceStore, SelectServices } from "./../Locations"
+import { ITransportServicePrice } from "./store"
+import { store as cabTypeStore, SelectCabTypes } from "./../CabTypes"
+import {
+  SelectTransportServices as SelectServices,
+  store as transportServiceStore,
+} from "./../TransportServices"
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField } from "./../Shared/InputField"
-import { SelectCabTypes } from "./List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    storePrice(data: any): Promise<ICabPrice> {
+    storePrice(data: any): Promise<ITransportServicePrice> {
       return xhr.post("/cab-prices", data).then(resp => resp.data.cab_price)
     },
   }
@@ -35,8 +38,8 @@ const validationSchema = Validator.object().shape({
       start_date: Validator.string().required("Start date is required"),
       end_date: Validator.string().required("End date is required"),
       cab_type: Validator.object().required("Cab type is required"),
-      location_service: Validator.object().required(
-        "Location service is required"
+      transport_service: Validator.object().required(
+        "Transport service is required"
       ),
       price: Validator.number(),
       per_km_charges: Validator.number(),
@@ -52,8 +55,8 @@ interface AddPriceCredentials {
   prices: {
     start_date: string
     end_date: string
-    cab_type?: ICabType
-    location_service?: locationServiceStore.IService
+    cab_type?: cabTypeStore.ICabType
+    transport_service?: transportServiceStore.ITransportService
     price?: number
     per_km_charges?: number
     minimum_km_per_day?: number
@@ -69,7 +72,7 @@ const initialValues: AddPriceCredentials = {
       start_date: "",
       end_date: "",
       cab_type: undefined,
-      location_service: undefined,
+      transport_service: undefined,
       price: undefined,
       per_km_charges: undefined,
       minimum_km_per_day: undefined,
@@ -96,12 +99,12 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
         values.prices.forEach(values => {
           const {
             cab_type,
-            location_service,
+            transport_service,
             start_date,
             end_date,
             ...otherData
           } = values
-          if (cab_type && location_service) {
+          if (cab_type && transport_service) {
             prices.push({
               ...otherData,
               start_date: moment(start_date)
@@ -117,7 +120,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                 .utc()
                 .format("YYYY-MM-DD HH:mm:ss"),
               cab_type_id: cab_type.id,
-              location_service_id: location_service.id,
+              transport_service_id: transport_service.id,
             })
           }
         })
@@ -125,7 +128,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
           .storePrice({ prices })
           .then(resp => {
             actions.setSubmitting(false)
-            navigate && navigate("../prices")
+            navigate && navigate("..")
           })
           .catch(error => {
             actions.setStatus(error.message)
@@ -201,7 +204,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                       </td>
                       <td>
                         <Field
-                          name={`${name}.${index}.location_service`}
+                          name={`${name}.${index}.transport_service`}
                           render={({
                             field,
                           }: FieldProps<AddPriceCredentials>) => (
@@ -265,15 +268,15 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
 
                       <td>
                         {prices.length > 1 ? (
-                          <Button onClick={e => remove(index)}>Remove</Button>
+                          <Button onClick={() => remove(index)}>Remove</Button>
                         ) : null}
-                        <Button onClick={e => push(price)}>Duplicate</Button>
+                        <Button onClick={() => push(price)}>Duplicate</Button>
                       </td>
                     </tr>
                   ))}
                   <tr>
                     <td>
-                      <Button onClick={e => push(initialValues.prices[0])}>
+                      <Button onClick={() => push(initialValues.prices[0])}>
                         Add More
                       </Button>
                     </td>

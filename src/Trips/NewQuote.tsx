@@ -6,7 +6,7 @@ import Button from "@tourepedia/button"
 import { withXHR, XHRProps } from "./../xhr"
 import { ITrip, IQuote } from "./store"
 import { CalculatePriceForm as CalculateHotelPrice } from "./../Hotels"
-import { CalculatePriceForm as CalculateCabPrice } from "./../CabTypes"
+import { CalculatePriceForm as CalculateCabPrice } from "./../TransportServicePrices"
 import { Input } from "./../Shared/InputField"
 
 export function XHR(xhr: AxiosInstance) {

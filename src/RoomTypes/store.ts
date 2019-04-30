@@ -1,5 +1,13 @@
 import { createAsyncAction, getType, ActionType } from "typesafe-actions"
-import { IBaseItem, IBaseState, init, model } from "./../model"
+import {
+  IBaseItem,
+  IBaseState,
+  init,
+  model,
+  IModelState,
+  IMeta,
+  createReducer,
+} from "./../model"
 
 export const key = "ROOM_TYPES_STATE"
 
@@ -11,10 +19,7 @@ export interface IRoomType extends IBaseItem {
 
 export interface IRoomTypes extends IBaseState<IRoomType> {}
 
-export interface IState {
-  readonly isFetching: boolean
-  readonly roomTypes: IRoomTypes
-}
+export interface IState extends IModelState<IRoomType> {}
 
 export interface IStateWithKey {
   readonly [key]: IState
@@ -22,7 +27,7 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  roomTypes: init<IRoomType>(),
+  state: init<IRoomType>(),
 }
 
 export const actions = {
@@ -30,45 +35,22 @@ export const actions = {
     "@ROOM_TYPES/LIST_FETCH_REQUEST",
     "@ROOM_TYPES/LIST_FETCH_SUCCESS",
     "@ROOM_TYPES/LIST_FETCH_FAILED"
-  )<any, IRoomType[], Error>(),
+  )<any, { data: IRoomType[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>
 
-export function reducer(
-  state: IState = INITIAL_STATE,
-  action: TActions
-): IState {
-  switch (action.type) {
-    case getType(actions.list.request):
-      return { ...state, isFetching: true }
-    case getType(actions.list.success):
-      return {
-        ...state,
-        roomTypes: model(state.roomTypes).insert(action.payload),
-        isFetching: false,
-      }
-    case getType(actions.list.failure):
-      return { ...state, isFetching: false }
-    default:
-      return state
-  }
-}
+export const reducer = createReducer(INITIAL_STATE, actions as any)
 
 export function selectors<State extends IStateWithKey>(state: State) {
+  const myState = state[key]
   return {
+    ...model(myState.state),
     get state(): IState {
-      return state[key]
+      return myState
     },
     get isFetching(): boolean {
       return this.state.isFetching
-    },
-    get roomTypes(): IRoomType[] {
-      return model<IRoomType>(this.state.roomTypes).get()
-    },
-    getRoomType(id?: string | number): IRoomType | undefined {
-      if (!id) return
-      return model<IRoomType>(this.state.roomTypes).getItem(id)
     },
   }
 }

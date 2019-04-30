@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"
-import { RouteComponentProps } from "@reach/router"
+import React, { Fragment } from "react"
+import { RouteComponentProps, Link } from "@reach/router"
 import {
   Formik,
   FormikProps,
@@ -12,9 +12,9 @@ import Button from "@tourepedia/button"
 import * as Validator from "yup"
 
 import { InputField } from "./../Shared/InputField"
-import { ILocation, IService } from "./store"
-import { SelectLocations } from "./List"
+import { SelectLocations, store as locationStore } from "./../Locations"
 import { withXHR, XHRProps } from "./../xhr"
+import Helmet from "react-helmet-async"
 
 const validationSchema = Validator.object().shape({
   via: Validator.array()
@@ -27,7 +27,7 @@ const validationSchema = Validator.object().shape({
 })
 
 interface NewServiceCredentials {
-  via: ILocation[]
+  via: locationStore.ILocation[]
   distance: number
 }
 
@@ -39,8 +39,10 @@ const initialValues: NewServiceCredentials = {
 interface NewServicesProps extends RouteComponentProps, XHRProps {}
 function NewServices({ xhr, navigate }: NewServicesProps) {
   return (
-    <div>
-      <h4>Add new service</h4>
+    <Fragment>
+      <Helmet>
+        <title>Add New Transport Service</title>
+      </Helmet>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -76,43 +78,48 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
           setFieldValue,
         }: FormikProps<NewServiceCredentials>) => (
           <Form noValidate>
-            <FieldArray
-              name="via"
-              render={({ name, remove, push }) => (
-                <div>
-                  <label>Locations</label>
-                  {values.via.map((location, index) => (
-                    <div key={index}>
-                      <SelectLocations
-                        name={`${name}.${index}`}
-                        multiple={false}
-                        value={values.via[index]}
-                        onChange={value =>
-                          setFieldValue(`${name}.${index}`, value)
-                        }
-                      />
-                      <Button onClick={_ => remove(index)}>Remove</Button>
-                    </div>
-                  ))}
-                  <Button onClick={_ => push(undefined)}>Add More</Button>
-                  <ErrorMessage name={name} />
-                </div>
-              )}
-            />
-            <InputField
-              name="distance"
-              type="number"
-              label="Distance (in kms)"
-              placeholder="420"
-              required
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Save
-            </Button>
+            {status ? <div>{status}</div> : null}
+            <fieldset>
+              <legend>Add New Transport Service</legend>
+              <FieldArray
+                name="via"
+                render={({ name, remove, push }) => (
+                  <div>
+                    <label>Locations</label>
+                    {values.via.map((location, index) => (
+                      <div key={index}>
+                        <SelectLocations
+                          name={`${name}.${index}`}
+                          multiple={false}
+                          value={values.via[index]}
+                          onChange={value =>
+                            setFieldValue(`${name}.${index}`, value)
+                          }
+                        />
+                        <Button onClick={_ => remove(index)}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button onClick={_ => push(undefined)}>Add More</Button>
+                    <ErrorMessage name={name} />
+                  </div>
+                )}
+              />
+              <InputField
+                name="distance"
+                type="number"
+                label="Distance (in kms)"
+                placeholder="420"
+                required
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+            </fieldset>
+            <Link to="..">Cancel</Link>
           </Form>
         )}
       />
-    </div>
+    </Fragment>
   )
 }
 

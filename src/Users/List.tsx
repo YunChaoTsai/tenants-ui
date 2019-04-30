@@ -5,13 +5,15 @@ import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { RedirectUnlessAuthenticated } from "./../Auth"
 import { IUser, actions, IStateWithKey, selectors } from "./store"
+import { List } from "./../Shared/List"
+import { Paginate, PaginateProps } from "./../Shared/Paginate"
+import { Search, useSearch } from "./../Shared/Search"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getUsers(params?: any): Promise<IUser[]> {
-      return xhr.get("/users", { params }).then(({ data }) => data.users)
+    getUsers(params?: any): Promise<{ data: IUser[]; meta: any }> {
+      return xhr.get("/users", { params }).then(resp => resp.data)
     },
   }
 }
@@ -24,9 +26,9 @@ export const getUsers = (params?: any): ThunkAction<Promise<IUser[]>> => (
   dispatch(actions.list.request())
   return XHR(xhr)
     .getUsers(params)
-    .then(users => {
-      dispatch(actions.list.success(users))
-      return users
+    .then(({ data, meta }) => {
+      dispatch(actions.list.success({ data, meta }))
+      return data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -34,36 +36,61 @@ export const getUsers = (params?: any): ThunkAction<Promise<IUser[]>> => (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   users: IUser[]
 }
 interface DispatchProps {
-  getUsers: (params?: any) => Promise<IUser[]>
+  getUsers: (params?: any) => Promise<any>
 }
 interface OwnProps extends RouteComponentProps {}
 interface UsersProps extends OwnProps, StateProps, DispatchProps {}
-export function Users({ getUsers, users, isFetching }: UsersProps) {
+export function Users({ getUsers, users, ...otherProps }: UsersProps) {
+  const [params, setParams] = useSearch()
+  const { currentPage, total, isFetching } = otherProps
   useEffect(() => {
-    getUsers()
+    getUsers({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Users</title>
       </Helmet>
-      {!isFetching ? `Total: ${users.length}` : ""}
-      <ul>
-        {isFetching ? (
-          <li>Loading...</li>
-        ) : (
-          users.map(r => (
-            <li key={r.id}>
-              <Link to={r.id.toString()}>{r.name}</Link>
-            </li>
-          ))
-        )}
-      </ul>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getUsers({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getUsers({ ...params, page })}
+        />
+      </div>
+      <List isFetching={isFetching} total={total}>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Email Verified At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(r => (
+              <tr key={r.id}>
+                <td>
+                  <Link to={r.id.toString()}>{r.name}</Link>
+                  <br />
+                  {r.roles.map(r => r.name).join(" • ")}
+                </td>
+                <td>{r.email}</td>
+                <td>{r.email_verified_at}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </List>
     </Fragment>
   )
 }
@@ -72,8 +99,9 @@ export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
   state => {
     const usersSelector = selectors(state)
     return {
+      ...usersSelector.meta,
       isFetching: usersSelector.isFetching,
-      users: usersSelector.users,
+      users: usersSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({

@@ -6,27 +6,29 @@ import moment from "moment"
 
 import { RedirectUnlessAuthenticated } from "./../Auth"
 import { withXHR, XHRProps } from "./../xhr"
+import { store as tripStore } from "./../Trips"
 
-type IConvertedTripAnalytics = { created_at: string }[]
-type IDuePayments = { due_amount: number; due_date: string }[]
+type IConvertedTripAnalytics = tripStore.ITrip[]
+type IDuePayments = {
+  due_amount: number
+  due_date: string
+  is_credit: boolean
+}[]
 type ITransactions = { amount: number; date: string; is_credited: boolean }[]
 
 function XHR(xhr: AxiosInstance) {
   return {
     getConvertedTripAnalytics(): Promise<IConvertedTripAnalytics> {
-      return xhr
-        .get("/converted-trips/analytics")
-        .then(resp => resp.data.analytics)
+      return xhr.get("/converted-trips").then(resp => resp.data.data)
     },
     getDuePayments(): Promise<IDuePayments> {
-      return xhr
-        .get("/payments/due-payments")
-        .then(resp => resp.data.due_payments)
+      return xhr.get("/instalments").then(resp => resp.data.data)
     },
-    getTransactions(): Promise<ITransactions> {
-      return xhr
-        .get("/payments/transactions")
-        .then(resp => resp.data.transactions)
+    getTransactions(): Promise<{
+      data: ITransactions
+      meta: { debited: number; credited: number }
+    }> {
+      return xhr.get("/payment-transactions").then(resp => resp.data)
     },
   }
 }
@@ -38,7 +40,11 @@ function Dashboard({ xhr }: DashboardProps) {
     IConvertedTripAnalytics
   >([])
   const [duePayments, setDuePayments] = useState<IDuePayments>([])
-  const [transactions, setTransactions] = useState<ITransactions>([])
+  const [transactions, setTransactions] = useState<{
+    data: ITransactions
+    debited: number
+    credited: number
+  }>({ data: [], debited: 0, credited: 0 })
   useEffect(() => {
     XHR(xhr)
       .getConvertedTripAnalytics()
@@ -48,7 +54,7 @@ function Dashboard({ xhr }: DashboardProps) {
       .then(setDuePayments)
     XHR(xhr)
       .getTransactions()
-      .then(setTransactions)
+      .then(({ data, meta }) => setTransactions({ data, ...meta }))
   }, [])
   return (
     <RedirectUnlessAuthenticated>
@@ -60,33 +66,68 @@ function Dashboard({ xhr }: DashboardProps) {
       {convertedTripAnalytics
         .map(a =>
           moment
-            .utc(a.created_at)
+            .utc(a.converted_at)
             .local()
-            .format("DD MMM, YYYY")
+            .format("DD/MM/YYYY")
         )
         .join(" • ")}
       <h3>Due payments</h3>
-      {duePayments
-        .map(
-          a =>
-            `${moment
-              .utc(a.due_date)
-              .local()
-              .format("DD MMM, YYYY")} - ${a.due_amount}`
-        )
-        .join(" • ")}
+      <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
+        <table>
+          <tbody>
+            <tr>
+              <th>Due Date</th>
+              {duePayments.map((a, i) => (
+                <td key={i}>
+                  {moment
+                    .utc(a.due_date)
+                    .local()
+                    .format("DD/MM/YYYY")}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <th>Amount</th>
+              {duePayments.map((a, i) => (
+                <td key={i}>
+                  {a.is_credit ? "+" : "-"}
+                  {a.due_amount}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <h3>Transactions</h3>
-      {transactions
-        .map(
-          a =>
-            `${moment
-              .utc(a.date)
-              .local()
-              .format("DD MMM, YYYY")} - ${a.amount} ${
-              a.is_credited ? "Credited" : "Debited"
-            }`
-        )
-        .join(" • ")}
+      <div>
+        Credited: {transactions.credited} • Debited: {transactions.debited}
+      </div>
+      <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
+        <table>
+          <tbody>
+            <tr>
+              <th>Date</th>
+              {transactions.data.map((a, i) => (
+                <td key={i}>
+                  {moment
+                    .utc(a.date)
+                    .local()
+                    .format("DD/MM/YYYY")}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <th>Amount</th>
+              {transactions.data.map((a, i) => (
+                <td key={i}>
+                  {a.is_credited ? "+" : "-"}
+                  {a.amount}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </RedirectUnlessAuthenticated>
   )
 }

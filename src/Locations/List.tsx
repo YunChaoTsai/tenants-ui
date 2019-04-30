@@ -17,28 +17,29 @@ import {
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { Async, AsyncProps } from "./../Shared/Select"
 import { withXHR, XHRProps } from "./../xhr"
+import Paginate, { PaginateProps } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "./../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getLocations(params?: any): Promise<ILocation[]> {
-      return xhr
-        .get("/locations", { params })
-        .then(({ data }) => data.locations)
+    getLocations(params?: any): Promise<{ data: ILocation[]; meta: any }> {
+      return xhr.get("/locations", { params }).then(resp => resp.data)
     },
     getCountries(params?: any): Promise<ICountry[]> {
       return xhr
         .get("/locations/countries", { params })
-        .then(({ data }) => data.countries)
+        .then(({ data }) => data.data)
     },
     getStates(params?: any): Promise<ICountryState[]> {
       return xhr
         .get("/locations/states", { params })
-        .then(({ data }) => data.states)
+        .then(({ data }) => data.data)
     },
     getCities(params?: any): Promise<ICity[]> {
       return xhr
         .get("/locations/cities", { params })
-        .then(({ data }) => data.cities)
+        .then(({ data }) => data.data)
     },
   }
 }
@@ -49,9 +50,9 @@ export const getLocations = (
   dispatch(actions.list.request())
   return XHR(xhr)
     .getLocations(params)
-    .then(locations => {
-      dispatch(actions.list.success(locations))
-      return locations
+    .then(data => {
+      dispatch(actions.list.success(data))
+      return data.data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -59,7 +60,7 @@ export const getLocations = (
     })
 }
 
-interface StateProps {
+interface StateProps extends PaginateProps {
   isFetching: boolean
   locations: ILocation[]
 }
@@ -77,8 +78,9 @@ export const connectWithList = connect<
   state => {
     const locationsSelector = selectors(state)
     return {
+      ...locationsSelector.meta,
       isFetching: locationsSelector.isFetching,
-      locations: locationsSelector.locations,
+      locations: locationsSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -91,26 +93,49 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getLocations, locations, isFetching }: ListProps) {
+function List({ getLocations, locations, ...otherProps }: ListProps) {
+  const { total, isFetching, currentPage } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getLocations({ limit: 1000 })
+    getLocations({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Locations</title>
       </Helmet>
-      {!isFetching ? `Total: ${locations.length}` : ""}
-      <ul>
-        {isFetching
-          ? "Loading..."
-          : locations.map(location => (
-              <li key={location.id}>
-                {location.name}
-                {/* <Link to={`${location.id.toString()}/edit`}>Edit</Link> */}
-              </li>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getLocations({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getLocations({ ...params, page })}
+        />
+      </div>
+      <Listable total={total} isFetching={isFetching}>
+        <table>
+          <thead>
+            <th>Short Name</th>
+            <th>Name</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+          </thead>
+          <tbody>
+            {locations.map(location => (
+              <tr key={location.id}>
+                <td>{location.short_name}</td>
+                <td>{location.name}</td>
+                <td>{location.latitude}</td>
+                <td>{location.longitude}</td>
+              </tr>
             ))}
-      </ul>
+          </tbody>
+        </table>
+      </Listable>
     </Fragment>
   )
 }
@@ -124,7 +149,15 @@ export const SelectLocations = withXHR<SelectProps>(function SelectLocations({
   ...otherProps
 }: SelectProps) {
   return (
-    <Async multiple {...otherProps} fetch={q => XHR(xhr).getLocations({ q })} />
+    <Async
+      multiple
+      {...otherProps}
+      fetch={q =>
+        XHR(xhr)
+          .getLocations({ q })
+          .then(resp => resp.data)
+      }
+    />
   )
 })
 

@@ -23,14 +23,15 @@ import Quotes, { Quote } from "./Quotes"
 import NewQuote from "./NewQuote"
 import { Dialog, useDialog } from "./../Shared/Dialog"
 import { withXHR, XHRProps } from "./../xhr"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
     getTrip(tripId: string): Promise<ITrip> {
-      return xhr.get(`/trips/${tripId}`).then(resp => resp.data.trip)
+      return xhr.get(`/trips/${tripId}`).then(resp => resp.data.data)
     },
     convertTrip(data: any): Promise<ITrip> {
-      return xhr.post("/converted-trips", data).then(resp => resp.data.trip)
+      return xhr.post("/converted-trips", data).then(resp => resp.data.data)
     },
   }
 }
@@ -74,7 +75,7 @@ const connectWithItem = connect<
     const tripSelector = selectors(state)
     return {
       isFetching: tripSelector.isFetching,
-      trip: tripSelector.getTrip(ownProps.tripId),
+      trip: tripSelector.getItem(ownProps.tripId),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -135,7 +136,7 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
     trip_id,
     latest_given_quote,
     contacts,
-    is_converted,
+    converted_at,
     payments,
   } = trip
   return (
@@ -147,33 +148,48 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
           {trip_source.short_name}-{trip_id})
         </title>
       </Helmet>
-      <h3>
-        {locations.map(l => l.short_name).join(" • ")} ({trip_source.short_name}
-        -{trip_id}) from{" "}
-        {moment
-          .utc(start_date)
-          .local()
-          .format("DD MMM, YYYY")}{" "}
-        to{" "}
-        {moment
-          .utc(end_date)
-          .local()
-          .format("DD MMM, YYYY")}{" "}
-        with {no_of_adults} Adults{children ? ` and ${children} children` : ""}
-      </h3>
-      <h4>{is_converted ? "Converted" : null}</h4>
-      <div>
-        Traveler Details:
-        <ul>
-          {contacts.map(contact => (
-            <li key={contact.id}>
-              {contact.name} - {contact.phone_number}
-              {contact.email ? <span>&lt;{contact.email}&gt;</span> : null}
-            </li>
-          ))}
-        </ul>
-      </div>
-      {payments ? (
+      <Grid>
+        <Col>
+          <h3>
+            {locations.map(l => l.short_name).join(" • ")} (
+            {trip_source.short_name}-{trip_id}) from{" "}
+          </h3>
+          <dl>
+            <dt>Dates</dt>
+            <dd>
+              {moment
+                .utc(start_date)
+                .local()
+                .format("DD MMM, YYYY")}{" "}
+              to{" "}
+              {moment
+                .utc(end_date)
+                .local()
+                .format("DD MMM, YYYY")}
+            </dd>
+            <dt>Pax</dt>
+            <dd>
+              {no_of_adults} Adults
+              {children ? ` and ${children} children` : ""}
+            </dd>
+          </dl>
+          <h4>{converted_at ? "Converted" : null}</h4>
+        </Col>
+        <Col md={4}>
+          <fieldset>
+            <legend>Traveler Details</legend>
+            <ul>
+              {contacts.map(contact => (
+                <li key={contact.id}>
+                  {contact.name} - {contact.phone_number}
+                  {contact.email ? <span>&lt;{contact.email}&gt;</span> : null}
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+        </Col>
+      </Grid>
+      {payments && payments.length ? (
         <div>
           <h4>Payments from customer</h4>
           <ul>
@@ -201,247 +217,26 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
         </div>
       ) : null}
       {latest_given_quote ? (
-        <div>
-          <h3>Latest given quote </h3>
-          <p>Given Price: {latest_given_quote.given_price}</p>
+        <fieldset>
+          <legend>Latest Given Quote</legend>
+          <h3>INR: {latest_given_quote.given_price} /-</h3>
           <p>
             Given By: {latest_given_quote.created_by.name} on{" "}
-            {latest_given_quote.created_at}
+            {moment
+              .utc(latest_given_quote.created_at)
+              .local()
+              .format("Do MMM, YYYY \\at hh:mm A")}
           </p>
           <Button onClick={showConvert}>Mark as converted</Button>
-          <Quote quote={latest_given_quote.quote} />
-          <Dialog open={isConvertVisible} onClose={hideConvert}>
-            <div style={{ padding: "10px" }}>
-              <h3>Trip Conversion</h3>
-              <Formik
-                initialValues={{
-                  comments: "",
-                  details_verified: false,
-                  instalments: [
-                    {
-                      due_date: "",
-                      amount: latest_given_quote.given_price,
-                      percentage: 100,
-                    },
-                  ],
-                }}
-                validationSchema={tripConversionValidationSchema}
-                onSubmit={(
-                  {
-                    details_verified,
-                    instalments,
-                    comments,
-                  }: ITripConversionSchema,
-                  actions: FormikActions<ITripConversionSchema>
-                ) => {
-                  const { given_price } = latest_given_quote
-                  actions.setStatus()
-                  if (!details_verified) {
-                    actions.setStatus(
-                      "Please verify the details and select the checkbox when done."
-                    )
-                    actions.setSubmitting(false)
-                    return
-                  }
-                  const totalInstalmentAmount = instalments.reduce(
-                    (totalAmount, { amount }) => totalAmount + amount,
-                    0
-                  )
-                  if (totalInstalmentAmount < given_price) {
-                    actions.setStatus(
-                      `Instalments doesn't sumup(Rs: ${totalInstalmentAmount} /-) with given quote's price (Rs: ${given_price}) /-`
-                    )
-                    actions.setSubmitting(false)
-                    return
-                  }
-                  if (
-                    confirm(
-                      `${
-                        totalInstalmentAmount > given_price
-                          ? "Total instalment is greater then given quote's amount. "
-                          : ""
-                      }Are you sure you want to mark this trip as converted ?`
-                    )
-                  ) {
-                    XHR(xhr)
-                      .convertTrip({
-                        instalments,
-                        comments,
-                        trip_id: id,
-                      })
-                      .then(trip => {
-                        actions.setSubmitting(false)
-                        hideConvert()
-                      })
-                    console.log(instalments)
-                  } else {
-                    actions.setSubmitting(false)
-                  }
-                }}
-                render={({
-                  isSubmitting,
-                  values,
-                  setFieldValue,
-                  status,
-                }: FormikProps<ITripConversionSchema>) => (
-                  <Form noValidate>
-                    {status ? (
-                      <div>
-                        {status} <hr />
-                      </div>
-                    ) : null}
-                    <div>
-                      <p>
-                        <b>Please verify following details with the customer</b>
-                      </p>
-                      <p>
-                        Destination:{" "}
-                        {locations.map(l => l.short_name).join(" • ")}
-                      </p>
-                      <p>
-                        Start Date:
-                        {moment
-                          .utc(start_date)
-                          .local()
-                          .format("DD MMM, YYYY")}{" "}
-                      </p>
-                      <p>
-                        End Date:
-                        {moment
-                          .utc(end_date)
-                          .local()
-                          .format("DD MMM, YYYY")}
-                      </p>
-                      <p>
-                        Adults: {no_of_adults} and Children:{" "}
-                        {children || <em>None</em>}
-                      </p>
-                      <p>
-                        Total Amount: Rs: {latest_given_quote.given_price} /-
-                      </p>
-                      <InputField
-                        name="details_verified"
-                        type="checkbox"
-                        label="Verified Details?"
-                      />
-                    </div>
-                    <hr />
-                    <div>Instalments</div>
-                    <FieldArray
-                      name="instalments"
-                      render={({ name, push, remove }) => (
-                        <ul>
-                          {values.instalments.map(
-                            (instalment, index, instalments) => (
-                              <li key={index}>
-                                <InputField
-                                  name={`${name}.${index}.due_date`}
-                                  label="Date"
-                                  type="date"
-                                />
-                                <div>
-                                  <label>Percentage</label>
-                                  <Field
-                                    name={`${name}.${index}.percentage`}
-                                    render={({
-                                      field,
-                                    }: FieldProps<ITripConversionSchema>) => (
-                                      <Input
-                                        {...field}
-                                        onChange={(
-                                          e: React.ChangeEvent<HTMLInputElement>
-                                        ) => {
-                                          setFieldValue(
-                                            `${name}.${index}.amount`,
-                                            (latest_given_quote.given_price *
-                                              parseFloat(
-                                                e.target.value || "0"
-                                              )) /
-                                              100
-                                          )
-                                          field.onChange(e)
-                                        }}
-                                        type="number"
-                                      />
-                                    )}
-                                  />
-                                </div>
-                                <div>
-                                  <label>Amount</label>
-                                  <Field
-                                    name={`${name}.${index}.amount`}
-                                    render={({
-                                      field,
-                                    }: FieldProps<ITripConversionSchema>) => (
-                                      <Input
-                                        {...field}
-                                        onChange={(
-                                          e: React.ChangeEvent<HTMLInputElement>
-                                        ) => {
-                                          setFieldValue(
-                                            `${name}.${index}.percentage`,
-                                            (100 *
-                                              parseFloat(
-                                                e.target.value || "0"
-                                              )) /
-                                              latest_given_quote.given_price
-                                          )
-                                          field.onChange(e)
-                                        }}
-                                        type="number"
-                                      />
-                                    )}
-                                  />
-                                </div>
-                                {instalments.length > 1 ? (
-                                  <Button onClick={e => remove(index)}>
-                                    Remove
-                                  </Button>
-                                ) : null}
-                                <Button onClick={e => push(instalment)}>
-                                  Duplicate
-                                </Button>
-                              </li>
-                            )
-                          )}
-                          <Button
-                            onClick={e => {
-                              const remainingPercentage = Math.max(
-                                100 -
-                                  values.instalments.reduce(
-                                    (totalPercentage, { percentage }) =>
-                                      totalPercentage + percentage,
-                                    0
-                                  ),
-                                0
-                              )
-                              push({
-                                due_date: "",
-                                amount:
-                                  (latest_given_quote.given_price *
-                                    remainingPercentage) /
-                                  100,
-                                percentage: remainingPercentage,
-                              })
-                            }}
-                          >
-                            Add More
-                          </Button>
-                        </ul>
-                      )}
-                    />
-                    <InputField name="comments" label="Comments" />
-                    <Button type="submit" disabled={isSubmitting}>
-                      Mark as converted
-                    </Button>
-                    <Button onClick={hideConvert}>Cancel</Button>
-                  </Form>
-                )}
-              />
-            </div>
-          </Dialog>
+          <ConvertTrip
+            trip={trip}
+            isConvertVisible={isConvertVisible}
+            hideConvert={hideConvert}
+            onConvert={(data: any) => XHR(xhr).convertTrip(data)}
+          />
           <hr />
-        </div>
+          <Quote quote={latest_given_quote.quote} />
+        </fieldset>
       ) : null}
       <Link to="quotes">Quotes</Link> • <Link to="new-quote">New Quote</Link>
       <Router>
@@ -449,6 +244,245 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
         <NewQuote path="new-quote" trip={trip} />
       </Router>
     </div>
+  )
+}
+
+export function ConvertTrip({
+  trip,
+  isConvertVisible,
+  hideConvert,
+  onConvert,
+}: {
+  trip: ITrip
+  isConvertVisible: boolean
+  hideConvert: () => void
+  onConvert: (data: any) => Promise<any>
+}) {
+  const {
+    id,
+    locations,
+    latest_given_quote,
+    start_date,
+    end_date,
+    no_of_adults,
+    children,
+  } = trip
+  if (!latest_given_quote) return null
+  return (
+    <Dialog open={isConvertVisible} onClose={hideConvert}>
+      <div style={{ padding: "10px" }}>
+        <h3>Trip Conversion</h3>
+        <Formik
+          initialValues={{
+            comments: "",
+            details_verified: false,
+            instalments: [
+              {
+                due_date: "",
+                amount: latest_given_quote.given_price,
+                percentage: 100,
+              },
+            ],
+          }}
+          validationSchema={tripConversionValidationSchema}
+          onSubmit={(
+            { details_verified, instalments, comments }: ITripConversionSchema,
+            actions: FormikActions<ITripConversionSchema>
+          ) => {
+            const { given_price } = latest_given_quote
+            actions.setStatus()
+            if (!details_verified) {
+              actions.setStatus(
+                "Please verify the details and select the checkbox when done."
+              )
+              actions.setSubmitting(false)
+              return
+            }
+            const totalInstalmentAmount = instalments.reduce(
+              (totalAmount, { amount }) => totalAmount + amount,
+              0
+            )
+            if (totalInstalmentAmount < given_price) {
+              actions.setStatus(
+                `Instalments doesn't sumup(Rs: ${totalInstalmentAmount} /-) with given quote's price (Rs: ${given_price}) /-`
+              )
+              actions.setSubmitting(false)
+              return
+            }
+            if (
+              confirm(
+                `${
+                  totalInstalmentAmount > given_price
+                    ? "Total instalment is greater then given quote's amount. "
+                    : ""
+                }Are you sure you want to mark this trip as converted ?`
+              )
+            ) {
+              onConvert({
+                instalments,
+                comments,
+                trip_id: id,
+              }).then(() => {
+                actions.setSubmitting(false)
+                hideConvert()
+              })
+            } else {
+              actions.setSubmitting(false)
+            }
+          }}
+          render={({
+            isSubmitting,
+            values,
+            setFieldValue,
+            status,
+          }: FormikProps<ITripConversionSchema>) => (
+            <Form noValidate>
+              {status ? (
+                <div>
+                  {status} <hr />
+                </div>
+              ) : null}
+              <div>
+                <p>
+                  <b>Please verify following details with the customer</b>
+                </p>
+                <p>
+                  Destination: {locations.map(l => l.short_name).join(" • ")}
+                </p>
+                <p>
+                  Start Date:
+                  {moment
+                    .utc(start_date)
+                    .local()
+                    .format("DD MMM, YYYY")}{" "}
+                </p>
+                <p>
+                  End Date:
+                  {moment
+                    .utc(end_date)
+                    .local()
+                    .format("DD MMM, YYYY")}
+                </p>
+                <p>
+                  Adults: {no_of_adults} and Children:{" "}
+                  {children || <em>None</em>}
+                </p>
+                <p>Total Amount: Rs: {latest_given_quote.given_price} /-</p>
+                <InputField
+                  name="details_verified"
+                  type="checkbox"
+                  label="Verified Details?"
+                />
+              </div>
+              <hr />
+              <div>Instalments</div>
+              <FieldArray
+                name="instalments"
+                render={({ name, push, remove }) => (
+                  <ul>
+                    {values.instalments.map(
+                      (instalment, index, instalments) => (
+                        <li key={index}>
+                          <InputField
+                            name={`${name}.${index}.due_date`}
+                            label="Date"
+                            type="date"
+                          />
+                          <div>
+                            <label>Percentage</label>
+                            <Field
+                              name={`${name}.${index}.percentage`}
+                              render={({
+                                field,
+                              }: FieldProps<ITripConversionSchema>) => (
+                                <Input
+                                  {...field}
+                                  onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                  ) => {
+                                    setFieldValue(
+                                      `${name}.${index}.amount`,
+                                      (latest_given_quote.given_price *
+                                        parseFloat(e.target.value || "0")) /
+                                        100
+                                    )
+                                    field.onChange(e)
+                                  }}
+                                  type="number"
+                                />
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <label>Amount</label>
+                            <Field
+                              name={`${name}.${index}.amount`}
+                              render={({
+                                field,
+                              }: FieldProps<ITripConversionSchema>) => (
+                                <Input
+                                  {...field}
+                                  onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                  ) => {
+                                    setFieldValue(
+                                      `${name}.${index}.percentage`,
+                                      (100 *
+                                        parseFloat(e.target.value || "0")) /
+                                        latest_given_quote.given_price
+                                    )
+                                    field.onChange(e)
+                                  }}
+                                  type="number"
+                                />
+                              )}
+                            />
+                          </div>
+                          {instalments.length > 1 ? (
+                            <Button onClick={e => remove(index)}>Remove</Button>
+                          ) : null}
+                          <Button onClick={e => push(instalment)}>
+                            Duplicate
+                          </Button>
+                        </li>
+                      )
+                    )}
+                    <Button
+                      onClick={e => {
+                        const remainingPercentage = Math.max(
+                          100 -
+                            values.instalments.reduce(
+                              (totalPercentage, { percentage }) =>
+                                totalPercentage + percentage,
+                              0
+                            ),
+                          0
+                        )
+                        push({
+                          due_date: "",
+                          amount:
+                            (latest_given_quote.given_price *
+                              remainingPercentage) /
+                            100,
+                          percentage: remainingPercentage,
+                        })
+                      }}
+                    >
+                      Add More
+                    </Button>
+                  </ul>
+                )}
+              />
+              <InputField name="comments" label="Comments" />
+              <Button type="submit" disabled={isSubmitting}>
+                Mark as converted
+              </Button>
+              <Button onClick={hideConvert}>Cancel</Button>
+            </Form>
+          )}
+        />
+      </div>
+    </Dialog>
   )
 }
 

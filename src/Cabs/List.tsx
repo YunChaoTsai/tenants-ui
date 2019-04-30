@@ -6,15 +6,17 @@ import { connect } from "react-redux"
 import { Omit } from "utility-types"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { RedirectUnlessAuthenticated } from "./../Auth"
 import { ICab, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
+import { Paginate, PaginateProps } from "./../Shared/Paginate"
+import { Search, useSearch } from "./../Shared/Search"
+import { List } from "./../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getCabs(params?: any): Promise<ICab[]> {
-      return xhr.get("/cabs", { params }).then(({ data }) => data.cabs)
+    getCabs(params?: any): Promise<{ data: ICab[]; meta: any }> {
+      return xhr.get("/cabs", { params }).then(resp => resp.data)
     },
   }
 }
@@ -27,9 +29,9 @@ export const getCabs = (params?: any): ThunkAction<Promise<ICab[]>> => (
   dispatch(actions.list.request())
   return XHR(xhr)
     .getCabs(params)
-    .then(cabs => {
-      dispatch(actions.list.success(cabs))
-      return cabs
+    .then(({ data, meta }) => {
+      dispatch(actions.list.success({ data, meta }))
+      return data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -37,38 +39,57 @@ export const getCabs = (params?: any): ThunkAction<Promise<ICab[]>> => (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   cabs: ICab[]
 }
 interface DispatchProps {
-  getCabs: (params?: any) => Promise<ICab[]>
+  getCabs: (params?: any) => Promise<any>
 }
 interface OwnProps extends RouteComponentProps {}
 interface CabsProps extends OwnProps, StateProps, DispatchProps {}
-export function Cabs({ getCabs, cabs, isFetching }: CabsProps) {
+export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
+  const { isFetching, currentPage, total } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getCabs()
+    getCabs({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Cabs</title>
       </Helmet>
-      {!isFetching ? `Total: ${cabs.length}` : ""}
-      <ul>
-        {isFetching ? (
-          <li>Loading...</li>
-        ) : (
-          cabs.map(r => (
-            <li key={r.id}>
-              <Link to={r.id.toString()}>
-                {r.name} - {r.number_plate}
-              </Link>
-            </li>
-          ))
-        )}
-      </ul>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getCabs({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getCabs({ ...params, page })}
+        />
+      </div>
+      <List isFetching={isFetching} total={total}>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Number Plate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cabs.map(r => (
+              <tr key={r.id}>
+                <td>
+                  <Link to={r.id.toString()}>{r.name}</Link>
+                </td>
+                <td>{r.number_plate}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </List>
     </Fragment>
   )
 }
@@ -77,8 +98,9 @@ export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
   state => {
     const cabsSelector = selectors(state)
     return {
+      ...cabsSelector.meta,
       isFetching: cabsSelector.isFetching,
-      cabs: cabsSelector.cabs,
+      cabs: cabsSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -95,5 +117,15 @@ export const SelectCabs = withXHR<SelectCabsProps>(function SelectCabs({
   xhr,
   ...otherProps
 }: SelectCabsProps) {
-  return <Async multiple fetch={q => XHR(xhr).getCabs()} {...otherProps} />
+  return (
+    <Async
+      multiple
+      fetch={q =>
+        XHR(xhr)
+          .getCabs()
+          .then(resp => resp.data)
+      }
+      {...otherProps}
+    />
+  )
 })

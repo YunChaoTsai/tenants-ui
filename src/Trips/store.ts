@@ -1,7 +1,16 @@
 import { createAsyncAction, getType, ActionType } from "typesafe-actions"
 
-import { IBaseItem, IBaseState, model, init } from "./../model"
+import {
+  IBaseItem,
+  IBaseState,
+  model,
+  init,
+  IMeta,
+  IModelState,
+  createReducer,
+} from "./../model"
 import { store as locationStore } from "./../Locations"
+import { store as transportServiceStore } from "./../TransportServices"
 import { store as tripSourceStore } from "./../TripSources"
 import { store as hotelStore } from "./../Hotels"
 import { store as roomTypeStore } from "./../RoomTypes"
@@ -38,8 +47,8 @@ export interface IQuoteCab {
   date: string
   cab_type_id: number
   cab_type: cabTypeStore.ICabType
-  location_service_id: number
-  location_service: locationStore.IService
+  transport_service_id: number
+  transport_service: transportServiceStore.ITransportService
   no_of_cabs: number
   calculated_price?: number
   given_price: number
@@ -82,10 +91,10 @@ export interface ITrip extends IBaseItem {
   latest_given_quote?: IGivenQuote
   given_quotes?: IGivenQuote[]
   contacts: contactStore.IContact[]
-  primary_contact?: contactStore.IContact
+  contact: contactStore.IContact
   stages: tripStageStore.ITripStage[]
   latest_stage?: tripStageStore.ITripStage
-  is_converted: boolean
+  converted_at?: string
   payments?: paymentStore.IPayment<ITrip>[]
   hotel_payments?: paymentStore.IPayment<hotelStore.IHotel>[]
   cab_payments?: paymentStore.IPayment<cabTypeStore.ICabType>[]
@@ -93,10 +102,7 @@ export interface ITrip extends IBaseItem {
 
 export interface ITrips extends IBaseState<ITrip> {}
 
-export interface IState {
-  readonly isFetching: boolean
-  readonly trips: ITrips
-}
+export interface IState extends IModelState<ITrip> {}
 
 export interface IStateWithKey {
   readonly [key]: IState
@@ -104,7 +110,7 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  trips: init<ITrip>(),
+  state: init<ITrip>(),
 }
 
 export const actions = {
@@ -112,7 +118,7 @@ export const actions = {
     "@TRIPS/LIST_FETCH_REQUEST",
     "@TRIPS/LIST_FETCH_SUCCESS",
     "@TRIPS/LIST_FETCH_FAILED"
-  )<any, ITrip[], Error>(),
+  )<any, { data: ITrip[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@TRIPS/ITEM_FETCH_REQUEST",
     "@TRIPS/ITEM_FETCH_SUCCESS",
@@ -122,50 +128,17 @@ export const actions = {
 
 export type TActions = ActionType<typeof actions>
 
-export function reducer(
-  state: IState = INITIAL_STATE,
-  action: TActions
-): IState {
-  switch (action.type) {
-    case getType(actions.list.request):
-      return { ...state, isFetching: true }
-    case getType(actions.list.success):
-      return {
-        ...state,
-        trips: model(state.trips).insert(action.payload),
-        isFetching: false,
-      }
-    case getType(actions.list.failure):
-      return { ...state, isFetching: false }
-    case getType(actions.item.request):
-      return { ...state, isFetching: true }
-    case getType(actions.item.success):
-      return {
-        ...state,
-        trips: model(state.trips).insert([action.payload]),
-        isFetching: false,
-      }
-    case getType(actions.item.failure):
-      return { ...state, isFetching: false }
-    default:
-      return state
-  }
-}
+export const reducer = createReducer(INITIAL_STATE, actions as any)
 
 export function selectors<State extends IStateWithKey>(state: State) {
+  const myState = state[key]
   return {
+    ...model(myState.state),
     get state(): IState {
-      return state[key]
+      return myState
     },
     get isFetching(): boolean {
       return this.state.isFetching
-    },
-    get trips(): ITrip[] {
-      return model<ITrip>(this.state.trips).get()
-    },
-    getTrip(id?: string | number): ITrip | undefined {
-      if (!id) return
-      return model<ITrip>(this.state.trips).getItem(id)
     },
   }
 }

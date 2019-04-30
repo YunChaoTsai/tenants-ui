@@ -27,7 +27,11 @@ export function InputField({
         <div className={className}>
           {label ? <label htmlFor="name">{label}</label> : null}
           <Input {...otherProps} type={type} {...field} />
-          <ErrorMessage name={field.name} />
+          <ErrorMessage
+            name={field.name}
+            component="span"
+            className="text--error"
+          />
         </div>
       )}
     />

@@ -10,6 +10,7 @@ export default function RoomTypesModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h2>Room Types</h2>
       <Link to="new">New Room Type</Link>
+      <hr />
       <Router>
         <NewItem path="/new" />
         <List path="/" />

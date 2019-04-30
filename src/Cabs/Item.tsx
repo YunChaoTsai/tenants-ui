@@ -6,13 +6,12 @@ import { connect } from "react-redux"
 import moment from "moment"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { RedirectUnlessAuthenticated } from "./../Auth"
 import { ICab, actions, IStateWithKey, selectors } from "./store"
 
 function XHR(xhr: AxiosInstance) {
   return {
     getCab(id: string): Promise<ICab> {
-      return xhr.get(`/cabs/${id}`).then(({ data }) => data.cab)
+      return xhr.get(`/cabs/${id}`).then(({ data }) => data.data)
     },
   }
 }
@@ -58,7 +57,7 @@ export const withCabData = connect<
     const cabsSelector = selectors(state)
     return {
       isFetching: cabsSelector.isFetching,
-      cab: cabsSelector.getCab(ownProps.cabId),
+      cab: cabsSelector.getItem(ownProps.cabId),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -119,7 +118,7 @@ export default function Cab({
                 <br />
               </div>
             ) : (
-              <Redirect noThrow to="/users" />
+              <Redirect noThrow to="/cabs" />
             )}
           </Fragment>
         )

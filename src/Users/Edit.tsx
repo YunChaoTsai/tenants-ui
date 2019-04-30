@@ -63,7 +63,7 @@ export function EditUser({ xhr, navigate, userId }: EditUserProps) {
                 return xhr
                   .patch(`/users/${userId}`, values)
                   .then(({ data }) => {
-                    const { user } = data
+                    const { data: user } = data
                     navigate && navigate(`../../${user.id}`)
                     actions.setSubmitting(false)
                   })

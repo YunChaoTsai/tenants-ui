@@ -13,6 +13,7 @@ export default function RolesModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h2>Roles</h2>
       <Link to="new">New Role</Link>
+      <hr />
       <Router>
         <Item path=":roleId" />
         <Edit path=":roleId/edit" />

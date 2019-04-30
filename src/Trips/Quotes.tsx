@@ -10,21 +10,20 @@ import { ITrip, IQuote, IGivenQuote } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Dialog, useDialog } from "./../Shared/Dialog"
 import { InputField } from "./../Shared/InputField"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
     getQuotes(tripId: number | string, params?: any): Promise<IQuote[]> {
       return xhr
         .get(`/trips/${tripId}/quotes`, { params })
-        .then(resp => resp.data.quotes)
+        .then(resp => resp.data.data)
     },
     getGivenQuotes(params?: any): Promise<IGivenQuote[]> {
-      return xhr
-        .get("/given-quotes", { params })
-        .then(resp => resp.data.given_quotes)
+      return xhr.get("/given-quotes", { params }).then(resp => resp.data.data)
     },
     giveQuote(data: any): Promise<IGivenQuote> {
-      return xhr.post(`/given-quotes`, data).then(resp => resp.data.quote)
+      return xhr.post(`/given-quotes`, data).then(resp => resp.data.data)
     },
   }
 }
@@ -58,7 +57,7 @@ export const Quote = withXHR(function Quote({
   const [showGiveQuote, open, close] = useDialog()
   return (
     <div>
-      <h4>Total Price: {total_price}</h4>
+      <h5>Total Price: {total_price}</h5>
       <p>Comments: {comments}</p>
       <div>By: {created_by.name}</div>
       <h5>Hotels</h5>
@@ -93,7 +92,7 @@ export const Quote = withXHR(function Quote({
             id,
             date,
             cab_type,
-            location_service,
+            transport_service,
             no_of_cabs,
             comments,
             given_price,
@@ -103,7 +102,7 @@ export const Quote = withXHR(function Quote({
                 .utc(date)
                 .local()
                 .format("DD MMM, YYYY")}{" "}
-              - {cab_type.name} - {location_service.name} - {no_of_cabs} cabs -
+              - {cab_type.name} - {transport_service.name} - {no_of_cabs} cabs -
               Rs: {given_price} /-
               {comments ? <p>Comments: {comments}</p> : null}
             </li>
@@ -135,7 +134,7 @@ export const Quote = withXHR(function Quote({
             }}
             render={({ isSubmitting, values, setFieldValue }) => (
               <Form noValidate style={{ padding: "20px" }}>
-                <h3>Give this quote (price: quote.total_price)</h3>
+                <h3>Give this quote (price: {quote.total_price})</h3>
                 <hr />
                 <div>
                   <label>Multiplication Factor</label>
@@ -197,46 +196,36 @@ function Quotes({ xhr, trip }: QuotesProps) {
     getQuotes()
   }, [])
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Given Quotes</th>
-            <th>Quotes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <ul className="list">
-                {giveQuotes.map(
-                  ({ id, given_price, quote, comments, created_by }) => (
-                    <li key={id}>
-                      <h4>Given Price: {given_price}</h4>
-                      <p>Comments: {comments}</p>
-                      <div>Given by: {created_by.name}</div>
-                      <h4>Give Quote</h4>
-                      <div style={{ background: "whitesmoke" }}>
-                        <Quote quote={quote} />
-                      </div>
-                    </li>
-                  )
-                )}
-              </ul>
-            </td>
-            <td>
-              <ul className="list">
-                {quotes.map(quote => (
-                  <li key={quote.id}>
-                    <Quote quote={quote} />
-                  </li>
-                ))}
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Grid>
+      <Col as="fieldset">
+        <legend>Given Quotes</legend>
+        <ul className="list">
+          {giveQuotes.map(
+            ({ id, given_price, quote, comments, created_by }) => (
+              <li key={id}>
+                <h4>Given Price: {given_price}</h4>
+                <p>Comments: {comments}</p>
+                <div>Given by: {created_by.name}</div>
+                <h4>Give Quote</h4>
+                <div style={{ background: "whitesmoke" }}>
+                  <Quote quote={quote} />
+                </div>
+              </li>
+            )
+          )}
+        </ul>
+      </Col>
+      <Col as="fieldset">
+        <legend>Quotes</legend>
+        <ul className="list">
+          {quotes.map(quote => (
+            <li key={quote.id}>
+              <Quote quote={quote} />
+            </li>
+          ))}
+        </ul>
+      </Col>
+    </Grid>
   )
 }
 

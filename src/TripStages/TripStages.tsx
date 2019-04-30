@@ -10,6 +10,7 @@ export default function TripStagesModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h2>Trip Stages</h2>
       <Link to="new">New Trip Stage</Link>
+      <hr />
       <Router>
         <NewItem path="/new" />
         <List path="/" />

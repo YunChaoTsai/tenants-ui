@@ -51,15 +51,18 @@ export function NewRole({ xhr, navigate }: NewRoleProps) {
         render={({ isSubmitting, status }: FormikProps<NewRoleCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <InputField
-              label="Name"
-              name="name"
-              required
-              placeholder="Manager"
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Submit
-            </Button>
+            <fieldset>
+              <legend>Add New Role</legend>
+              <InputField
+                label="Name"
+                name="name"
+                required
+                placeholder="Manager"
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Submit
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

@@ -1,6 +1,14 @@
-import { createAsyncAction, getType, ActionType } from "typesafe-actions"
+import { createAsyncAction, ActionType } from "typesafe-actions"
 
-import { IBaseItem, IBaseState, model, init } from "./../model"
+import {
+  IBaseItem,
+  IBaseState,
+  IModelState,
+  model,
+  init,
+  createReducer,
+  IMeta,
+} from "./../model"
 
 export const key = "CAB_LIST_STATE"
 
@@ -17,9 +25,8 @@ export interface ICab extends IBaseItem {
 
 export interface ICabs extends IBaseState<ICab> {}
 
-export interface IState {
+export interface IState extends IModelState<ICab> {
   readonly isFetching: boolean
-  readonly cabs: ICabs
 }
 
 export interface IStateWithKey {
@@ -28,7 +35,7 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  cabs: init<ICab>(),
+  state: init<ICab>(),
 }
 
 export const actions = {
@@ -36,7 +43,7 @@ export const actions = {
     "@CABS/LIST_FETCH_REQUEST",
     "@CABS/LIST_FETCH_SUCCESS",
     "@CABS/LIST_FETCH_FAILED"
-  )<any, ICab[], Error>(),
+  )<any, { data: ICab[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@CABS/ITEM_FETCH_REQUEST",
     "@CABS/ITEM_FETCH_SUCCESS",
@@ -46,50 +53,20 @@ export const actions = {
 
 export type TActions = ActionType<typeof actions>
 
-export function reducer(
-  state: IState = INITIAL_STATE,
-  action: TActions
-): IState {
-  switch (action.type) {
-    case getType(actions.list.request):
-      return { ...state, isFetching: true }
-    case getType(actions.list.success):
-      return {
-        ...state,
-        cabs: model(state.cabs).insert(action.payload),
-        isFetching: false,
-      }
-    case getType(actions.list.failure):
-      return { ...state, isFetching: false }
-    case getType(actions.item.request):
-      return { ...state, isFetching: true }
-    case getType(actions.item.success):
-      return {
-        ...state,
-        cabs: model(state.cabs).insert([action.payload]),
-        isFetching: false,
-      }
-    case getType(actions.item.failure):
-      return { ...state, isFetching: false }
-    default:
-      return state
-  }
-}
+export const reducer = createReducer<ICab, IState>(
+  INITIAL_STATE,
+  actions as any
+)
 
 export function selectors<State extends IStateWithKey>(state: State) {
+  const myState: IState = state[key]
   return {
+    ...model<ICab>(myState.state),
     get state(): IState {
-      return state[key]
+      return myState
     },
     get isFetching(): boolean {
       return this.state.isFetching
-    },
-    get cabs(): ICab[] {
-      return model<ICab>(this.state.cabs).get()
-    },
-    getCab(id?: string | number): ICab | undefined {
-      if (!id) return
-      return model<ICab>(this.state.cabs).getItem(id)
     },
   }
 }

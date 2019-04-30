@@ -21,6 +21,4 @@ export interface IContact {
   phone_number?: string
   emails: IEmail<IContact>[]
   phone_numbers: IPhoneNumber<IContact>[]
-  primary_email: IEmail<IContact>
-  primary_phone_number: IPhoneNumber<IContact>
 }

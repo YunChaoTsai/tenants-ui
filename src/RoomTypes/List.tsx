@@ -2,18 +2,21 @@ import React, { Fragment, useEffect } from "react"
 import Helmet from "react-helmet-async"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
-import { RouteComponentProps, Link } from "@reach/router"
+import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 
 import { IRoomType, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
+import Paginate, { PaginateProps } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getRoomTypes(params?: any): Promise<IRoomType[]> {
-      return xhr.get("/room-types").then(({ data }) => data.room_types)
+    getRoomTypes(params?: any): Promise<{ data: IRoomType[]; meta: any }> {
+      return xhr.get("/room-types", { params }).then(resp => resp.data)
     },
   }
 }
@@ -24,9 +27,9 @@ export const getRoomTypes = (
   dispatch(actions.list.request())
   return XHR(xhr)
     .getRoomTypes(params)
-    .then(roomTypes => {
-      dispatch(actions.list.success(roomTypes))
-      return roomTypes
+    .then(data => {
+      dispatch(actions.list.success(data))
+      return data.data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -34,8 +37,7 @@ export const getRoomTypes = (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   roomTypes: IRoomType[]
 }
 interface DispatchProps {
@@ -52,8 +54,9 @@ export const connectWithList = connect<
   state => {
     const roomTypesSelector = selectors(state)
     return {
+      ...roomTypesSelector.meta,
       isFetching: roomTypesSelector.isFetching,
-      roomTypes: roomTypesSelector.roomTypes,
+      roomTypes: roomTypesSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -66,26 +69,39 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getRoomTypes, roomTypes, isFetching }: ListProps) {
+function List({ getRoomTypes, roomTypes, ...otherProps }: ListProps) {
+  const { isFetching, total, currentPage } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getRoomTypes()
+    getRoomTypes({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Room Types</title>
       </Helmet>
-      {!isFetching ? `Total: ${roomTypes.length}` : ""}
-      <ul>
-        {isFetching
-          ? "Loading..."
-          : roomTypes.map(roomType => (
-              <li key={roomType.id}>
-                {roomType.name} - {roomType.description}
-                {/* <Link to={`${roomType.id.toString()}/edit`}>Edit</Link> */}
-              </li>
-            ))}
-      </ul>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getRoomTypes({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getRoomTypes({ ...params, page })}
+        />
+      </div>
+      <Listable total={total} isFetching={isFetching}>
+        <dl>
+          {roomTypes.map(roomType => (
+            <Fragment key={roomType.id}>
+              <dt>{roomType.name}</dt>
+              <dd>{roomType.description}</dd>
+            </Fragment>
+          ))}
+        </dl>
+      </Listable>
     </Fragment>
   )
 }
@@ -97,7 +113,15 @@ interface SelectRoomTypesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 export const SelectRoomTypes = withXHR<SelectRoomTypesProps>(
   function SelectRoomTypes({ xhr, ...otherProps }: SelectRoomTypesProps) {
     return (
-      <Async multiple {...otherProps} fetch={q => XHR(xhr).getRoomTypes()} />
+      <Async
+        multiple
+        {...otherProps}
+        fetch={q =>
+          XHR(xhr)
+            .getRoomTypes()
+            .then(resp => resp.data)
+        }
+      />
     )
   }
 )

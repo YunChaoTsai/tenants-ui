@@ -1,8 +1,8 @@
-@import url("https://fonts.googleapis.com/css?family=Lato:400,700");
-
 html {
   font-size: 16px;
   background: black;
+  font-family: sans-serif;
+  line-height: 1.15;
 }
 
 html,
@@ -13,13 +13,23 @@ body {
 }
 
 body {
-  font-family: "Lato", serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 400;
   margin: 0;
+  color: #212529;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 a[aria-current="page"] {
-  color: orangered;
+  color: #045230;
 }
 
 [role="status"] {
@@ -36,31 +46,73 @@ a[aria-current="page"] {
 
 table {
   border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
 th,
 td {
-  border: 1px solid silver;
+  border: 1px solid #dee2e6;
   vertical-align: top;
+  padding: 0.75rem;
 }
 th {
   background: whitesmoke;
-  padding: 5px;
+  color: #495057;
+  border-color: #dee2e6;
+  vertical-align: bottom;
+  border-bottom-width: 2px;
 }
 
+tr:hover {
+  background: whitesmoke;
+}
+
+dt {
+  font-weight: bold;
+}
+dd {
+  margin-bottom: 0.5rem;
+  margin-left: 0;
+}
+
+/**
+ * Utility classes
+ */
 .text--right {
   text-align: right;
 }
-
+.text--center {
+  text-align: center;
+}
+.text--error {
+  color: orangered;
+}
 .display--inline-block {
   display: inline-block;
 }
 .display--inline {
   display: inline;
 }
+.display--flex {
+  display: flex;
+  align-items: center;
+}
+.justify-content--space-between {
+  justify-content: space-between;
+}
 .vertical-align--top {
   vertical-align: top;
 }
+.width--100 {
+  width: 100%;
+}
+.float--right {
+  float: right;
+}
+
+/**
+ * Components
+ */
 .list {
   display: block;
   list-style: none;
@@ -96,10 +148,12 @@ th {
   display: inline-block;
   position: relative;
 }
-.drop-down > .toggler {
+.drop-down > .toggler,
+.drop-down > a:first-child {
   cursor: pointer;
 }
-.drop-down > .toggler:after {
+.drop-down > .toggler:after,
+.drop-down > a:first-child:after {
   content: "\005E";
   display: inline-block;
   margin-left: 3px;
@@ -107,7 +161,13 @@ th {
   transform: rotateX(180deg);
   transform-origin: center;
 }
-.drop-down > .menu {
+.drop-down:hover > .toggler:after,
+.drop-down:hover > a:first:after {
+  transform: rotateX(0);
+}
+.drop-down > .menu,
+.drop-down > ul,
+.drop-down > ol {
   position: absolute;
   top: 100%;
   display: none;
@@ -116,11 +176,37 @@ th {
   margin: 0;
   min-width: 100px;
 }
-.drop-down:hover > .menu {
+.drop-down:hover > .menu,
+.drop-down:hover > ul,
+.drop-down:hover > ol {
   display: block;
   border: 1px solid silver;
   background: white;
 }
-.drop-down:hover > .toggler:after {
-  transform: rotateX(0);
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1turn);
+  }
+}
+.spin {
+  animation: fa-spin 0.6s infinite linear;
+  display: inline-block;
+}
+
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+.table {
+  width: 100%;
+}
+.table--fixed {
+  width: 100%;
+  table-layout: fixed;
 }

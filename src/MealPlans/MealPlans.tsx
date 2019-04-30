@@ -10,6 +10,7 @@ export default function MealPlansModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h2>Meal Plans</h2>
       <Link to="new">New Meal Plan</Link>
+      <hr />
       <Router>
         <NewItem path="/new" />
         <List path="/" />

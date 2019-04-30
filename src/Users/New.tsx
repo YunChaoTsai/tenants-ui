@@ -56,7 +56,7 @@ export function NewUser({ xhr, navigate }: NewUserProps) {
           return xhr
             .post("/users", values)
             .then(({ data }) => {
-              const { user } = data
+              const { data: user } = data
               navigate && navigate(`../${user.id}`)
               actions.setSubmitting(false)
             })
@@ -71,31 +71,40 @@ export function NewUser({ xhr, navigate }: NewUserProps) {
         render={({ isSubmitting, status }: FormikProps<NewUserCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <InputField label="Name" name="name" required />
-            <InputField
-              label="Email"
-              type="email"
-              name="email"
-              autoComplete="username"
-              required
-            />
-            <InputField
-              label="Password"
-              type="password"
-              name="password"
-              autoComplete="new-password"
-              required
-            />
-            <InputField
-              label="Retype Password"
-              type="password"
-              name="password_confirmation"
-              autoComplete="new-password"
-              required
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Submit
-            </Button>
+            <fieldset>
+              <InputField
+                label="Name"
+                name="name"
+                required
+                placeholder="John Tourepedia"
+                autoComplete="name"
+              />
+              <InputField
+                label="Email"
+                type="email"
+                name="email"
+                autoComplete="username"
+                placeholder="username@tourepedia.com"
+                required
+              />
+              <InputField
+                label="Password"
+                type="password"
+                name="password"
+                autoComplete="new-password"
+                required
+              />
+              <InputField
+                label="Retype Password"
+                type="password"
+                name="password_confirmation"
+                autoComplete="new-password"
+                required
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Submit
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

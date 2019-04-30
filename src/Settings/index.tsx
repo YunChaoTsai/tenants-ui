@@ -14,14 +14,21 @@ function Settings({ user }: SettingsProps) {
         <title>Settings</title>
       </Helmet>
       <h2>Settings</h2>
-      <ul>
-        <li>
-          <Link to="change-password">Change Password</Link>
-        </li>
-      </ul>
-      <Router>
-        <ChangePassword path="change-password" />
-      </Router>
+      <div className="row">
+        <fieldset className="col-sm-2">
+          <ul className="list">
+            <li>
+              <Link to="change-password">Change Password</Link>
+            </li>
+          </ul>
+        </fieldset>
+        <div className="col-sm">
+          <Router>
+            <ChangePassword path="change-password" />
+            <ChangePassword path="/" />
+          </Router>
+        </div>
+      </div>
     </RedirectUnlessAuthenticated>
   )
 }
