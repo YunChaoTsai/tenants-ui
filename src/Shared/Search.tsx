@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Formik, Form } from "formik"
 import { InputField } from "./InputField"
 import Button from "@tourepedia/button"
@@ -8,6 +8,11 @@ export interface SearchProps {
     q: string
   }
   onSearch: (params: any) => void
+}
+
+export function useSearch(initialValues: any = {}) {
+  const [params, setParams] = useState<any>(initialValues)
+  return [params, setParams]
 }
 
 const defaultInitialParams = {
@@ -24,9 +29,9 @@ export function Search({
       onSubmit={values => onSearch(values)}
       render={() => (
         <Form noValidate className="display--flex">
-          <InputField name="q" placeholder="Type to search..." />
-          <Button type="submit">Submit</Button>
-          <Button type="reset">Reset</Button>
+          <InputField name="q" placeholder="Search..." />
+          <Button type="submit">&#128269;</Button>
+          <Button type="reset">&#8634;</Button>
         </Form>
       )}
     />

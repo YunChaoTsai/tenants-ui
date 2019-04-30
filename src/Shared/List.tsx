@@ -1,4 +1,5 @@
 import React, { Fragment } from "react"
+import Spinner from "./Spinner"
 
 export interface ListProps {
   isFetching: boolean
@@ -17,7 +18,9 @@ export function List({
   return (
     <Fragment>
       {isFetching ? (
-        <div className="text--center">Loading...</div>
+        <div className="text--center">
+          <Spinner />
+        </div>
       ) : total === 0 ? (
         <div className="text--center">No item in the list</div>
       ) : children ? (
@@ -28,3 +31,5 @@ export function List({
     </Fragment>
   )
 }
+
+export default List

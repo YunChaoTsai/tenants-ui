@@ -17,22 +17,25 @@ export function Paginate({
   currentPage,
   isFetching,
   lastPage,
-  onFetch,
+  onChange,
 }: PaginateProps & {
-  onFetch: (page: number) => any
+  onChange: (page: number) => any
 }) {
   return (
     <span>
       {from}-{to} of {total}{" "}
       <Button
         disabled={isFetching || currentPage <= 1}
-        onClick={() => onFetch(currentPage)}
+        onClick={() => onChange(currentPage - 1)}
       >
         &lt;
       </Button>
+      <Button disabled={isFetching} onClick={() => onChange(currentPage)}>
+        &#8635;
+      </Button>
       <Button
         disabled={isFetching || lastPage <= currentPage}
-        onClick={() => onFetch(currentPage + 1)}
+        onClick={() => onChange(currentPage + 1)}
       >
         &gt;
       </Button>
