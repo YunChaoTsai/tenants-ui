@@ -13,6 +13,7 @@ export default function UsersModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h2>Users</h2>
       <Link to="new">New User</Link>
+      <hr />
       <Router>
         <Item path=":userId" />
         <EditItem path=":userId/edit" />

@@ -12,7 +12,7 @@ export function XHR(xhr: AxiosInstance) {
     getCountryDialCode(params?: any): Promise<ICountryDialCode[]> {
       return xhr
         .get("/country-dial-codes", { params })
-        .then(resp => resp.data.country_dial_codes)
+        .then(resp => resp.data.data)
     },
   }
 }

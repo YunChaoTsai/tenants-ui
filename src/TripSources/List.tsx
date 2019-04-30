@@ -9,13 +9,14 @@ import { ITripSource, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
+import Paginate, { PaginateProps } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "./../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getTripSources(params?: any): Promise<ITripSource[]> {
-      return xhr
-        .get("/trip-sources", { params })
-        .then(({ data }) => data.trip_sources)
+    getTripSources(params?: any): Promise<{ data: ITripSource[]; meta: any }> {
+      return xhr.get("/trip-sources", { params }).then(resp => resp.data)
     },
   }
 }
@@ -28,7 +29,7 @@ export const getTripSources = (
     .getTripSources(params)
     .then(tripSources => {
       dispatch(actions.list.success(tripSources))
-      return tripSources
+      return tripSources.data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -36,8 +37,7 @@ export const getTripSources = (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   tripSources: ITripSource[]
 }
 interface DispatchProps {
@@ -54,8 +54,9 @@ export const connectWithList = connect<
   state => {
     const tripSourcesSelector = selectors(state)
     return {
+      ...tripSourcesSelector.meta,
       isFetching: tripSourcesSelector.isFetching,
-      tripSources: tripSourcesSelector.tripSources,
+      tripSources: tripSourcesSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -68,26 +69,38 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getTripSources, tripSources, isFetching }: ListProps) {
+function List({ getTripSources, tripSources, ...otherProps }: ListProps) {
+  const { isFetching, total, currentPage } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getTripSources()
+    getTripSources({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
-        <title>Trip Sources</title>
+        <title>Trip Sources List</title>
       </Helmet>
-      {!isFetching ? `Total: ${tripSources.length}` : ""}
-      <ul>
-        {isFetching
-          ? "Loading..."
-          : tripSources.map(tripSource => (
-              <li key={tripSource.id}>
-                {tripSource.name} - {tripSource.short_name}
-                {/* <Link to={`${tripSource.id.toString()}/edit`}>Edit</Link> */}
-              </li>
-            ))}
-      </ul>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getTripSources({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getTripSources({ ...params, page })}
+        />
+      </div>
+      <Listable total={total} isFetching={isFetching}>
+        <ul>
+          {tripSources.map(tripSource => (
+            <li key={tripSource.id}>
+              {tripSource.name} - {tripSource.short_name}
+            </li>
+          ))}
+        </ul>
+      </Listable>
     </Fragment>
   )
 }
@@ -102,7 +115,11 @@ export const SelectTripSources = withXHR<SelectTripSourcesProps>(
       <Async
         multiple
         {...otherProps}
-        fetch={q => XHR(xhr).getTripSources({ q })}
+        fetch={q =>
+          XHR(xhr)
+            .getTripSources({ q })
+            .then(resp => resp.data)
+        }
       />
     )
   }

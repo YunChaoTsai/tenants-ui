@@ -15,9 +15,11 @@ import * as Validator from "yup"
 import moment from "moment"
 import { AxiosInstance } from "axios"
 
-import { ICabType } from "./store"
-import { SelectCabTypes } from "./List"
-import { store as locationStore, SelectServices } from "./../Locations"
+import { store as cabTypeStore, SelectCabTypes } from "./../CabTypes"
+import {
+  SelectTransportServices as SelectServices,
+  store as transportServiceStore,
+} from "./../TransportServices"
 import { InputField, Input } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
 
@@ -38,7 +40,7 @@ const validationSchema = Validator.object().shape({
         .integer("Number of days should be a positive integer")
         .required("Number of days is required."),
       cab_type: Validator.object().required("Cab type field is required"),
-      location_service: Validator.object().required("Service is required"),
+      transport_service: Validator.object().required("Service is required"),
       no_of_cabs: Validator.number()
         .positive("Number of cabs should be a positive integer")
         .integer("Number of cabs should be a positive integer.")
@@ -51,8 +53,8 @@ interface CalculatePriceSchema {
   cabs: {
     start_date: string
     no_of_days: number
-    cab_type?: ICabType
-    location_service?: locationStore.IService
+    cab_type?: cabTypeStore.ICabType
+    transport_service?: transportServiceStore.ITransportService
     no_of_cabs: number
     calculated_price?: number
     given_price?: number
@@ -66,7 +68,7 @@ const InitialValues: CalculatePriceSchema = {
       start_date: "",
       no_of_days: 1,
       cab_type: undefined,
-      location_service: undefined,
+      transport_service: undefined,
       no_of_cabs: 1,
       calculated_price: undefined,
       given_price: 0,
@@ -93,7 +95,13 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           0
         ),
         flattenValues.cabs.map(
-          ({ start_date, no_of_days, cab_type, location_service, ...cab }) => ({
+          ({
+            start_date,
+            no_of_days,
+            cab_type,
+            transport_service,
+            ...cab
+          }) => ({
             ...cab,
             date: moment(start_date)
               .hours(12)
@@ -102,7 +110,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
               .utc()
               .format("YYYY-MM-DD HH:mm:ss"),
             cab_type_id: cab_type && cab_type.id,
-            location_service_id: location_service && location_service.id,
+            transport_service_id: transport_service && transport_service.id,
           })
         )
       )
@@ -126,14 +134,14 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             start_date,
             no_of_days,
             cab_type,
-            location_service,
+            transport_service,
             no_of_cabs,
           } = values
           if (
             start_date &&
             no_of_days &&
             cab_type &&
-            location_service &&
+            transport_service &&
             no_of_cabs
           ) {
             for (let i = 0; i < no_of_days; i++) {
@@ -153,7 +161,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                   .utc()
                   .format("YYYY-MM-DD HH:mm:ss"),
                 cab_type_id: cab_type.id,
-                location_service_id: location_service.id,
+                transport_service_id: transport_service.id,
                 no_of_cabs,
               })
             }
@@ -222,7 +230,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       </td>
                       <td>
                         <Field
-                          name={`${name}.${index}.location_service`}
+                          name={`${name}.${index}.transport_service`}
                           render={({
                             field,
                             form: { setFieldValue },

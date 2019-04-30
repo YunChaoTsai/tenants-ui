@@ -97,88 +97,91 @@ function NewItem({ xhr, navigate }: NewItemProps) {
         }: FormikProps<NewItemCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <Field
-              name="country"
-              render={({ field }: FieldProps<NewItemCredentials>) => (
-                <div>
-                  <SelectCountries
-                    multiple={false}
-                    label="Country"
-                    name={field.name}
-                    value={field.value}
-                    onChange={value => {
-                      setFieldValue(field.name, value)
-                      setFieldValue(
-                        "country_short_name",
-                        value ? value.short_name : null
-                      )
-                    }}
-                    placeholder="Type to search.. (e.g. India)"
+            <fieldset>
+              <legend>Add New Location</legend>
+              <Field
+                name="country"
+                render={({ field }: FieldProps<NewItemCredentials>) => (
+                  <div>
+                    <SelectCountries
+                      multiple={false}
+                      label="Country"
+                      name={field.name}
+                      value={field.value}
+                      onChange={value => {
+                        setFieldValue(field.name, value)
+                        setFieldValue(
+                          "country_short_name",
+                          value ? value.short_name : null
+                        )
+                      }}
+                      placeholder="Type to search.. (e.g. India)"
+                    />
+                    <ErrorMessage name={field.name} />
+                  </div>
+                )}
+              />
+              <Field
+                name="country"
+                render={({ field }: FieldProps<NewItemCredentials>) => (
+                  <InputField
+                    label="Country Short Name"
+                    name="country_short_name"
+                    placeholder="IN"
+                    readOnly={!!values.country}
                   />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <Field
-              name="country"
-              render={({ field }: FieldProps<NewItemCredentials>) => (
-                <InputField
-                  label="Country Short Name"
-                  name="country_short_name"
-                  placeholder="IN"
-                  readOnly={!!values.country}
-                />
-              )}
-            />
-            <Field
-              name="state"
-              render={({ field }: FieldProps<NewItemCredentials>) => (
-                <div>
-                  <SelectStates
-                    multiple={false}
-                    label="State"
-                    name={field.name}
-                    value={field.value}
-                    onChange={value => setFieldValue(field.name, value)}
-                    placeholder="Type to search.. (e.g. Rajasthan)"
-                    creatable
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <Field
-              name="city"
-              render={({ field }: FieldProps<NewItemCredentials>) => (
-                <div>
-                  <SelectCities
-                    multiple={false}
-                    label="City"
-                    name={field.name}
-                    value={field.value}
-                    onChange={value => setFieldValue(field.name, value)}
-                    placeholder="Type to search.. (e.g. Jaipur)"
-                    creatable
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <InputField
-              name="latitude"
-              label="Latitude"
-              placeholder="27° 2' 9.6252'' N"
-              type="string"
-            />
-            <InputField
-              name="longitude"
-              label="Longitude"
-              placeholder="88° 15' 45.6192'' E"
-              type="string"
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Save
-            </Button>{" "}
+                )}
+              />
+              <Field
+                name="state"
+                render={({ field }: FieldProps<NewItemCredentials>) => (
+                  <div>
+                    <SelectStates
+                      multiple={false}
+                      label="State"
+                      name={field.name}
+                      value={field.value}
+                      onChange={value => setFieldValue(field.name, value)}
+                      placeholder="Type to search.. (e.g. Rajasthan)"
+                      creatable
+                    />
+                    <ErrorMessage name={field.name} />
+                  </div>
+                )}
+              />
+              <Field
+                name="city"
+                render={({ field }: FieldProps<NewItemCredentials>) => (
+                  <div>
+                    <SelectCities
+                      multiple={false}
+                      label="City"
+                      name={field.name}
+                      value={field.value}
+                      onChange={value => setFieldValue(field.name, value)}
+                      placeholder="Type to search.. (e.g. Jaipur)"
+                      creatable
+                    />
+                    <ErrorMessage name={field.name} />
+                  </div>
+                )}
+              />
+              <InputField
+                name="latitude"
+                label="Latitude"
+                placeholder="27° 2' 9.6252'' N"
+                type="string"
+              />
+              <InputField
+                name="longitude"
+                label="Longitude"
+                placeholder="88° 15' 45.6192'' E"
+                type="string"
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

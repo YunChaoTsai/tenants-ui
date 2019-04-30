@@ -2,18 +2,21 @@ import React, { Fragment, useEffect, useState } from "react"
 import Helmet from "react-helmet-async"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
-import { RouteComponentProps, Link } from "@reach/router"
+import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 
 import { ICabType, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
+import { PaginateProps, Paginate } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "./../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getCabTypes(params?: any): Promise<ICabType[]> {
-      return xhr.get("/cab-types", { params }).then(({ data }) => data.data)
+    getCabTypes(params?: any): Promise<{ data: ICabType[]; meta: any }> {
+      return xhr.get("/cab-types", { params }).then(({ data }) => data)
     },
   }
 }
@@ -26,9 +29,9 @@ export const getCabTypes = (params?: any): ThunkAction<Promise<ICabType[]>> => (
   dispatch(actions.list.request())
   return XHR(xhr)
     .getCabTypes(params)
-    .then(cabTypes => {
-      dispatch(actions.list.success(cabTypes))
-      return cabTypes
+    .then(({ data, meta }) => {
+      dispatch(actions.list.success({ data, meta }))
+      return data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -36,8 +39,7 @@ export const getCabTypes = (params?: any): ThunkAction<Promise<ICabType[]>> => (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   cabTypes: ICabType[]
 }
 interface DispatchProps {
@@ -54,8 +56,9 @@ export const connectWithList = connect<
   state => {
     const cabTypesSelector = selectors(state)
     return {
+      ...cabTypesSelector.meta,
       isFetching: cabTypesSelector.isFetching,
-      cabTypes: cabTypesSelector.cabTypes,
+      cabTypes: cabTypesSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -68,19 +71,30 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getCabTypes, cabTypes, isFetching }: ListProps) {
+function List({ getCabTypes, cabTypes, ...otherProps }: ListProps) {
+  const { isFetching, total, currentPage } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getCabTypes()
+    getCabTypes({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Cab Types</title>
       </Helmet>
-      {!isFetching ? `Total: ${cabTypes.length}` : ""}
-      {isFetching ? (
-        "Loading..."
-      ) : (
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getCabTypes({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getCabTypes({ ...params, page })}
+        />
+      </div>
+      <Listable isFetching={isFetching} total={total}>
         <table>
           <thead>
             <tr>
@@ -97,7 +111,7 @@ function List({ getCabTypes, cabTypes, isFetching }: ListProps) {
             ))}
           </tbody>
         </table>
-      )}
+      </Listable>
     </Fragment>
   )
 }
@@ -112,7 +126,11 @@ export const SelectCabTypes = withXHR<SelectCabTypeProps>(
       <Async
         multiple
         {...otherProps}
-        fetch={q => XHR(xhr).getCabTypes({ q })}
+        fetch={q =>
+          XHR(xhr)
+            .getCabTypes({ q })
+            .then(resp => resp.data)
+        }
       />
     )
   }

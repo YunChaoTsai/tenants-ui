@@ -16,6 +16,8 @@ import * as Validator from "yup"
 
 import { RedirectUnlessAuthenticated, AuthUserProvider } from "./../Auth"
 import { ThunkDispatch, ThunkAction } from "./../types"
+import Helmet from "react-helmet-async"
+import { InputField } from "../Shared/InputField"
 
 // schemas
 export interface IChangePasswordCredentials {
@@ -58,7 +60,9 @@ interface ChangePasswordProps extends OwnProps, DispatchProps {}
 function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <h2>Change Password</h2>
+      <Helmet>
+        <title>Change Password</title>
+      </Helmet>
       <Formik
         initialValues={changePasswordInitialValues}
         validationSchema={changePasswordSchema}
@@ -79,78 +83,48 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
         }}
         render={(form: FormikProps<IChangePasswordCredentials>) => (
           <Form noValidate>
-            <AuthUserProvider>
-              {({ user }) =>
-                user ? (
-                  <input
-                    type="email"
-                    name="email"
-                    value={user.email}
-                    hidden
-                    readOnly
-                    autoComplete="username"
-                  />
-                ) : null
-              }
-            </AuthUserProvider>
-            <Field
-              name="current"
-              render={({ field }: FieldProps<IChangePasswordCredentials>) => (
-                <div>
-                  <label htmlFor="current">Current Password</label>
-                  <input
-                    {...field}
-                    type="password"
-                    required
-                    id="current"
-                    autoComplete="current-password"
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <Field
-              name="password"
-              render={({ field }: FieldProps<IChangePasswordCredentials>) => (
-                <div>
-                  <label htmlFor="password">New Password</label>
-                  <input
-                    {...field}
-                    type="password"
-                    required
-                    id="password"
-                    autoComplete="new-password"
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <Field
-              name="password_confirmation"
-              render={({ field }: FieldProps<IChangePasswordCredentials>) => (
-                <div>
-                  <label htmlFor="password_confirmation">
-                    Confirm new password
-                  </label>
-                  <input
-                    {...field}
-                    type="password"
-                    required
-                    id="password_confirmation"
-                    autoComplete="new-password"
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <Button type="submit">Update</Button>
-            <Button
-              onClick={() => {
-                navigate && navigate("..")
-              }}
-            >
-              Cancel
-            </Button>
+            <fieldset>
+              <legend>Change Password</legend>
+              <AuthUserProvider>
+                {({ user }) =>
+                  user ? (
+                    <input
+                      type="email"
+                      name="email"
+                      value={user.email}
+                      hidden
+                      readOnly
+                      autoComplete="username"
+                    />
+                  ) : null
+                }
+              </AuthUserProvider>
+              <InputField
+                label="Current Password"
+                name="current"
+                type="password"
+                required
+                id="current"
+                autoComplete="current-password"
+              />
+              <InputField
+                name="password"
+                label="New Password"
+                type="password"
+                required
+                id="password"
+                autoComplete="new-password"
+              />
+              <InputField
+                label="Confirm new password"
+                name="password_confirmation"
+                type="password"
+                required
+                id="password_confirmation"
+                autoComplete="new-password"
+              />
+              <Button type="submit">Update</Button>
+            </fieldset>
           </Form>
         )}
       />

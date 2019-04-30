@@ -9,10 +9,8 @@ import NewItem from "./New"
 export default function CabsModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <div className="display--flex justify-content--space-between">
-        <h2>Cabs</h2>
-        <Link to="new">New Cab</Link>
-      </div>
+      <h2>Cabs</h2>
+      <Link to="new">New Cab</Link>
       <hr />
       <Router>
         <NewItem path="/new" />

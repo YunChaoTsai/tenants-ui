@@ -5,7 +5,7 @@ import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 
-import { IRoomType, actions, IStateWithKey, selectors } from "./store"
+import { ITransportService, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
@@ -15,18 +15,24 @@ import Listable from "../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getRoomTypes(params?: any): Promise<{ data: IRoomType[]; meta: any }> {
-      return xhr.get("/room-types", { params }).then(resp => resp.data)
+    getTransportServices(
+      params?: any
+    ): Promise<{ data: ITransportService[]; meta: any }> {
+      return xhr.get("/transport-services", { params }).then(resp => resp.data)
     },
   }
 }
 
-export const getRoomTypes = (
+export const getTransportServices = (
   params?: any
-): ThunkAction<Promise<IRoomType[]>> => (dispatch, getState, { xhr }) => {
+): ThunkAction<Promise<ITransportService[]>> => (
+  dispatch,
+  getState,
+  { xhr }
+) => {
   dispatch(actions.list.request())
   return XHR(xhr)
-    .getRoomTypes(params)
+    .getTransportServices(params)
     .then(data => {
       dispatch(actions.list.success(data))
       return data.data
@@ -38,10 +44,10 @@ export const getRoomTypes = (
 }
 
 interface StateProps extends PaginateProps {
-  roomTypes: IRoomType[]
+  transportServices: ITransportService[]
 }
 interface DispatchProps {
-  getRoomTypes: (params?: any) => Promise<IRoomType[]>
+  getTransportServices: (params?: any) => Promise<ITransportService[]>
 }
 interface OwnProps {}
 
@@ -52,15 +58,16 @@ export const connectWithList = connect<
   IStateWithKey
 >(
   state => {
-    const roomTypesSelector = selectors(state)
+    const transportServicesSelector = selectors(state)
     return {
-      ...roomTypesSelector.meta,
-      isFetching: roomTypesSelector.isFetching,
-      roomTypes: roomTypesSelector.get(),
+      ...transportServicesSelector.meta,
+      isFetching: transportServicesSelector.isFetching,
+      transportServices: transportServicesSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
-    getRoomTypes: (params?: any) => dispatch(getRoomTypes(params)),
+    getTransportServices: (params?: any) =>
+      dispatch(getTransportServices(params)),
   })
 )
 
@@ -69,38 +76,50 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getRoomTypes, roomTypes, ...otherProps }: ListProps) {
+function List({
+  getTransportServices,
+  transportServices,
+  ...otherProps
+}: ListProps) {
   const { isFetching, total, currentPage } = otherProps
   const [params, setParams] = useSearch()
   useEffect(() => {
-    getRoomTypes({ page: currentPage })
+    getTransportServices({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
-        <title>Room Types</title>
+        <title>Transport Services List</title>
       </Helmet>
       <div className="display--flex justify-content--space-between">
         <Search
           onSearch={params => {
             setParams(params)
-            getRoomTypes({ ...params, page: 1 })
+            getTransportServices({ ...params, page: 1 })
           }}
         />
         <Paginate
           {...otherProps}
-          onChange={page => getRoomTypes({ ...params, page })}
+          onChange={page => getTransportServices({ ...params, page })}
         />
       </div>
       <Listable total={total} isFetching={isFetching}>
-        <dl>
-          {roomTypes.map(roomType => (
-            <Fragment key={roomType.id}>
-              <dt>{roomType.name}</dt>
-              <dd>{roomType.description}</dd>
-            </Fragment>
-          ))}
-        </dl>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Distance(kms)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transportServices.map(transportService => (
+              <tr key={transportService.id}>
+                <td>{transportService.name}</td>
+                <td>{transportService.distance}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </Listable>
     </Fragment>
   )
@@ -108,17 +127,22 @@ function List({ getRoomTypes, roomTypes, ...otherProps }: ListProps) {
 
 export default connectWithList(List)
 
-interface SelectRoomTypesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
+interface SelectTransportServicesProps
+  extends XHRProps,
+    Omit<AsyncProps, "fetch"> {}
 
-export const SelectRoomTypes = withXHR<SelectRoomTypesProps>(
-  function SelectRoomTypes({ xhr, ...otherProps }: SelectRoomTypesProps) {
+export const SelectTransportServices = withXHR<SelectTransportServicesProps>(
+  function SelectTransportServices({
+    xhr,
+    ...otherProps
+  }: SelectTransportServicesProps) {
     return (
       <Async
         multiple
         {...otherProps}
         fetch={q =>
           XHR(xhr)
-            .getRoomTypes()
+            .getTransportServices({ q })
             .then(resp => resp.data)
         }
       />

@@ -115,110 +115,124 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           isSubmitting,
           setFieldValue,
           values,
+          status,
         }: FormikProps<NewItemCredentials>) => {
           return (
             <Form noValidate>
-              <InputField
-                label="Name"
-                name="name"
-                placeholder="Taj Hotel"
-                required
-              />
-              <Field
-                name="location"
-                render={({
-                  field: { name, value },
-                }: FieldProps<NewItemCredentials>) => (
-                  <div>
-                    <SelectLocations
-                      label="Location"
-                      name="location"
-                      multiple={false}
-                      value={value}
-                      onChange={value => setFieldValue(name, value)}
-                    />
-                    <ErrorMessage name={name} />
-                  </div>
-                )}
-              />
-              <InputField
-                label="Stars"
-                name="stars"
-                type="number"
-                required
-                max={5}
-                min={1}
-              />
-              <FieldArray
-                name="meal_plans"
-                render={({ name }) => (
-                  <div>
-                    <SelectMealPlans
-                      label="Meal Plan(s) served"
-                      name={name}
-                      value={values.meal_plans}
-                      onChange={values => setFieldValue("meal_plans", values)}
-                    />
-                    <ErrorMessage name={name} />
-                  </div>
-                )}
-              />
-              <FieldArray
-                name="room_types"
-                render={({ name, push, remove }) => (
-                  <div>
-                    <label>Room Type(s) Available</label>
-                    <ul>
-                      {values.room_types.map((room_type, index, room_types) => (
-                        <li key={index}>
-                          <SelectRoomTypes
-                            multiple={false}
-                            label="Room Type"
-                            name={`${name}.${index}.room_type`}
-                            value={room_type.room_type}
-                            onChange={value =>
-                              setFieldValue(`${name}.${index}.room_type`, value)
-                            }
-                          />
-                          <ErrorMessage name={`${name}.${index}.room_type`} />
-                          <InputField
-                            label="Allowed extra bed(s)"
-                            type="number"
-                            name={`${name}.${index}.allowed_extra_beds`}
-                            value={room_type.allowed_extra_beds}
-                            min={0}
-                          />
-                          {room_types.length > 1 ? (
-                            <Button onClick={_ => remove(index)}>Remove</Button>
-                          ) : null}
+              {status ? <div>{status}</div> : null}
+              <fieldset>
+                <legend>Add Hotel</legend>
+                <InputField
+                  label="Name"
+                  name="name"
+                  placeholder="Taj Hotel"
+                  required
+                />
+                <Field
+                  name="location"
+                  render={({
+                    field: { name, value },
+                  }: FieldProps<NewItemCredentials>) => (
+                    <div>
+                      <SelectLocations
+                        label="Location"
+                        name="location"
+                        multiple={false}
+                        value={value}
+                        onChange={value => setFieldValue(name, value)}
+                      />
+                      <ErrorMessage name={name} />
+                    </div>
+                  )}
+                />
+                <InputField
+                  label="Stars"
+                  name="stars"
+                  type="number"
+                  required
+                  max={5}
+                  min={1}
+                />
+                <FieldArray
+                  name="meal_plans"
+                  render={({ name }) => (
+                    <div>
+                      <SelectMealPlans
+                        label="Meal Plan(s) served"
+                        name={name}
+                        value={values.meal_plans}
+                        onChange={values => setFieldValue("meal_plans", values)}
+                      />
+                      <ErrorMessage name={name} />
+                    </div>
+                  )}
+                />
+                <FieldArray
+                  name="room_types"
+                  render={({ name, push, remove }) => (
+                    <fieldset>
+                      <legend>Room Type(s) Available</legend>
+                      <ul className="list">
+                        {values.room_types.map(
+                          (room_type, index, room_types) => (
+                            <li key={index}>
+                              <SelectRoomTypes
+                                multiple={false}
+                                label="Room Type"
+                                name={`${name}.${index}.room_type`}
+                                value={room_type.room_type}
+                                onChange={value =>
+                                  setFieldValue(
+                                    `${name}.${index}.room_type`,
+                                    value
+                                  )
+                                }
+                              />
+                              <ErrorMessage
+                                name={`${name}.${index}.room_type`}
+                              />
+                              <InputField
+                                label="Allowed extra bed(s)"
+                                type="number"
+                                name={`${name}.${index}.allowed_extra_beds`}
+                                value={room_type.allowed_extra_beds}
+                                min={0}
+                              />
+                              {room_types.length > 1 ? (
+                                <Button onClick={_ => remove(index)}>
+                                  Remove
+                                </Button>
+                              ) : null}
+                            </li>
+                          )
+                        )}
+                        <li>
+                          <Button onClick={_ => push(values.room_types[0])}>
+                            Add More
+                          </Button>
                         </li>
-                      ))}
-                      <li>
-                        <Button onClick={_ => push(values.room_types[0])}>
-                          Add More
-                        </Button>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              />
-              <InputField
-                label="Extra bed child start age"
-                name="eb_child_age_start"
-                required
-                type="number"
-                min={1}
-              />
-              <InputField
-                label="Extra bed child end age"
-                name="eb_child_age_end"
-                required
-                type="number"
-                min={1}
-              />
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>{" "}
+                      </ul>
+                    </fieldset>
+                  )}
+                />
+                <InputField
+                  label="Extra bed child start age"
+                  name="eb_child_age_start"
+                  required
+                  type="number"
+                  min={1}
+                />
+                <InputField
+                  label="Extra bed child end age"
+                  name="eb_child_age_end"
+                  required
+                  type="number"
+                  min={1}
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  Save
+                </Button>
+              </fieldset>
               <Link to="..">Cancel</Link>
             </Form>
           )

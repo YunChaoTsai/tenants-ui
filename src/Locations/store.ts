@@ -1,5 +1,13 @@
 import { createAsyncAction, getType, ActionType } from "typesafe-actions"
-import { IBaseItem, IBaseState, init, model } from "./../model"
+import {
+  IBaseItem,
+  IBaseState,
+  init,
+  model,
+  IMeta,
+  IModelState,
+  createReducer,
+} from "./../model"
 
 export const key = "LOCATIONS_STATE"
 
@@ -31,21 +39,13 @@ export interface ILocation extends IBaseItem {
   city?: ICity
   state?: ICountryState
   country?: ICountry
-}
-
-export interface IService {
-  id: number
-  distance: number
-  name: string
-  locations: ILocation[]
+  latitude: string
+  longitude: string
 }
 
 export interface ILocations extends IBaseState<ILocation> {}
 
-export interface IState {
-  readonly isFetching: boolean
-  readonly locations: ILocations
-}
+export interface IState extends IModelState<ILocation> {}
 
 export interface IStateWithKey {
   readonly [key]: IState
@@ -53,7 +53,7 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  locations: init<ILocation>(),
+  state: init<ILocation>(),
 }
 
 export const actions = {
@@ -61,45 +61,22 @@ export const actions = {
     "@LOCATIONS/LIST_FETCH_REQUEST",
     "@LOCATIONS/LIST_FETCH_SUCCESS",
     "@LOCATIONS/LIST_FETCH_FAILED"
-  )<any, ILocation[], Error>(),
+  )<any, { data: ILocation[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>
 
-export function reducer(
-  state: IState = INITIAL_STATE,
-  action: TActions
-): IState {
-  switch (action.type) {
-    case getType(actions.list.request):
-      return { ...state, isFetching: true }
-    case getType(actions.list.success):
-      return {
-        ...state,
-        locations: model(state.locations).insert(action.payload),
-        isFetching: false,
-      }
-    case getType(actions.list.failure):
-      return { ...state, isFetching: false }
-    default:
-      return state
-  }
-}
+export const reducer = createReducer(INITIAL_STATE, actions as any)
 
 export function selectors<State extends IStateWithKey>(state: State) {
+  const myState = state[key]
   return {
+    ...model(myState.state),
     get state(): IState {
-      return state[key]
+      return myState
     },
     get isFetching(): boolean {
       return this.state.isFetching
-    },
-    get locations(): ILocation[] {
-      return model<ILocation>(this.state.locations).get()
-    },
-    getLocation(id?: string | number): ILocation | undefined {
-      if (!id) return
-      return model<ILocation>(this.state.locations).getItem(id)
     },
   }
 }

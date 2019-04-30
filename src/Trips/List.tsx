@@ -1,16 +1,21 @@
-import React, { useEffect } from "react"
+import React, { useEffect, Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import moment from "moment"
+import Helmet from "react-helmet-async"
 
 import { ITrip, IStateWithKey, actions, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
+import Paginate, { PaginateProps } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "./../Shared/List"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getTrips(params?: any): Promise<ITrip[]> {
-      return xhr.get("/trips").then(resp => resp.data.trips)
+    getTrips(params?: any): Promise<{ data: ITrip[]; meta: any }> {
+      return xhr.get("/trips", { params }).then(resp => resp.data)
     },
   }
 }
@@ -25,7 +30,7 @@ export const getTrips = (params?: any): ThunkAction<Promise<ITrip[]>> => (
     .getTrips(params)
     .then(trips => {
       dispatch(actions.list.success(trips))
-      return trips
+      return trips.data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -33,8 +38,7 @@ export const getTrips = (params?: any): ThunkAction<Promise<ITrip[]>> => (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   trips: ITrip[]
 }
 interface DispatchProps {
@@ -53,8 +57,9 @@ export const connectWithList = connect<
   state => {
     const tripSelector = selectors(state)
     return {
+      ...tripSelector.meta,
       isFetching: tripSelector.isFetching,
-      trips: tripSelector.trips,
+      trips: tripSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -62,27 +67,33 @@ export const connectWithList = connect<
   })
 )
 
-function List({ isFetching, trips, getTrips }: ListProps) {
+function List({ trips, getTrips, ...otherProps }: ListProps) {
+  const { isFetching, total, currentPage } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getTrips()
+    getTrips({ page: currentPage })
   }, [])
-  if (isFetching) return <span>Loading...</span>
   return (
-    <div>
-      <div>Total: {trips.length}</div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Dates</th>
-            <th>Stage</th>
-            <th>Destinations</th>
-            <th>Traveler</th>
-            <th>Persons</th>
-          </tr>
-        </thead>
-        <tbody>
-          {trips.map(
+    <Fragment>
+      <Helmet>
+        <title>List of trips</title>
+      </Helmet>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getTrips({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getTrips({ ...params, page })}
+        />
+      </div>
+      <Listable total={total} isFetching={isFetching}>
+        <Table
+          headers={["ID", "Dates", "Stages", "Destinations", "Traveler", "Pax"]}
+          rows={trips.map(
             ({
               id,
               trip_source,
@@ -92,47 +103,35 @@ function List({ isFetching, trips, getTrips }: ListProps) {
               locations,
               no_of_adults,
               children,
-              primary_contact,
+              contact,
               latest_stage,
-            }) => (
-              <tr key={id}>
-                <td>
-                  <Link to={id.toString()}>
-                    {trip_source.short_name}-{trip_id}
-                  </Link>
-                </td>
-                <td>
-                  {moment
-                    .utc(start_date)
-                    .local()
-                    .format("DD MMM, YYYY")}
-                  {" to "}
-                  {moment
-                    .utc(end_date)
-                    .local()
-                    .format("DD MMM, YYYY")}
-                </td>
-                <td>{latest_stage ? latest_stage.name : "Initiated"}</td>
-                <td>{locations.map(l => l.short_name).join(" • ")}</td>
-                <td>
-                  {primary_contact ? (
-                    <div>
-                      {primary_contact.name}
-                      <br />
-                      {primary_contact.phone_number}&lt;{primary_contact.email}
-                      &gt;
-                    </div>
-                  ) : null}
-                </td>
-                <td>
-                  {no_of_adults} Adults{children ? " with " + children : ""}
-                </td>
-              </tr>
-            )
+            }) => [
+              <Link to={id.toString()}>
+                {trip_source.short_name}-{trip_id}
+              </Link>,
+              `${moment
+                .utc(start_date)
+                .local()
+                .format("DD/MM/YYYY")} to ${moment
+                .utc(end_date)
+                .local()
+                .format("DD/MM/YYYY")}`,
+              latest_stage ? latest_stage.name : "Initiated",
+              locations.map(l => l.short_name).join(" • "),
+              contact ? (
+                <div>
+                  {contact.name}
+                  <br />
+                  <a href={`tel:${contact.phone_number}`}>&#128222;</a>
+                  <a href={`mailto:${contact.email}`}>&#9993;</a>
+                </div>
+              ) : null,
+              `${no_of_adults} Adults${children ? " with " + children : ""}`,
+            ]
           )}
-        </tbody>
-      </table>
-    </div>
+        />
+      </Listable>
+    </Fragment>
   )
 }
 

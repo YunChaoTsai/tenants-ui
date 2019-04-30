@@ -10,6 +10,7 @@ export default function TripSourcesModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <h2>Trip Sources</h2>
       <Link to="new">New Trip Source</Link>
+      <hr />
       <Router>
         <NewItem path="/new" />
         <List path="/" />

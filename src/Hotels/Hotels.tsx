@@ -13,6 +13,7 @@ export default function HotelsModule(props: RouteComponentProps) {
       <h2>Hotels</h2>
       <Link to="new">New Hotel</Link> •{" "}
       <Link to="calculate-price">Calculate Price</Link>
+      <hr />
       <Router>
         <NewItem path="new" />
         <Item path=":hotelId/*" />

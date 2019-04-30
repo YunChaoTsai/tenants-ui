@@ -1,4 +1,4 @@
-import { createAsyncAction, getType, ActionType } from "typesafe-actions"
+import { createAsyncAction, ActionType } from "typesafe-actions"
 import {
   IBaseItem,
   IBaseState,
@@ -9,21 +9,16 @@ import {
   createReducer,
 } from "./../model"
 import { store as transportServiceStore } from "./../TransportServices"
+import { store as cabTypeStore } from "./../CabTypes"
 
-export const key = "CAB_TYPES_STATE"
+export const key = "TRANSPORT_SERVICE_PRICES_STATE"
 
-export interface ICabType extends IBaseItem {
-  id: number
-  name: string
-  capacity: number
-}
-
-export interface ICabPrice {
+export interface ITransportServicePrice extends IBaseItem {
   id: number
   start_date: string
   end_date: string
   cab_type_id: number
-  cab_type: ICabType
+  cab_type: cabTypeStore.ICabType
   transport_service_id: number
   transport_service: transportServiceStore.ITransportService
   price?: number
@@ -34,9 +29,10 @@ export interface ICabPrice {
   night_charges: number
 }
 
-export interface ICabTypes extends IBaseState<ICabType> {}
+export interface ITransportServicePrices
+  extends IBaseState<ITransportServicePrice> {}
 
-export interface IState extends IModelState<ICabType> {}
+export interface IState extends IModelState<ITransportServicePrice> {}
 
 export interface IStateWithKey {
   readonly [key]: IState
@@ -44,20 +40,20 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  state: init<ICabType>(),
+  state: init<ITransportServicePrice>(),
 }
 
 export const actions = {
   list: createAsyncAction(
-    "@CAB_TYPES/LIST_FETCH_REQUEST",
-    "@CAB_TYPES/LIST_FETCH_SUCCESS",
-    "@CAB_TYPES/LIST_FETCH_FAILED"
-  )<any, { data: ICabType[]; meta: IMeta }, Error>(),
+    "@TRANSPORT_SERVICE_PRICES/LIST_FETCH_REQUEST",
+    "@TRANSPORT_SERVICE_PRICES/LIST_FETCH_SUCCESS",
+    "@TRANSPORT_SERVICE_PRICES/LIST_FETCH_FAILED"
+  )<any, { data: ITransportServicePrice[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>
 
-export const reducer = createReducer<ICabType, IState>(
+export const reducer = createReducer<ITransportServicePrice, IState>(
   INITIAL_STATE,
   actions as any
 )
@@ -65,7 +61,7 @@ export const reducer = createReducer<ICabType, IState>(
 export function selectors<State extends IStateWithKey>(state: State) {
   const myState = state[key]
   return {
-    ...model<ICabType>(myState.state),
+    ...model<ITransportServicePrice>(myState.state),
     get state(): IState {
       return myState
     },

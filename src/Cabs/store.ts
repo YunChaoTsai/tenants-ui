@@ -7,6 +7,7 @@ import {
   model,
   init,
   createReducer,
+  IMeta,
 } from "./../model"
 
 export const key = "CAB_LIST_STATE"
@@ -42,7 +43,7 @@ export const actions = {
     "@CABS/LIST_FETCH_REQUEST",
     "@CABS/LIST_FETCH_SUCCESS",
     "@CABS/LIST_FETCH_FAILED"
-  )<any, { data: ICab[]; meta: any }, Error>(),
+  )<any, { data: ICab[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@CABS/ITEM_FETCH_REQUEST",
     "@CABS/ITEM_FETCH_SUCCESS",

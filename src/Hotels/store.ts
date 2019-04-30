@@ -1,6 +1,15 @@
-import { createAsyncAction, ActionType, getType } from "typesafe-actions"
+import { createAsyncAction, ActionType } from "typesafe-actions"
+import { combineReducers } from "redux"
 
-import { IBaseItem, IBaseState, init, model } from "./../model"
+import {
+  IBaseItem,
+  IBaseState,
+  init,
+  model,
+  createReducer,
+  IModelState,
+  IMeta,
+} from "./../model"
 import { store as mealPlanStore } from "./../MealPlans"
 import { store as roomTypeStore } from "./../RoomTypes"
 import { store as locationStore } from "./../Locations"
@@ -20,8 +29,8 @@ export interface IPrice {
   end_date: string
   meal_plan_id: number
   room_type_id: number
-  meal_plan?: mealPlanStore.IMealPlan
-  room_type?: roomTypeStore.IRoomType
+  meal_plan: mealPlanStore.IMealPlan
+  room_type: roomTypeStore.IRoomType
 }
 
 export interface IHotelRoomType extends roomTypeStore.IRoomType {
@@ -47,104 +56,86 @@ export interface IHotel extends IBaseItem {
 export interface IHotels extends IBaseState<IHotel> {}
 export interface IPrices extends IBaseState<IPrice> {}
 
+export interface IHotelState extends IModelState<IHotel> {}
+export interface IHotelPriceState extends IModelState<IPrice> {}
+
 export interface IState {
-  readonly isFetching: boolean
-  readonly isFetchingPrices: boolean
-  readonly hotels: IHotels
-  readonly prices: IPrices
+  hotels: IHotelState
+  prices: IHotelPriceState
 }
 
 export interface IStateWithKey {
   readonly [key]: IState
 }
 
-export const actions = {
+export const hotelActions = {
   list: createAsyncAction(
     "@HOTELS/LIST_FETCH_REQUEST",
     "@HOTELS/LIST_FETCH_SUCCESS",
     "@HOTELS/LIST_FETCH_FAILED"
-  )<any, IHotel[], Error>(),
+  )<any, { data: IHotel[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@HOTELS/ITEM_FETCH_REQUEST",
     "@HOTELS/ITEM_FETCH_SUCCESS",
     "@HOTELS/ITEM_FETCH_FAILED"
   )<any, IHotel, Error>(),
-  prices: createAsyncAction(
+}
+export const priceActions = {
+  list: createAsyncAction(
     "@HOTEL_PRICES/LIST_FETCH_REQUEST",
     "@HOTEL_PRICES/LIST_FETCH_SUCCESS",
     "@HOTEL_PRICES/LIST_FETCH_FAILED"
-  )<any, IPrice[], Error>(),
+  )<any, { data: IPrice[]; meta: IMeta }, Error>(),
+}
+
+export const actions = {
+  hotels: hotelActions,
+  prices: priceActions,
 }
 
 export type TActions = ActionType<typeof actions>
 
-const INITIAL_STATE = {
-  isFetching: true,
-  isFetchingPrices: true,
-  hotels: init<IHotel>(),
-  prices: init<IPrice>(),
+const INITIAL_STATE: IState = {
+  hotels: {
+    isFetching: true,
+    state: init<IHotel>(),
+  },
+  prices: {
+    isFetching: true,
+    state: init<IPrice>(),
+  },
 }
 
-export function reducer(
-  state: IState = INITIAL_STATE,
-  action: TActions
-): IState {
-  switch (action.type) {
-    case getType(actions.list.request):
-      return { ...state, isFetching: true }
-    case getType(actions.list.success):
-      return {
-        ...state,
-        hotels: model(state.hotels).insert(action.payload),
-        isFetching: false,
-      }
-    case getType(actions.list.failure):
-      return { ...state, isFetching: false }
-    case getType(actions.item.request):
-      return { ...state, isFetching: true }
-    case getType(actions.item.success):
-      return {
-        ...state,
-        hotels: model(state.hotels).insert([action.payload]),
-        isFetching: false,
-      }
-    case getType(actions.item.failure):
-      return { ...state, isFetching: false }
-    case getType(actions.prices.request):
-      return { ...state, isFetchingPrices: true }
-    case getType(actions.prices.success):
-      return {
-        ...state,
-        prices: model(state.prices).insert(action.payload),
-        isFetchingPrices: false,
-      }
-    case getType(actions.prices.failure):
-      return { ...state, isFetchingPrices: false }
-    default:
-      return state
-  }
-}
+export const reducer = combineReducers({
+  hotels: createReducer(INITIAL_STATE.hotels, actions.hotels as any),
+  prices: createReducer(INITIAL_STATE.prices, actions.prices as any),
+})
 
 export function selectors<State extends IStateWithKey>(state: State) {
+  const myState = state[key]
+  const hotelState = myState.hotels
+  const priceState = myState.prices
   return {
-    get state(): IState {
-      return state[key]
+    hotels: {
+      ...model(hotelState.state),
+      get state() {
+        return hotelState
+      },
+      get isFetching(): boolean {
+        return this.state.isFetching
+      },
     },
-    get isFetching(): boolean {
-      return this.state.isFetching
-    },
-    get hotels(): IHotel[] {
-      return model<IHotel>(this.state.hotels).get()
-    },
-    getHotel(id?: string | number): IHotel | undefined {
-      if (!id) return
-      return model<IHotel>(this.state.hotels).getItem(id)
-    },
-    get isFetchingPrices(): boolean {
-      return this.state.isFetchingPrices
+    prices: {
+      ...model(priceState.state),
+      get state() {
+        return priceState
+      },
+      get isFetching(): boolean {
+        return this.state.isFetching
+      },
     },
     getHotelPrices(id: number): IPrice[] {
-      return model<IPrice>(this.state.prices)
+      return model(priceState.state)
         .get()
         .filter(price => price.hotel_id === id)
     },

@@ -3,7 +3,12 @@ import { RouteComponentProps, Link, Router } from "@reach/router"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 
-import { IHotel, IStateWithKey, selectors, actions } from "./store"
+import {
+  IHotel,
+  IStateWithKey,
+  selectors,
+  hotelActions as actions,
+} from "./store"
 import { ThunkDispatch, ThunkAction } from "./../types"
 import Prices from "./Prices"
 import AddPrices from "./AddPrices"
@@ -15,7 +20,7 @@ import { withXHR, XHRProps } from "./../xhr"
 export function XHR(xhr: AxiosInstance) {
   return {
     getHotel(id: string): Promise<IHotel> {
-      return xhr.get(`/hotels/${id}`).then(resp => resp.data.hotel)
+      return xhr.get(`/hotels/${id}`).then(resp => resp.data.data)
     },
     createContact(id: string | number, contactData: any): Promise<IHotel> {
       return xhr
@@ -23,7 +28,7 @@ export function XHR(xhr: AxiosInstance) {
           hotel_id: id,
           ...contactData,
         })
-        .then(resp => resp.data.hotel)
+        .then(resp => resp.data.data)
     },
   }
 }
@@ -67,10 +72,10 @@ const connectWithItem = connect<
   IStateWithKey
 >(
   (state, { hotelId }) => {
-    const hotelSelector = selectors(state)
+    const hotelSelector = selectors(state).hotels
     return {
       isFetching: hotelSelector.isFetching,
-      hotel: hotelSelector.getHotel(hotelId),
+      hotel: hotelSelector.getItem(hotelId),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -126,69 +131,82 @@ export function Item({
         return (
           <div>
             <Link to="..">Back</Link>
-            <h3>
-              {name} • {location.short_name} • {stars} stars
-            </h3>
-            <div>
-              Extra bed child ages: From {extra_bed_child_age_start} To{" "}
-              {extra_bed_child_age_end}
-            </div>
-            <div>
-              Meal Plans:{" "}
-              {meal_plans.map(mealPlan => mealPlan.name).join(" • ")}
-            </div>
-            <div>
-              Room Types:{" "}
-              {room_types
-                .map(
-                  roomType =>
-                    `${roomType.name}(${roomType.allowed_extra_beds} AEBs)`
-                )
-                .join(" • ")}
-            </div>
-            <div>
-              <h4>Contacts</h4>
-              <ul>
-                {(contacts || []).map(contact => (
-                  <li key={contact.id}>
-                    {contact.name} {contact.phone_number}&lt;{contact.email}&gt;
-                  </li>
-                ))}
-              </ul>
-              <Dialog
-                open={isVisibleAddContact}
-                onClose={hideAddContact}
-                closeButton
-              >
-                <div style={{ padding: "10px" }}>
-                  <h3>Add Contact</h3>
-                  <AddContactForm
-                    onCancel={hideAddContact}
-                    onCreate={({
-                      name,
-                      email,
-                      phone_number,
-                      phone_number_dial_code,
-                    }) => {
-                      return XHR(xhr)
-                        .createContact(hotelId, {
+            <div className="row">
+              <div className="col-md-6">
+                <h3>
+                  {name} • {location.short_name} • {stars} Star
+                </h3>
+                <dl>
+                  <dt>Meal Plans:</dt>
+                  <dd>
+                    {meal_plans.map(mealPlan => mealPlan.name).join(" • ")}
+                  </dd>
+                  <dt>Room Types:</dt>
+                  <dd>
+                    {room_types
+                      .map(
+                        roomType =>
+                          `${roomType.name}(${
+                            roomType.allowed_extra_beds
+                          } AEBs)`
+                      )
+                      .join(" • ")}
+                  </dd>
+                  <dt>Extra bed child ages:</dt>
+                  <dd>
+                    From {extra_bed_child_age_start} to{" "}
+                    {extra_bed_child_age_end} years
+                  </dd>
+                </dl>
+              </div>
+              <div className="col-md-6">
+                <fieldset className="float--right">
+                  <legend>Contacts</legend>
+                  <ul>
+                    {(contacts || []).map(contact => (
+                      <li key={contact.id}>
+                        {contact.name} {contact.phone_number}&lt;{contact.email}
+                        &gt;
+                      </li>
+                    ))}
+                  </ul>
+                  <Dialog
+                    open={isVisibleAddContact}
+                    onClose={hideAddContact}
+                    closeButton
+                  >
+                    <div style={{ padding: "10px" }}>
+                      <h3>Add Contact</h3>
+                      <AddContactForm
+                        onCancel={hideAddContact}
+                        onCreate={({
                           name,
                           email,
                           phone_number,
-                          country_dial_code_id: phone_number_dial_code
-                            ? phone_number_dial_code.id
-                            : null,
-                        })
-                        .then(hotel => {
-                          getHotel(hotelId)
-                          return hotel
-                        })
-                    }}
-                  />
-                </div>
-              </Dialog>
-              <Button onClick={showAddContact}>Add Contact</Button>
+                          phone_number_dial_code,
+                        }) => {
+                          return XHR(xhr)
+                            .createContact(hotelId, {
+                              name,
+                              email,
+                              phone_number,
+                              country_dial_code_id: phone_number_dial_code
+                                ? phone_number_dial_code.id
+                                : null,
+                            })
+                            .then(hotel => {
+                              getHotel(hotelId)
+                              return hotel
+                            })
+                        }}
+                      />
+                    </div>
+                  </Dialog>
+                  <Button onClick={showAddContact}>Add Contact</Button>
+                </fieldset>
+              </div>
             </div>
+            <hr />
             <div>
               <h4>Prices</h4>
               <Link to="add-prices">Add Prices</Link>

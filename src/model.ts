@@ -100,6 +100,7 @@ export function model<Item extends IBaseItem>(prevState?: IBaseState<Item>) {
 
 export interface IModelState<IItem extends IBaseItem> {
   readonly state: IBaseState<IItem>
+  readonly isFetching: boolean
 }
 
 export function createReducer<
@@ -113,32 +114,37 @@ export function createReducer<
   }
 ) {
   return (state: IState = INITIAL_STATE, action: ActionType<any>): IState => {
-    switch (action.type) {
-      case getType(actions.list.request):
-        return { ...state, isFetching: true }
-      case getType(actions.list.success):
-        return {
-          ...state,
-          state: model(init<IItem>()).insert(
-            action.payload.data,
-            action.payload.meta
-          ),
-          isFetching: false,
-        }
-      case getType(actions.list.failure):
-        return { ...state, isFetching: false }
-      case getType(actions.item.request):
-        return { ...state, isFetching: true }
-      case getType(actions.item.success):
-        return {
-          ...state,
-          state: model(state.state).insert([action.payload]),
-          isFetching: false,
-        }
-      case getType(actions.item.failure):
-        return { ...state, isFetching: false }
-      default:
-        return state
+    if (actions.list) {
+      switch (action.type) {
+        case getType(actions.list.request):
+          return { ...state, isFetching: true }
+        case getType(actions.list.success):
+          return {
+            ...state,
+            state: model(init<IItem>()).insert(
+              action.payload.data,
+              action.payload.meta
+            ),
+            isFetching: false,
+          }
+        case getType(actions.list.failure):
+          return { ...state, isFetching: false }
+      }
     }
+    if (actions.item) {
+      switch (action.type) {
+        case getType(actions.item.request):
+          return { ...state, isFetching: true }
+        case getType(actions.item.success):
+          return {
+            ...state,
+            state: model(state.state).insert([action.payload]),
+            isFetching: false,
+          }
+        case getType(actions.item.failure):
+          return { ...state, isFetching: false }
+      }
+    }
+    return state
   }
 }

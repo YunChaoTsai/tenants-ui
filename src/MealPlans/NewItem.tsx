@@ -51,16 +51,19 @@ function NewItem({ xhr, navigate }: NewItemProps) {
         render={({ isSubmitting, status }: FormikProps<NewItemCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <InputField label="Name" name="name" placeholder="MAP" required />
-            <InputField
-              label="Description"
-              name="description"
-              placeholder="Modified American Plan (Two meals: Breakfast and one of Lunch or Dinner)"
-              required
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Save
-            </Button>{" "}
+            <fieldset>
+              <legend>Add New Meal Plan</legend>
+              <InputField label="Name" name="name" placeholder="MAP" required />
+              <InputField
+                label="Description"
+                name="description"
+                placeholder="Modified American Plan (Two meals: Breakfast and one of Lunch or Dinner)"
+                required
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

@@ -12,7 +12,7 @@ import { IUser, actions, IStateWithKey, selectors } from "./store"
 function XHR(xhr: AxiosInstance) {
   return {
     getUser(id: string): Promise<IUser> {
-      return xhr.get(`/users/${id}`).then(({ data }) => data.user)
+      return xhr.get(`/users/${id}`).then(({ data }) => data.data)
     },
   }
 }
@@ -58,7 +58,7 @@ export const withUserData = connect<
     const usersSelector = selectors(state)
     return {
       isFetching: usersSelector.isFetching,
-      user: usersSelector.getUser(ownProps.userId),
+      user: usersSelector.getItem(ownProps.userId),
     }
   },
   (dispatch: ThunkDispatch) => ({

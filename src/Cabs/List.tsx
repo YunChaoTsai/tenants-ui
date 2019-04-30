@@ -10,7 +10,7 @@ import { ICab, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
-import { Search } from "./../Shared/Search"
+import { Search, useSearch } from "./../Shared/Search"
 import { List } from "./../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
@@ -49,6 +49,7 @@ interface OwnProps extends RouteComponentProps {}
 interface CabsProps extends OwnProps, StateProps, DispatchProps {}
 export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
   const { isFetching, currentPage, total } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
     getCabs({ page: currentPage })
   }, [])
@@ -58,8 +59,16 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
         <title>Cabs</title>
       </Helmet>
       <div className="display--flex justify-content--space-between">
-        <Search onSearch={params => getCabs({ ...params, page: 1 })} />
-        <Paginate {...otherProps} onFetch={page => getCabs({ page })} />
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getCabs({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getCabs({ ...params, page })}
+        />
       </div>
       <List isFetching={isFetching} total={total}>
         <table>

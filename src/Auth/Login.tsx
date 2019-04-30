@@ -80,7 +80,7 @@ function Login({ login, navigate, location }: LoginProps) {
       <Helmet>
         <title>Login</title>
       </Helmet>
-      <h2>Login to Tourepdia Dashboard</h2>
+      <h1 className="text--center">Tourepedia Admin Dashboard</h1>
       <Formik
         initialValues={initialValues}
         onSubmit={(
@@ -104,6 +104,7 @@ function Login({ login, navigate, location }: LoginProps) {
           <Form noValidate>
             {status ? <div>{status}</div> : null}
             <fieldset>
+              <legend>Login</legend>
               <InputField
                 label="Email"
                 name="email"

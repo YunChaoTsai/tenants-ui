@@ -6,13 +6,12 @@ import { connect } from "react-redux"
 import moment from "moment"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { RedirectUnlessAuthenticated } from "./../Auth"
 import { IRole, actions, IStateWithKey, selectors } from "./store"
 
 function XHR(xhr: AxiosInstance) {
   return {
     getRole(id: string): Promise<IRole> {
-      return xhr.get(`/roles/${id}`).then(({ data }) => data.role)
+      return xhr.get(`/roles/${id}`).then(({ data }) => data.data)
     },
   }
 }
@@ -58,7 +57,7 @@ export const withRoleData = connect<
     const rolesSelector = selectors(state)
     return {
       isFetching: rolesSelector.isFetching,
-      role: rolesSelector.getRole(ownProps.roleId),
+      role: rolesSelector.getItem(ownProps.roleId),
     }
   },
   (dispatch: ThunkDispatch) => ({

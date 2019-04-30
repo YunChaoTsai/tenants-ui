@@ -58,7 +58,7 @@ export function EditRole({ xhr, navigate, roleId }: EditRoleProps) {
                 return xhr
                   .put(`/roles/${id}`, values)
                   .then(({ data }) => {
-                    const { role } = data
+                    const { data: role } = data
                     navigate && navigate(`../../${role.id}`)
                     actions.setSubmitting(false)
                   })
@@ -76,15 +76,18 @@ export function EditRole({ xhr, navigate, roleId }: EditRoleProps) {
               }: FormikProps<RoleCredentials>) => (
                 <Form noValidate>
                   {status ? <div>{status}</div> : null}
-                  <InputField
-                    label="Name"
-                    name="name"
-                    placeholder="Manager"
-                    required
-                  />
-                  <Button type="submit" disabled={isSubmitting}>
-                    Save
-                  </Button>
+                  <fieldset>
+                    <legend>Edit Role</legend>
+                    <InputField
+                      label="Name"
+                      name="name"
+                      placeholder="Manager"
+                      required
+                    />
+                    <Button type="submit" disabled={isSubmitting}>
+                      Save
+                    </Button>
+                  </fieldset>
                   <Link to="..">Cancel</Link>
                 </Form>
               )}

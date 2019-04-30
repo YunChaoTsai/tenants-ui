@@ -74,42 +74,44 @@ export function NewCab({ xhr, navigate }: NewCabProps) {
         render={({
           isSubmitting,
           status,
-          values,
           setFieldValue,
         }: FormikProps<NewCabCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <InputField
-              label="Name"
-              name="name"
-              required
-              placeholder="Suzuki Wagon R"
-            />
-            <Field
-              name="cab_type"
-              render={({ field }: FieldProps<NewCabCredentials>) => (
-                <div>
-                  <SelectCabTypes
-                    label="Cab Type"
-                    name={field.name}
-                    multiple={false}
-                    value={field.value}
-                    placeholder="Type to search... (e.g. Wagon)"
-                    onChange={value => setFieldValue(field.name, value)}
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
-              )}
-            />
-            <InputField
-              label="Number Plate"
-              name="number_plate"
-              required
-              placeholder="RJ18 CC 7838"
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Submit
-            </Button>
+            <fieldset>
+              <legend>Add New Cab</legend>
+              <InputField
+                label="Name"
+                name="name"
+                required
+                placeholder="Suzuki Wagon R"
+              />
+              <Field
+                name="cab_type"
+                render={({ field }: FieldProps<NewCabCredentials>) => (
+                  <div>
+                    <SelectCabTypes
+                      label="Cab Type"
+                      name={field.name}
+                      multiple={false}
+                      value={field.value}
+                      placeholder="Type to search... (e.g. Wagon)"
+                      onChange={value => setFieldValue(field.name, value)}
+                    />
+                    <ErrorMessage name={field.name} />
+                  </div>
+                )}
+              />
+              <InputField
+                label="Number Plate"
+                name="number_plate"
+                required
+                placeholder="RJ18 CC 7838"
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Submit
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

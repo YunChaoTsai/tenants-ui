@@ -51,21 +51,24 @@ function NewItem({ xhr, navigate }: NewItemProps) {
         render={({ isSubmitting, status }: FormikProps<NewItemCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
-            <InputField
-              label="Name"
-              name="name"
-              placeholder="Converted"
-              required
-            />
-            <InputField
-              label="Description"
-              name="description"
-              placeholder="Trip Converted"
-              required
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Save
-            </Button>{" "}
+            <fieldset>
+              <legend>Add new Trip Stage</legend>
+              <InputField
+                label="Name"
+                name="name"
+                placeholder="Converted"
+                required
+              />
+              <InputField
+                label="Description"
+                name="description"
+                placeholder="Trip Converted"
+                required
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

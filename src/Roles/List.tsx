@@ -6,20 +6,20 @@ import { connect } from "react-redux"
 import { Omit } from "utility-types"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { RedirectUnlessAuthenticated } from "./../Auth"
 import { IRole, IPermission, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
+import Paginate, { PaginateProps } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "./../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getRoles(params?: any): Promise<IRole[]> {
-      return xhr.get("/roles", { params }).then(({ data }) => data.roles)
+    getRoles(params?: any): Promise<{ data: IRole[]; meta: any }> {
+      return xhr.get("/roles", { params }).then(resp => resp.data)
     },
     getPermissions(params?: any): Promise<IPermission[]> {
-      return xhr
-        .get("/permissions", { params })
-        .then(({ data }) => data.permissions)
+      return xhr.get("/permissions", { params }).then(({ data }) => data.data)
     },
   }
 }
@@ -34,7 +34,7 @@ export const getRoles = (params?: any): ThunkAction<Promise<IRole[]>> => (
     .getRoles(params)
     .then(roles => {
       dispatch(actions.list.success(roles))
-      return roles
+      return roles.data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -42,8 +42,7 @@ export const getRoles = (params?: any): ThunkAction<Promise<IRole[]>> => (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   roles: IRole[]
 }
 interface DispatchProps {
@@ -51,27 +50,49 @@ interface DispatchProps {
 }
 interface OwnProps extends RouteComponentProps {}
 interface RolesProps extends OwnProps, StateProps, DispatchProps {}
-export function Roles({ getRoles, roles, isFetching }: RolesProps) {
+export function Roles({ getRoles, roles, ...otherProps }: RolesProps) {
+  const { isFetching, currentPage, total } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getRoles()
+    getRoles({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Roles</title>
       </Helmet>
-      {!isFetching ? `Total: ${roles.length}` : ""}
-      <ul>
-        {isFetching ? (
-          <li>Loading...</li>
-        ) : (
-          roles.map(r => (
-            <li key={r.id}>
-              <Link to={r.id.toString()}>{r.name}</Link>
-            </li>
-          ))
-        )}
-      </ul>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getRoles({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getRoles({ ...params, page })}
+        />
+      </div>
+      <Listable total={total} isFetching={isFetching}>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Permission</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map(r => (
+              <tr key={r.id}>
+                <td>
+                  <Link to={r.id.toString()}>{r.name}</Link>
+                </td>
+                <td>{(r.permissions || []).map(p => p.name).join(" • ")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Listable>
     </Fragment>
   )
 }
@@ -80,8 +101,9 @@ export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
   state => {
     const rolesSelector = selectors(state)
     return {
+      ...rolesSelector.meta,
       isFetching: rolesSelector.isFetching,
-      roles: rolesSelector.roles,
+      roles: rolesSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -98,7 +120,17 @@ export const SelectRoles = withXHR<SelectRolesProps>(function SelectRoles({
   xhr,
   ...otherProps
 }: SelectRolesProps) {
-  return <Async multiple fetch={q => XHR(xhr).getRoles()} {...otherProps} />
+  return (
+    <Async
+      multiple
+      fetch={q =>
+        XHR(xhr)
+          .getRoles()
+          .then(resp => resp.data)
+      }
+      {...otherProps}
+    />
+  )
 })
 
 interface SelectPermissionsProps extends XHRProps, Omit<AsyncProps, "fetch"> {

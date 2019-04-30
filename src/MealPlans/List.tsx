@@ -1,19 +1,22 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useEffect } from "react"
 import Helmet from "react-helmet-async"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
-import { RouteComponentProps, Link } from "@reach/router"
+import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 
 import { IMealPlan, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "./../Shared/Select"
+import Paginate, { PaginateProps } from "../Shared/Paginate"
+import Search, { useSearch } from "../Shared/Search"
+import Listable from "../Shared/List"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getMealPlans(params?: any): Promise<IMealPlan[]> {
-      return xhr.get("/meal-plans").then(({ data }) => data.meal_plans)
+    getMealPlans(params?: any): Promise<{ data: IMealPlan[]; meta: any }> {
+      return xhr.get("/meal-plans", { params }).then(resp => resp.data)
     },
   }
 }
@@ -24,9 +27,9 @@ export const getMealPlans = (
   dispatch(actions.list.request())
   return XHR(xhr)
     .getMealPlans(params)
-    .then(mealPlans => {
-      dispatch(actions.list.success(mealPlans))
-      return mealPlans
+    .then(({ data, meta }) => {
+      dispatch(actions.list.success({ data, meta }))
+      return data
     })
     .catch(error => {
       dispatch(actions.list.failure(error))
@@ -34,12 +37,11 @@ export const getMealPlans = (
     })
 }
 
-interface StateProps {
-  isFetching: boolean
+interface StateProps extends PaginateProps {
   mealPlans: IMealPlan[]
 }
 interface DispatchProps {
-  getMealPlans: (params?: any) => Promise<IMealPlan[]>
+  getMealPlans: (params?: any) => Promise<any>
 }
 interface OwnProps {}
 
@@ -52,8 +54,9 @@ export const connectWithList = connect<
   state => {
     const mealPlansSelector = selectors(state)
     return {
+      ...mealPlansSelector.meta,
       isFetching: mealPlansSelector.isFetching,
-      mealPlans: mealPlansSelector.mealPlans,
+      mealPlans: mealPlansSelector.get(),
     }
   },
   (dispatch: ThunkDispatch) => ({
@@ -66,26 +69,39 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getMealPlans, mealPlans, isFetching }: ListProps) {
+function List({ getMealPlans, mealPlans, ...otherProps }: ListProps) {
+  const { isFetching, total, currentPage } = otherProps
+  const [params, setParams] = useSearch()
   useEffect(() => {
-    getMealPlans()
+    getMealPlans({ page: currentPage })
   }, [])
   return (
     <Fragment>
       <Helmet>
         <title>Meal Plans</title>
       </Helmet>
-      {!isFetching ? `Total: ${mealPlans.length}` : ""}
-      <ul>
-        {isFetching
-          ? "Loading..."
-          : mealPlans.map(mealPlan => (
-              <li key={mealPlan.id}>
-                {mealPlan.name} - {mealPlan.description}
-                {/* <Link to={`${mealPlan.id.toString()}/edit`}>Edit</Link> */}
-              </li>
-            ))}
-      </ul>
+      <div className="display--flex justify-content--space-between">
+        <Search
+          onSearch={params => {
+            setParams(params)
+            getMealPlans({ ...params, page: 1 })
+          }}
+        />
+        <Paginate
+          {...otherProps}
+          onChange={page => getMealPlans({ ...params, page })}
+        />
+      </div>
+      <Listable total={total} isFetching={isFetching}>
+        <dl>
+          {mealPlans.map(mealPlan => (
+            <Fragment key={mealPlan.id}>
+              <dt>{mealPlan.name}</dt>
+              <dd>{mealPlan.description}</dd>
+            </Fragment>
+          ))}
+        </dl>
+      </Listable>
     </Fragment>
   )
 }
@@ -97,7 +113,15 @@ interface SelectMealPlanProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 export const SelectMealPlans = withXHR<SelectMealPlanProps>(
   function SelectMealPlans({ xhr, ...otherProps }: SelectMealPlanProps) {
     return (
-      <Async multiple {...otherProps} fetch={q => XHR(xhr).getMealPlans()} />
+      <Async
+        multiple
+        {...otherProps}
+        fetch={q =>
+          XHR(xhr)
+            .getMealPlans()
+            .then(resp => resp.data)
+        }
+      />
     )
   }
 )

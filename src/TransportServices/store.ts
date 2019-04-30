@@ -8,18 +8,20 @@ import {
   IMeta,
   createReducer,
 } from "./../model"
+import { store as locationStore } from "./../Locations"
 
-export const key = "ROOM_TYPES_STATE"
+export const key = "TRANSPORT_SERVICES_STATE"
 
-export interface IRoomType extends IBaseItem {
+export interface ITransportService extends IBaseItem {
   id: number
+  distance: number
   name: string
-  description: string
+  locations: locationStore.ILocation[]
 }
 
-export interface IRoomTypes extends IBaseState<IRoomType> {}
+export interface ITransportServices extends IBaseState<ITransportService> {}
 
-export interface IState extends IModelState<IRoomType> {}
+export interface IState extends IModelState<ITransportService> {}
 
 export interface IStateWithKey {
   readonly [key]: IState
@@ -27,15 +29,15 @@ export interface IStateWithKey {
 
 const INITIAL_STATE: IState = {
   isFetching: true,
-  state: init<IRoomType>(),
+  state: init<ITransportService>(),
 }
 
 export const actions = {
   list: createAsyncAction(
-    "@ROOM_TYPES/LIST_FETCH_REQUEST",
-    "@ROOM_TYPES/LIST_FETCH_SUCCESS",
-    "@ROOM_TYPES/LIST_FETCH_FAILED"
-  )<any, { data: IRoomType[]; meta: IMeta }, Error>(),
+    "@TRANSPORT_SERVICES/LIST_FETCH_REQUEST",
+    "@TRANSPORT_SERVICES/LIST_FETCH_SUCCESS",
+    "@TRANSPORT_SERVICES/LIST_FETCH_FAILED"
+  )<any, { data: ITransportService[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>
