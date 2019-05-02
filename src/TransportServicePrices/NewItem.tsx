@@ -145,146 +145,150 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
         setFieldValue,
       }: FormikProps<AddPriceCredentials>) => (
         <Form noValidate>
-          {status ? <div>{status}</div> : null}
-          <table>
-            <thead>
-              <tr>
-                <td>Start Date</td>
-                <td>End Date</td>
-                <td>Cab Type</td>
-                <td>Transport Service</td>
-                <td>Price(for fixed/service type)</td>
-                <td>/KM charges</td>
-                <td>Minimum kms per day</td>
-                <td>Toll factor</td>
-                <td>Night factor</td>
-                <td>Parking factor</td>
-              </tr>
-            </thead>
-            <FieldArray
-              name="prices"
-              render={({ name, push, remove }) => (
-                <tbody>
-                  {values.prices.map((price, index, prices) => (
-                    <tr key={index}>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.start_date`}
-                          type="date"
-                          required
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.end_date`}
-                          type="date"
-                          required
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`${name}.${index}.cab_type`}
-                          render={({
-                            field,
-                          }: FieldProps<AddPriceCredentials>) => (
-                            <div>
-                              <SelectCabTypes
-                                name={field.name}
-                                multiple={false}
-                                required
-                                value={field.value}
-                                onChange={value =>
-                                  setFieldValue(field.name, value)
-                                }
-                              />
-                              <ErrorMessage name={field.name} />
-                            </div>
-                          )}
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`${name}.${index}.transport_service`}
-                          render={({
-                            field,
-                          }: FieldProps<AddPriceCredentials>) => (
-                            <div>
-                              <SelectServices
-                                name={field.name}
-                                multiple={false}
-                                required
-                                value={field.value}
-                                onChange={value =>
-                                  setFieldValue(field.name, value)
-                                }
-                              />
-                              <ErrorMessage name={field.name} />
-                            </div>
-                          )}
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.price`}
-                          type="number"
-                          min={0}
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.per_km_charges`}
-                          type="number"
-                          min={0}
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.minimum_km_per_day`}
-                          type="number"
-                          min={0}
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.toll_charges`}
-                          type="number"
-                          min={0}
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.night_charges`}
-                          type="number"
-                          min={0}
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.parking_charges`}
-                          type="number"
-                          min={0}
-                        />
-                      </td>
+          <div className="table-responsive">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Cab Type</th>
+                  <th>Transport Service</th>
+                  <th>Price(for fixed/service type)</th>
+                  <th>/KM charges</th>
+                  <th>Minimum kms per day</th>
+                  <th>Toll factor</th>
+                  <th>Night factor</th>
+                  <th>Parking factor</th>
+                </tr>
+              </thead>
+              <FieldArray
+                name="prices"
+                render={({ name, push, remove }) => (
+                  <tbody>
+                    {values.prices.map((price, index, prices) => (
+                      <tr key={index}>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.start_date`}
+                            type="date"
+                            required
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.end_date`}
+                            type="date"
+                            required
+                          />
+                        </td>
+                        <td>
+                          <Field
+                            name={`${name}.${index}.cab_type`}
+                            render={({
+                              field,
+                            }: FieldProps<AddPriceCredentials>) => (
+                              <div>
+                                <SelectCabTypes
+                                  name={field.name}
+                                  multiple={false}
+                                  required
+                                  value={field.value}
+                                  onChange={value =>
+                                    setFieldValue(field.name, value)
+                                  }
+                                />
+                                <ErrorMessage name={field.name} />
+                              </div>
+                            )}
+                          />
+                        </td>
+                        <td>
+                          <Field
+                            name={`${name}.${index}.transport_service`}
+                            render={({
+                              field,
+                            }: FieldProps<AddPriceCredentials>) => (
+                              <div>
+                                <SelectServices
+                                  name={field.name}
+                                  multiple={false}
+                                  required
+                                  value={field.value}
+                                  onChange={value =>
+                                    setFieldValue(field.name, value)
+                                  }
+                                />
+                                <ErrorMessage name={field.name} />
+                              </div>
+                            )}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.price`}
+                            type="number"
+                            min={0}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.per_km_charges`}
+                            type="number"
+                            min={0}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.minimum_km_per_day`}
+                            type="number"
+                            min={0}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.toll_charges`}
+                            type="number"
+                            min={0}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.night_charges`}
+                            type="number"
+                            min={0}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.parking_charges`}
+                            type="number"
+                            min={0}
+                          />
+                        </td>
 
+                        <td>
+                          {prices.length > 1 ? (
+                            <Button onClick={() => remove(index)}>
+                              Remove
+                            </Button>
+                          ) : null}
+                          <Button onClick={() => push(price)}>Duplicate</Button>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr>
                       <td>
-                        {prices.length > 1 ? (
-                          <Button onClick={() => remove(index)}>Remove</Button>
-                        ) : null}
-                        <Button onClick={() => push(price)}>Duplicate</Button>
+                        <Button onClick={() => push(initialValues.prices[0])}>
+                          Add More
+                        </Button>
                       </td>
                     </tr>
-                  ))}
-                  <tr>
-                    <td>
-                      <Button onClick={() => push(initialValues.prices[0])}>
-                        Add More
-                      </Button>
-                    </td>
-                  </tr>
-                </tbody>
-              )}
-            />
-          </table>
+                  </tbody>
+                )}
+              />
+            </table>
+          </div>
+          {status ? <div>{status}</div> : null}
           <Button type="submit" disabled={isSubmitting}>
             Save
           </Button>{" "}

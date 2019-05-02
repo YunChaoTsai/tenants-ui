@@ -63,7 +63,7 @@ th {
   border-bottom-width: 2px;
 }
 
-tr:hover {
+tr:nth-child(2n) {
   background: whitesmoke;
 }
 

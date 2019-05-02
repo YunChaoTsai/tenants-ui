@@ -53,13 +53,13 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
           actions.setStatus()
           const { distance, via } = values
           return xhr
-            .post("/location-services", {
+            .post("/transport-services", {
               distance,
               via: via.map(location => location.id),
             })
             .then(({ data }) => {
               const { service } = data
-              navigate && navigate("../services")
+              navigate && navigate("..")
               actions.setSubmitting(false)
             })
             .catch(error => {
