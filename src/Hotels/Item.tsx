@@ -127,6 +127,7 @@ export function Item({
           room_types,
           location,
           contacts,
+          payment_preference,
         } = hotel
         return (
           <div>
@@ -151,6 +152,10 @@ export function Item({
                           } AEBs)`
                       )
                       .join(" • ")}
+                  </dd>
+                  <dt>Payment Preference</dt>
+                  <dd>
+                    {payment_preference ? payment_preference.name : "NOT SET"}
                   </dd>
                   <dt>Extra bed child ages:</dt>
                   <dd>

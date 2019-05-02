@@ -19,6 +19,10 @@ import { withXHR, XHRProps } from "./../xhr"
 import { store as mealPlanStore, SelectMealPlans } from "./../MealPlans"
 import { store as roomTypeStore, SelectRoomTypes } from "./../RoomTypes"
 import { store as locationStore, SelectLocations } from "./../Locations"
+import {
+  store as hotelPaymentPreferenceStore,
+  SelectHotelPaymentPreferences,
+} from "../HotelPaymentPreferences"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
@@ -60,6 +64,7 @@ interface NewItemCredentials {
     allowed_extra_beds: number
   }[]
   location?: locationStore.ILocation
+  payment_preference?: hotelPaymentPreferenceStore.IHotelPaymentPreference
 }
 const initialValues: NewItemCredentials = {
   name: "",
@@ -97,9 +102,12 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 })
               ),
               location_id: values.location ? values.location.id : undefined,
+              payment_preference_id: values.payment_preference
+                ? values.payment_preference.id
+                : undefined,
             })
             .then(({ data }) => {
-              const { hotel } = data
+              const { data: hotel } = data
               navigate && navigate(`../${hotel.id}`)
               actions.setSubmitting(false)
             })
@@ -145,6 +153,24 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                     </div>
                   )}
                 />
+                <Field
+                  name="payment_preference"
+                  render={({
+                    field: { name, value },
+                  }: FieldProps<NewItemCredentials>) => (
+                    <div>
+                      <SelectHotelPaymentPreferences
+                        label="Payment Preference"
+                        name="payment_preference"
+                        multiple={false}
+                        value={value}
+                        onChange={value => setFieldValue(name, value)}
+                        fetchOnMount
+                      />
+                      <ErrorMessage name={name} />
+                    </div>
+                  )}
+                />
                 <InputField
                   label="Stars"
                   name="stars"
@@ -162,6 +188,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                         name={name}
                         value={values.meal_plans}
                         onChange={values => setFieldValue("meal_plans", values)}
+                        fetchOnMount
                       />
                       <ErrorMessage name={name} />
                     </div>
@@ -181,6 +208,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                                 label="Room Type"
                                 name={`${name}.${index}.room_type`}
                                 value={room_type.room_type}
+                                fetchOnMount
                                 onChange={value =>
                                   setFieldValue(
                                     `${name}.${index}.room_type`,

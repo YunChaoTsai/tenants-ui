@@ -14,6 +14,7 @@ import { store as mealPlanStore } from "./../MealPlans"
 import { store as roomTypeStore } from "./../RoomTypes"
 import { store as locationStore } from "./../Locations"
 import { store as contactStore } from "./../Contacts"
+import { store as hotelPaymentPreferenceStore } from "./../HotelPaymentPreferences"
 
 export const key = "HOTEL_LIST_STATE"
 
@@ -51,6 +52,7 @@ export interface IHotel extends IBaseItem {
   location: IHotelLocation
   prices?: IPrice[]
   contacts?: contactStore.IContact[]
+  payment_preference?: hotelPaymentPreferenceStore.IHotelPaymentPreference
 }
 
 export interface IHotels extends IBaseState<IHotel> {}
