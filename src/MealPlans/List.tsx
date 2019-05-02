@@ -118,7 +118,7 @@ export const SelectMealPlans = withXHR<SelectMealPlanProps>(
         {...otherProps}
         fetch={q =>
           XHR(xhr)
-            .getMealPlans()
+            .getMealPlans({ q })
             .then(resp => resp.data)
         }
       />

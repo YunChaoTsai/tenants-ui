@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Subtract, Omit } from "utility-types"
+import React, { useState, useEffect } from "react"
+import { Omit } from "utility-types"
 
 export interface SelectProps {
   multiple?: boolean
@@ -17,6 +17,7 @@ export interface SelectProps {
   onFocus?: (e: any) => void
   required?: boolean
   labelKey?: string
+  fetchOnMount?: boolean
 }
 
 export function Select({
@@ -35,7 +36,13 @@ export function Select({
   onFocus,
   required,
   labelKey = "name",
+  fetchOnMount,
 }: SelectProps) {
+  useEffect(() => {
+    if (fetchOnMount) {
+      onQuery(query || "")
+    }
+  }, [])
   name = name || (multiple ? "select[]" : "select")
   value = value || (multiple ? [] : undefined)
   if (value) {

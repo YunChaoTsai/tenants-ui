@@ -12,6 +12,11 @@ import { Dialog, useDialog } from "./../Shared/Dialog"
 import { InputField } from "./../Shared/InputField"
 import { Grid, Col } from "../Shared/Layout"
 
+interface IInstalment {
+  amount: number
+  due_date: string
+}
+
 export function XHR(xhr: AxiosInstance) {
   return {
     getQuotes(tripId: number | string, params?: any): Promise<IQuote[]> {
@@ -24,6 +29,14 @@ export function XHR(xhr: AxiosInstance) {
     },
     giveQuote(data: any): Promise<IGivenQuote> {
       return xhr.post(`/given-quotes`, data).then(resp => resp.data.data)
+    },
+    getInstalments(
+      quoteId: number
+    ): Promise<{
+      data: IInstalment[]
+      meta: { total: number }
+    }> {
+      return xhr.get(`/quote-instalments/${quoteId}`).then(resp => resp.data)
     },
   }
 }
@@ -42,6 +55,7 @@ export const Quote = withXHR(function Quote({
 }: XHRProps & {
   quote: IQuote
 }) {
+  const [instalments, setInstalments] = useState<IInstalment[]>([])
   function giveQuote(
     quoteId: number,
     givenPrice: number,
@@ -110,6 +124,28 @@ export const Quote = withXHR(function Quote({
         )}
       </ul>
       <Button onClick={open}>Give this quote</Button>
+      <Button
+        onClick={() => {
+          XHR(xhr)
+            .getInstalments(id)
+            .then(resp => setInstalments(resp.data))
+        }}
+      >
+        Get Instalments
+      </Button>
+      {instalments ? (
+        <div>
+          {instalments
+            .map(
+              i =>
+                `${i.amount} - ${moment
+                  .utc(i.due_date)
+                  .local()
+                  .format("DD/MM/YYYY")}`
+            )
+            .join(" • ")}
+        </div>
+      ) : null}
       <Dialog open={showGiveQuote} onClose={close}>
         <div>
           <Formik
@@ -125,9 +161,7 @@ export const Quote = withXHR(function Quote({
                   "Are you sure you want to give this quote to the customer?"
                 )
               ) {
-                giveQuote(quote.id, values.given_price, values.comments).then(
-                  close
-                )
+                giveQuote(id, values.given_price, values.comments).then(close)
               } else {
                 actions.setSubmitting(false)
               }
