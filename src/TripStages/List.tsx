@@ -118,7 +118,7 @@ export const SelectTripStages = withXHR<SelectTripStagesProps>(
         {...otherProps}
         fetch={q =>
           XHR(xhr)
-            .getTripStages()
+            .getTripStages({ q })
             .then(resp => resp.data)
         }
       />
