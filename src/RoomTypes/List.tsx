@@ -118,7 +118,7 @@ export const SelectRoomTypes = withXHR<SelectRoomTypesProps>(
         {...otherProps}
         fetch={q =>
           XHR(xhr)
-            .getRoomTypes()
+            .getRoomTypes({ q })
             .then(resp => resp.data)
         }
       />
