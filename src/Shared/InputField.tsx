@@ -1,11 +1,17 @@
 import React from "react"
 import { ErrorMessage, FieldProps, Field } from "formik"
+import { Omit } from "utility-types"
+
+interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, "as"> {
+  as?: React.ReactType
+}
 
 export function Input({
   type = "text",
+  as: Component = "input",
   ...otherProps
-}: React.HTMLProps<HTMLInputElement>) {
-  return <input {...otherProps} type={type} />
+}: InputProps) {
+  return <Component {...otherProps} type={type} />
 }
 
 export function InputField({
@@ -14,11 +20,12 @@ export function InputField({
   type = "text",
   className,
   ...otherProps
-}: React.HTMLProps<HTMLInputElement> & {
+}: InputProps & {
   name: string
   type?: string
   label?: React.ReactNode
   className?: string
+  as?: React.ReactType
 }) {
   return (
     <Field
