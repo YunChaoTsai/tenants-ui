@@ -23,6 +23,7 @@ import { TripSources } from "./TripSources"
 import { TripStages } from "./TripStages"
 import { TransportServices } from "./TransportServices"
 import { TransportServicePrices } from "./TransportServicePrices"
+import { HotelPaymentPreferences } from "./HotelPaymentPreferences"
 import { Container } from "./Shared/Layout"
 
 interface HeaderProps extends AuthProps {}
@@ -35,36 +36,37 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
       <nav>
         <ul className="list--inline">
           <NavLink to="/">Tourepedia Dashboard</NavLink>
-          <NavLink to="/trips">Trips</NavLink>
-          <NavLink to="/hotels">Hotels</NavLink>
           <li className="drop-down">
-            <Link to="/transport-services">Transport Services</Link>
+            <Link to="/trips">Trips</Link>
             <ul>
-              <NavLink to="/transport-services/cab-types">Cab Types</NavLink>
-              <NavLink to="/transport-services/transport-service-prices">
-                Transport Service Prices
-              </NavLink>
-            </ul>
-          </li>
-          <li className="drop-down">
-            <a className="toggler" href="#">
-              Analyst
-            </a>
-            <ul className="menu">
-              <NavLink to="/meal-plans">Meal Plans</NavLink>
-              <NavLink to="/room-types">Room Types</NavLink>
-              <NavLink to="/locations">Locations</NavLink>
-              <NavLink to="/cabs">Cabs</NavLink>
               <NavLink to="/trip-sources">Trip Sources</NavLink>
               <NavLink to="/trip-stages">Trip Stages</NavLink>
             </ul>
           </li>
           <li className="drop-down">
-            <a className="toggler" href="#">
-              Accounts
-            </a>
+            <Link to="/hotels">Hotels</Link>
+            <ul>
+              <NavLink to="/meal-plans">Meal Plans</NavLink>
+              <NavLink to="/room-types">Room Types</NavLink>
+              <NavLink to="/hotel-payment-preferences">
+                Payment Preferences
+              </NavLink>
+            </ul>
+          </li>
+          <li className="drop-down">
+            <Link to="/transport-services">Transport Services</Link>
+            <ul>
+              <NavLink to="/cab-types">Cab Types</NavLink>
+              <NavLink to="/transport-service-prices">
+                Transport Service Prices
+              </NavLink>
+              <NavLink to="/locations">Locations</NavLink>
+              <NavLink to="/cabs">Cabs</NavLink>
+            </ul>
+          </li>
+          <li className="drop-down">
+            <Link to="/users">Users</Link>
             <ul className="menu">
-              <NavLink to="/users">Users</NavLink>
               <NavLink to="/roles">Roles</NavLink>
             </ul>
           </li>
@@ -115,6 +117,7 @@ export default function App() {
           <TripStages path="/trip-stages/*" />
           <TransportServices path="/transport-services/*" />
           <TransportServicePrices path="/transport-service-prices/*" />
+          <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
           <NotFound default />
         </Router>
       </Container>
