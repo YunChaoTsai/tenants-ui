@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from "react"
 import Helmet from "react-helmet-async"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
-import { RouteComponentProps, Link } from "@reach/router"
+import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 
 import {
@@ -20,6 +20,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -117,24 +118,14 @@ function List({ getLocations, locations, ...otherProps }: ListProps) {
         />
       </div>
       <Listable total={total} isFetching={isFetching}>
-        <table>
-          <thead>
-            <th>Short Name</th>
-            <th>Name</th>
-            <th>Latitude</th>
-            <th>Longitude</th>
-          </thead>
-          <tbody>
-            {locations.map(location => (
-              <tr key={location.id}>
-                <td>{location.short_name}</td>
-                <td>{location.name}</td>
-                <td>{location.latitude}</td>
-                <td>{location.longitude}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Name", "Latitude", "Longitude"]}
+          rows={locations.map(location => [
+            location.name,
+            location.latitude,
+            location.longitude,
+          ])}
+        />
       </Listable>
     </Fragment>
   )
