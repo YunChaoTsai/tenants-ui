@@ -24,6 +24,7 @@ import { TripStages } from "./TripStages"
 import { TransportServices } from "./TransportServices"
 import { TransportServicePrices } from "./TransportServicePrices"
 import { HotelPaymentPreferences } from "./HotelPaymentPreferences"
+import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 
 interface HeaderProps extends AuthProps {}
@@ -93,34 +94,33 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
 
 export default function App() {
   return (
-    <Fragment>
+    <Container fluid className="fh">
       <Helmet titleTemplate="%s | Tourepedia" defaultTitle="Tourepedia" />
       <Header />
-      <Container fluid>
-        <Router>
-          <Login path="/login" />
-          <ForgotPassword path="/forgot-password" />
-          <ResetPassword path="/reset-password" />
-          <Dashboard path="/" />
-          <Logout path="/logout" />
-          <Settings path="/settings/*" />
-          <Users path="/users/*" />
-          <Roles path="/roles/*" />
-          <Hotels path="/hotels/*" />
-          <MealPlans path="/meal-plans/*" />
-          <RoomTypes path="/room-types/*" />
-          <Locations path="/locations/*" />
-          <CabTypes path="/cab-types/*" />
-          <Cabs path="/cabs/*" />
-          <Trips path="/trips/*" />
-          <TripSources path="/trip-sources/*" />
-          <TripStages path="/trip-stages/*" />
-          <TransportServices path="/transport-services/*" />
-          <TransportServicePrices path="/transport-service-prices/*" />
-          <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
-          <NotFound default />
-        </Router>
-      </Container>
-    </Fragment>
+      <Router>
+        <Login path="/login" />
+        <ForgotPassword path="/forgot-password" />
+        <ResetPassword path="/reset-password" />
+        <Dashboard path="/" />
+        <Logout path="/logout" />
+        <Settings path="/settings/*" />
+        <Users path="/users/*" />
+        <Roles path="/roles/*" />
+        <Hotels path="/hotels/*" />
+        <MealPlans path="/meal-plans/*" />
+        <RoomTypes path="/room-types/*" />
+        <Locations path="/locations/*" />
+        <CabTypes path="/cab-types/*" />
+        <Cabs path="/cabs/*" />
+        <Trips path="/trips/*" />
+        <TripSources path="/trip-sources/*" />
+        <TripStages path="/trip-stages/*" />
+        <TransportServices path="/transport-services/*" />
+        <TransportServicePrices path="/transport-service-prices/*" />
+        <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
+        <EmailVerified path="email-verified" />
+        <NotFound default />
+      </Router>
+    </Container>
   )
 }

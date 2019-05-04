@@ -212,3 +212,10 @@ dd {
   width: 100%;
   table-layout: fixed;
 }
+.fh {
+  height: 100% !important;
+  overflow: auto;
+}
+.fvh {
+  min-height: 100vh;
+}

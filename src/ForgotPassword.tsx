@@ -1,5 +1,5 @@
 import React from "react"
-import { RouteComponentProps, Link } from "@reach/router"
+import { RouteComponentProps, Link, Location } from "@reach/router"
 import Button from "@tourepedia/button"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
@@ -23,6 +23,7 @@ import { InputField } from "./Shared/InputField"
 // schemas
 export interface IForgotPasswordCredentials {
   email: string
+  reset_password_link: string
 }
 export const forgotPasswordSchema = Validator.object().shape({
   email: Validator.string()
@@ -61,13 +62,16 @@ function ForgotPassword({
       <Helmet>
         <title>Forgot Password</title>
       </Helmet>
-      <h2>Forgot Password</h2>
+      <h2>Forgot Your Password?</h2>
       <p>
-        Not problem? Just enter your email address and we will send the reset
-        password instructions to you.
+        No problem? Just enter your email address and we will send instructions
+        to reset your password.
       </p>
       <Formik
-        initialValues={{ email }}
+        initialValues={{
+          email,
+          reset_password_link: `${location && location.origin}/reset-password`,
+        }}
         validationSchema={forgotPasswordSchema}
         onSubmit={(
           values: IForgotPasswordCredentials,
@@ -89,6 +93,7 @@ function ForgotPassword({
           errors,
           status,
           isSubmitting,
+          values,
         }: FormikProps<IForgotPasswordCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
@@ -102,6 +107,12 @@ function ForgotPassword({
                 autoFocus
                 type="email"
                 id="email"
+              />
+              <input
+                type="hidden"
+                name="reset_password_link"
+                hidden
+                value={values.reset_password_link}
               />
               <Button type="submit" disabled={isSubmitting}>
                 Send Instructions

@@ -17,6 +17,10 @@ import { withXHR, XHRProps } from "./../xhr"
 
 export interface NewUserCredentials {
   name: string
+  email: string
+  password: string
+  password_confirmation: string
+  email_verified_link: string
 }
 const newUserSchema = Validator.object().shape({
   name: Validator.string()
@@ -33,16 +37,20 @@ const newUserSchema = Validator.object().shape({
     .required("Password confirmation is required")
     .min(8, "Password must be of a length greater than 8"),
 })
-const initialValues = {
+const initialValues: NewUserCredentials = {
   name: "",
   email: "",
   password: "",
   password_confirmation: "",
+  email_verified_link: "",
 }
 
 interface NewUserProps extends RouteComponentProps, XHRProps {}
 
-export function NewUser({ xhr, navigate }: NewUserProps) {
+export function NewUser({ xhr, navigate, location }: NewUserProps) {
+  initialValues.email_verified_link = location
+    ? `${location.origin}/email-verified`
+    : ""
   return (
     <div>
       <Formik
@@ -68,7 +76,11 @@ export function NewUser({ xhr, navigate }: NewUserProps) {
               actions.setSubmitting(false)
             })
         }}
-        render={({ isSubmitting, status }: FormikProps<NewUserCredentials>) => (
+        render={({
+          isSubmitting,
+          status,
+          values,
+        }: FormikProps<NewUserCredentials>) => (
           <Form noValidate>
             {status ? <div>{status}</div> : null}
             <fieldset>
@@ -100,6 +112,12 @@ export function NewUser({ xhr, navigate }: NewUserProps) {
                 name="password_confirmation"
                 autoComplete="new-password"
                 required
+              />
+              <input
+                hidden
+                type="hidden"
+                name="email_verified_link"
+                value={values.email_verified_link}
               />
               <Button type="submit" disabled={isSubmitting}>
                 Submit
