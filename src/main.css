@@ -27,9 +27,12 @@ body {
 * {
   box-sizing: border-box;
 }
+a {
+  color: black;
+}
 
 a[aria-current="page"] {
-  color: #045230;
+  color: blue;
 }
 
 [role="status"] {
@@ -37,7 +40,7 @@ a[aria-current="page"] {
 }
 
 [hidden] {
-  display: none;
+  display: none !important;
 }
 
 [disabled] {
@@ -75,6 +78,69 @@ dd {
   margin-left: 0;
 }
 
+label {
+  font-size: 0.9rem;
+}
+
+input[type="email"],
+input[type="text"],
+input[type="date"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+textarea {
+  font-size: 1rem;
+  display: block;
+}
+input[type="email"],
+input[type="text"],
+input[type="date"],
+input[type="password"] {
+  max-width: 300px;
+  display: block;
+  width: 100%;
+}
+
+fieldset {
+  border-color: black;
+  border-radius: 0.5rem;
+  margin-bottom: 20px;
+}
+button {
+  background: black;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+}
+legend,
+button,
+input[type="email"],
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="password"],
+input[type="search"],
+textarea {
+  height: 32px;
+  line-height: 30px;
+  padding: 0 0.5em;
+  border: 1px solid black;
+  border-radius: 0.3em;
+}
+textarea {
+  height: auto;
+  line-height: 1.5;
+  min-height: 100px;
+  min-width: 200px;
+  display: block;
+}
+button {
+  padding-left: 1em;
+  padding-right: 1em;
+  letter-spacing: 0.1px;
+  text-transform: uppercase;
+}
+
 /**
  * Utility classes
  */
@@ -84,8 +150,9 @@ dd {
 .text--center {
   text-align: center;
 }
-.text--error {
-  color: orangered;
+.text--error,
+.error {
+  color: #b10000;
 }
 .display--inline-block {
   display: inline-block;
@@ -108,6 +175,13 @@ dd {
 }
 .float--right {
   float: right;
+}
+.fh {
+  height: 100% !important;
+  overflow: auto;
+}
+.fvh {
+  min-height: 100vh;
 }
 
 /**
@@ -212,10 +286,125 @@ dd {
   width: 100%;
   table-layout: fixed;
 }
-.fh {
-  height: 100% !important;
-  overflow: auto;
+.form-group {
+  margin-bottom: 15px;
 }
-.fvh {
-  min-height: 100vh;
+.form-group.is-touched.has-error input {
+  border-color: #b10000;
+}
+.form-group .text--error,
+.form-group .error {
+  background: #b10000;
+  color: white;
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.9rem;
+  border-radius: 0.2rem;
+  margin-top: 5px;
+}
+.input-group {
+  display: flex;
+  align-items: center;
+}
+.input-group .form-group {
+  margin: 0;
+}
+.input-group input:not(:first-child),
+.input-group .form-group:not(:first-child) input,
+.input-group button:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.input-group input:not(:last-child),
+.input-group .form-group:not(:last-child) input,
+.input-group button:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.button-group {
+  display: inline-flex;
+}
+.button-group button:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.button-group button:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.select {
+  display: block;
+}
+.select > [role="group"] {
+  position: relative;
+  max-width: 300px;
+  min-width: 100px;
+}
+.select [type="search"] {
+  width: 100%;
+}
+.select [role="listbox"] {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  max-width: 100%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
+  background: white;
+  border: 1px solid black;
+  display: none;
+  overflow: auto;
+  max-height: 200px;
+  border-radius: 0 0 5px 5px;
+}
+.select[data-focused="true"] [role="listbox"] {
+  display: block;
+}
+.select[data-focused="true"] [type="search"] {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.select [role="listbox"] [role="option"] {
+  white-space: nowrap;
+  list-style: none;
+  display: block;
+  padding: 5px;
+  outline: none !important;
+}
+.select [aria-readonly="true"] {
+  color: silver;
+}
+.select [role="listbox"] [role="option"] + [role="option"] {
+  border-top: 1px solid silver;
+}
+.select [role="listbox"] [aria-selected="true"] {
+  background: black;
+  color: white;
+}
+.select [role="listbox"] [aria-selected="true"]:before {
+  content: "\2713 ";
+}
+.select ul {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 5px;
+}
+.select .selected-list li {
+  display: inline-block;
+  margin: 0 5px 5px 0;
+  padding: 3px 8px;
+  background: black;
+  color: white;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.select .selected-list li:before {
+  content: "\2713 ";
 }
