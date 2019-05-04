@@ -14,7 +14,7 @@ import Button from "@tourepedia/button"
 import * as Validator from "yup"
 import moment from "moment"
 
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
@@ -185,49 +185,44 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                           />
                         </td>
                         <td>
-                          <FieldArray
+                          <FormikFormGroup
                             name={`prices.${index}.meal_plan`}
-                            render={({ name }) => (
-                              <div>
-                                <SelectMealPlans
-                                  name={name}
-                                  searchable={false}
-                                  multiple={false}
-                                  options={hotel.meal_plans}
-                                  onChange={value => setFieldValue(name, value)}
-                                  value={price.meal_plan}
-                                />
-                                <ErrorMessage name={name} />
-                              </div>
+                            render={({ field }) => (
+                              <SelectMealPlans
+                                {...field}
+                                searchable={false}
+                                multiple={false}
+                                options={hotel.meal_plans}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
                             )}
                           />
                         </td>
                         <td>
-                          <FieldArray
+                          <FormikFormGroup
                             name={`prices.${index}.room_type`}
-                            render={({ name }) => (
-                              <div>
-                                <SelectRoomTypes
-                                  searchable={false}
-                                  multiple={false}
-                                  options={hotel.room_types}
-                                  onChange={(value?: IHotelRoomType) => {
-                                    setFieldValue(name, value)
-                                    if (!value || !value.allowed_extra_beds) {
-                                      setFieldValue(
-                                        `prices.${index}.adult_with_extra_bed_price`,
-                                        0
-                                      )
-                                      setFieldValue(
-                                        `prices.${index}.child_with_extra_bed_price`,
-                                        0
-                                      )
-                                    }
-                                  }}
-                                  value={price.room_type}
-                                />
-                                <ErrorMessage name={name} />
-                              </div>
+                            render={({ field }) => (
+                              <SelectRoomTypes
+                                {...field}
+                                searchable={false}
+                                multiple={false}
+                                options={hotel.room_types}
+                                onChange={(value: IHotelRoomType, name) => {
+                                  setFieldValue(name, value)
+                                  if (!value || !value.allowed_extra_beds) {
+                                    setFieldValue(
+                                      `prices.${index}.adult_with_extra_bed_price`,
+                                      0
+                                    )
+                                    setFieldValue(
+                                      `prices.${index}.child_with_extra_bed_price`,
+                                      0
+                                    )
+                                  }
+                                }}
+                              />
                             )}
                           />
                         </td>

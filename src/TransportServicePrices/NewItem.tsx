@@ -22,7 +22,7 @@ import {
   store as transportServiceStore,
 } from "./../TransportServices"
 import { withXHR, XHRProps } from "./../xhr"
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -182,44 +182,36 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                           />
                         </td>
                         <td>
-                          <Field
+                          <FormikFormGroup
                             name={`${name}.${index}.cab_type`}
                             render={({
                               field,
                             }: FieldProps<AddPriceCredentials>) => (
-                              <div>
-                                <SelectCabTypes
-                                  name={field.name}
-                                  multiple={false}
-                                  required
-                                  value={field.value}
-                                  onChange={value =>
-                                    setFieldValue(field.name, value)
-                                  }
-                                />
-                                <ErrorMessage name={field.name} />
-                              </div>
+                              <SelectCabTypes
+                                {...field}
+                                multiple={false}
+                                required
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
                             )}
                           />
                         </td>
                         <td>
-                          <Field
+                          <FormikFormGroup
                             name={`${name}.${index}.transport_service`}
                             render={({
                               field,
                             }: FieldProps<AddPriceCredentials>) => (
-                              <div>
-                                <SelectServices
-                                  name={field.name}
-                                  multiple={false}
-                                  required
-                                  value={field.value}
-                                  onChange={value =>
-                                    setFieldValue(field.name, value)
-                                  }
-                                />
-                                <ErrorMessage name={field.name} />
-                              </div>
+                              <SelectServices
+                                {...field}
+                                multiple={false}
+                                required
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
                             )}
                           />
                         </td>

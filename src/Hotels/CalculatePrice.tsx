@@ -15,7 +15,7 @@ import moment from "moment"
 import * as Validator from "yup"
 import { AxiosInstance } from "axios"
 
-import { InputField, Input } from "./../Shared/InputField"
+import { InputField, Input, FormikFormGroup } from "./../Shared/InputField"
 import { SelectHotels } from "./List"
 import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
 import { SelectMealPlans } from "./../MealPlans"
@@ -290,47 +290,38 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           />
                         </td>
                         <td>
-                          <Field
+                          <FormikFormGroup
                             name={`${name}.${index}.hotel`}
                             render={({
                               field,
-                            }: FieldProps<CalculatePriceParams>) => {
-                              return (
-                                <div>
-                                  <SelectHotels
-                                    multiple={false}
-                                    value={field.value}
-                                    onChange={value =>
-                                      setFieldValue(field.name, value)
-                                    }
-                                  />
-                                  <ErrorMessage name={field.name} />
-                                </div>
-                              )
-                            }}
+                            }: FieldProps<CalculatePriceParams>) => (
+                              <SelectHotels
+                                {...field}
+                                multiple={false}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
                           />
                         </td>
                         <td>
-                          <Field
+                          <FormikFormGroup
                             name={`${name}.${index}.meal_plan`}
                             render={({
                               field,
                             }: FieldProps<CalculatePriceParams>) => (
-                              <div>
-                                <SelectMealPlans
-                                  searchable={false}
-                                  multiple={false}
-                                  value={field.value}
-                                  onChange={value =>
-                                    setFieldValue(field.name, value)
-                                  }
-                                  options={
-                                    hotel.hotel ? hotel.hotel.meal_plans : []
-                                  }
-                                  name={field.name}
-                                />
-                                <ErrorMessage name={field.name} />
-                              </div>
+                              <SelectMealPlans
+                                {...field}
+                                searchable={false}
+                                multiple={false}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                                options={
+                                  hotel.hotel ? hotel.hotel.meal_plans : []
+                                }
+                              />
                             )}
                           />
                         </td>
@@ -343,41 +334,40 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                   {hotel.room_details.map(
                                     (roomDetail, index) => (
                                       <li key={index}>
-                                        <SelectRoomTypes
+                                        <FormikFormGroup
                                           name={`${name}.${index}.room_type`}
-                                          searchable={false}
-                                          multiple={false}
-                                          value={roomDetail.room_type}
-                                          onChange={(
-                                            value?: IHotelRoomType
-                                          ) => {
-                                            setFieldValue(
-                                              `${name}.${index}.room_type`,
-                                              value
-                                            )
-                                            if (
-                                              !value ||
-                                              !value.allowed_extra_beds
-                                            ) {
-                                              setFieldValue(
-                                                `${name}.${index}.adults_with_extra_bed`,
-                                                0
-                                              )
-                                              setFieldValue(
-                                                `${name}.${index}.children_with_extra_bed`,
-                                                0
-                                              )
-                                            }
-                                          }}
-                                          options={
-                                            hotel.hotel
-                                              ? hotel.hotel.room_types
-                                              : []
-                                          }
-                                          label="Room Type"
-                                        />
-                                        <ErrorMessage
-                                          name={`${name}.${index}.room_type`}
+                                          render={({ field }) => (
+                                            <SelectRoomTypes
+                                              {...field}
+                                              label="Room Type"
+                                              options={
+                                                hotel.hotel
+                                                  ? hotel.hotel.room_types
+                                                  : []
+                                              }
+                                              searchable={false}
+                                              multiple={false}
+                                              onChange={(
+                                                value: IHotelRoomType,
+                                                n
+                                              ) => {
+                                                setFieldValue(n, value)
+                                                if (
+                                                  !value ||
+                                                  !value.allowed_extra_beds
+                                                ) {
+                                                  setFieldValue(
+                                                    `${name}.${index}.adults_with_extra_bed`,
+                                                    0
+                                                  )
+                                                  setFieldValue(
+                                                    `${name}.${index}.children_with_extra_bed`,
+                                                    0
+                                                  )
+                                                }
+                                              }}
+                                            />
+                                          )}
                                         />
                                         <InputField
                                           name={`${name}.${index}.no_of_rooms`}
@@ -450,6 +440,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           <Button disabled={isSubmitting} type="submit">
                             Get Price
                           </Button>
+                          <br />
                           <div>{hotel.calculated_price}</div>
                         </td>
                         <td>
@@ -486,7 +477,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                         <td>
                           <Input
                             name={`${name}.${index}.comments`}
-                            type="string"
+                            as="textarea"
                             maxLength={191}
                             value={hotel.comments}
                             placeholder="Regarding pricing difference or any other"

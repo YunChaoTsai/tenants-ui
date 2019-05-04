@@ -80,16 +80,19 @@ export function EditUser({ xhr, navigate, userId }: EditUserProps) {
                 status,
               }: FormikProps<UserCredentials>) => (
                 <Form noValidate>
-                  {status ? <div>{status}</div> : null}
-                  <InputField
-                    label="Name"
-                    name="name"
-                    placeholder="Manager"
-                    required
-                  />
-                  <Button type="submit" disabled={isSubmitting}>
-                    Submit
-                  </Button>
+                  <fieldset>
+                    <legend>Edit User Details</legend>
+                    {status ? <div>{status}</div> : null}
+                    <InputField
+                      label="Name"
+                      name="name"
+                      placeholder="Manager"
+                      required
+                    />
+                    <Button type="submit" disabled={isSubmitting}>
+                      Submit
+                    </Button>
+                  </fieldset>
                   <Link to="..">Cancel</Link>
                 </Form>
               )}

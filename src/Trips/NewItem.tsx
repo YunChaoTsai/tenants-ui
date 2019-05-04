@@ -14,7 +14,7 @@ import Button from "@tourepedia/button"
 import * as Validator from "yup"
 import moment from "moment"
 
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectLocations, store as locationStore } from "./../Locations"
 import { SelectTripSources, store as tripSourceStore } from "./../TripSources"
 import { withXHR, XHRProps } from "./../xhr"
@@ -180,18 +180,14 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           {status ? <div>{status}</div> : null}
           <fieldset>
             <legend>Destination Details</legend>
-            <FieldArray
+            <FormikFormGroup
               name="destinations"
-              render={({ name }) => (
-                <div>
-                  <SelectLocations
-                    label="Destinations"
-                    name={name}
-                    value={values.destinations}
-                    onChange={value => setFieldValue(name, value)}
-                  />
-                  <ErrorMessage name={name} />
-                </div>
+              render={({ field }) => (
+                <SelectLocations
+                  {...field}
+                  label="Destinations"
+                  onChange={(value, name) => setFieldValue(name, value)}
+                />
               )}
             />
             <InputField
@@ -207,20 +203,17 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               min={1}
               required
             />
-            <Field
+            <FormikFormGroup
               name="trip_source"
               render={({ field }: FieldProps<NewItemSchema>) => (
-                <div>
-                  <SelectTripSources
-                    name={field.name}
-                    label="Trip Source"
-                    required
-                    value={values.trip_source}
-                    onChange={value => setFieldValue(field.name, value)}
-                    multiple={false}
-                  />
-                  <ErrorMessage name={field.name} />
-                </div>
+                <SelectTripSources
+                  {...field}
+                  label="Trip Source"
+                  required
+                  fetchOnMount
+                  onChange={(value, name) => setFieldValue(name, value)}
+                  multiple={false}
+                />
               )}
             />
             <InputField name="trip_id" label="Trip ID" placeholder="1231231" />
@@ -242,18 +235,17 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                     required
                     type="email"
                   />
-                  <SelectCountryDialCodes
-                    label="Country code"
+                  <FormikFormGroup
                     name={`${name}.phone_number_country_dial_code`}
-                    value={values.contact.phone_number_country_dial_code}
-                    placeholder="Type here... eg India or +91"
-                    required
-                    onChange={value =>
-                      setFieldValue(
-                        `${name}.phone_number_country_dial_code`,
-                        value
-                      )
-                    }
+                    render={({ field }) => (
+                      <SelectCountryDialCodes
+                        {...field}
+                        label="Country code"
+                        placeholder="Type here... eg India or +91"
+                        required
+                        onChange={(value, name) => setFieldValue(name, value)}
+                      />
+                    )}
                   />
                   <InputField
                     name={`${name}.phone_number`}
@@ -280,7 +272,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 <fieldset>
                   <legend>Children</legend>
                   <ul className="list">
-                    {values.children.map((children, index) => (
+                    {values.children.map((_, index) => (
                       <li key={index}>
                         <InputField
                           label="Age"

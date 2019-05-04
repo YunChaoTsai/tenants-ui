@@ -1,6 +1,6 @@
 import React from "react"
 import { Formik, Form } from "formik"
-import { InputField } from "../Shared/InputField"
+import { InputField, FormikFormGroup } from "../Shared/InputField"
 import { SelectCountryDialCodes } from "../CountryDialCodes"
 import Button from "@tourepedia/button"
 import * as Validator from "yup"
@@ -17,7 +17,9 @@ const addContactValidationSchema = Validator.object()
       phone_number: number,
       schema: Validator.ObjectSchema<countryDialCodesStore.ICountryDialCode>
     ) {
-      return phone_number ? schema.required() : schema
+      return phone_number
+        ? schema.required("Dial code is required with phone number")
+        : schema
     }),
   })
   .required("Contact data is required")
@@ -59,15 +61,19 @@ export function AddContactForm({ onCreate, onCancel }: AddContactFormProps) {
             actions.setSubmitting(false)
           })
       }}
-      render={({ values, setFieldValue, isSubmitting }) => (
+      render={({ setFieldValue, isSubmitting }) => (
         <Form noValidate>
           <InputField name="name" label="Name" required />
           <InputField name="email" label="Email" type="email" />
-          <SelectCountryDialCodes
-            label="Country Code"
+          <FormikFormGroup
             name="phone_number_dial_code"
-            value={values.phone_number_dial_code}
-            onChange={value => setFieldValue("phone_number_dial_code", value)}
+            render={({ field }) => (
+              <SelectCountryDialCodes
+                {...field}
+                label="Country Code"
+                onChange={(value, name) => setFieldValue(name, value)}
+              />
+            )}
           />
           <InputField name="phone_number" label="Phone Number" type="number" />
           <Button disabled={isSubmitting} type="submit">

@@ -13,7 +13,7 @@ import * as Validator from "yup"
 import Button from "@tourepedia/button"
 
 import { withXHR, XHRProps } from "./../xhr"
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectCabTypes, store as cabTypeStore } from "./../CabTypes"
 
 export interface NewCabCredentials {
@@ -86,20 +86,16 @@ export function NewCab({ xhr, navigate }: NewCabProps) {
                 required
                 placeholder="Suzuki Wagon R"
               />
-              <Field
+              <FormikFormGroup
                 name="cab_type"
                 render={({ field }: FieldProps<NewCabCredentials>) => (
-                  <div>
-                    <SelectCabTypes
-                      label="Cab Type"
-                      name={field.name}
-                      multiple={false}
-                      value={field.value}
-                      placeholder="Type to search... (e.g. Wagon)"
-                      onChange={value => setFieldValue(field.name, value)}
-                    />
-                    <ErrorMessage name={field.name} />
-                  </div>
+                  <SelectCabTypes
+                    {...field}
+                    label="Cab Type"
+                    multiple={false}
+                    placeholder="Type to search... (e.g. Wagon)"
+                    onChange={(value, name) => setFieldValue(name, value)}
+                  />
                 )}
               />
               <InputField

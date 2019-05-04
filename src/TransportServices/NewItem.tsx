@@ -1,23 +1,21 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import {
-  Formik,
-  FormikProps,
-  FormikActions,
-  Form,
-  FieldArray,
-  ErrorMessage,
-} from "formik"
+import { Formik, FormikProps, FormikActions, Form, FieldArray } from "formik"
 import Button from "@tourepedia/button"
 import * as Validator from "yup"
 
-import { InputField } from "./../Shared/InputField"
+import {
+  InputField,
+  ErrorMessage,
+  FormikFormGroup,
+} from "./../Shared/InputField"
 import { SelectLocations, store as locationStore } from "./../Locations"
 import { withXHR, XHRProps } from "./../xhr"
 import Helmet from "react-helmet-async"
 
 const validationSchema = Validator.object().shape({
   via: Validator.array()
+    .of(Validator.object().required("Destination is required"))
     .min(2, "Atleast two locations required")
     .required("Via field is required"),
   distance: Validator.number()
@@ -32,7 +30,7 @@ interface NewServiceCredentials {
 }
 
 const initialValues: NewServiceCredentials = {
-  via: [undefined as any],
+  via: [undefined as any, undefined as any],
   distance: 0,
 }
 
@@ -84,23 +82,28 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
               <FieldArray
                 name="via"
                 render={({ name, remove, push }) => (
-                  <div>
-                    <label>Locations</label>
-                    {values.via.map((location, index) => (
+                  <div className="form-group">
+                    <label>Destinations</label>
+                    {values.via.map((_, index, locations) => (
                       <div key={index}>
-                        <SelectLocations
+                        <FormikFormGroup
                           name={`${name}.${index}`}
-                          multiple={false}
-                          value={values.via[index]}
-                          onChange={value =>
-                            setFieldValue(`${name}.${index}`, value)
-                          }
+                          render={({ field }) => (
+                            <SelectLocations
+                              {...field}
+                              multiple={false}
+                              onChange={(value, name) =>
+                                setFieldValue(name, value)
+                              }
+                            />
+                          )}
                         />
-                        <Button onClick={_ => remove(index)}>Remove</Button>
+                        {locations.length > 2 ? (
+                          <Button onClick={_ => remove(index)}>Remove</Button>
+                        ) : null}
                       </div>
                     ))}
                     <Button onClick={_ => push(undefined)}>Add More</Button>
-                    <ErrorMessage name={name} />
                   </div>
                 )}
               />

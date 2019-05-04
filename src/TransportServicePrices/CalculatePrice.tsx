@@ -20,7 +20,7 @@ import {
   SelectTransportServices as SelectServices,
   store as transportServiceStore,
 } from "./../TransportServices"
-import { InputField, Input } from "./../Shared/InputField"
+import { InputField, Input, FormikFormGroup } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
 
 export function XHR(xhr: AxiosInstance) {
@@ -229,44 +229,34 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                         />
                       </td>
                       <td>
-                        <Field
+                        <FormikFormGroup
                           name={`${name}.${index}.transport_service`}
                           render={({
                             field,
-                            form: { setFieldValue },
                           }: FieldProps<CalculatePriceSchema>) => (
-                            <div>
-                              <SelectServices
-                                multiple={false}
-                                name={field.name}
-                                value={field.value}
-                                onChange={value =>
-                                  setFieldValue(field.name, value)
-                                }
-                              />
-                              <ErrorMessage name={field.name} />
-                            </div>
+                            <SelectServices
+                              {...field}
+                              multiple={false}
+                              onChange={(value, name) =>
+                                setFieldValue(name, value)
+                              }
+                            />
                           )}
                         />
                       </td>
                       <td>
-                        <Field
+                        <FormikFormGroup
                           name={`${name}.${index}.cab_type`}
                           render={({
                             field,
-                            form: { setFieldValue },
                           }: FieldProps<CalculatePriceSchema>) => (
-                            <div>
-                              <SelectCabTypes
-                                multiple={false}
-                                name={field.name}
-                                value={field.value}
-                                onChange={value =>
-                                  setFieldValue(field.name, value)
-                                }
-                              />
-                              <ErrorMessage name={field.name} />
-                            </div>
+                            <SelectCabTypes
+                              {...field}
+                              multiple={false}
+                              onChange={(value, name) =>
+                                setFieldValue(name, value)
+                              }
+                            />
                           )}
                         />
                       </td>
@@ -317,7 +307,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       <td>
                         <Input
                           name={`${name}.${index}.comments`}
-                          type="string"
+                          as="textarea"
                           maxLength={191}
                           value={cab.comments}
                           placeholder="Regarding pricing difference or any other"
