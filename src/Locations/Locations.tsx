@@ -9,8 +9,7 @@ export default function LocationsModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <h2>Locations</h2>
-      <Link to="new">New Location</Link> • <Link to="services">Services</Link> •{" "}
-      <Link to="new-service">New Service</Link>
+      <Link to="new">New Location</Link>
       <hr />
       <Router>
         <NewItem path="/new" />

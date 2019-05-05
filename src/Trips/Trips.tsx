@@ -9,7 +9,7 @@ import NewItem from "./NewItem"
 export default function Trips(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <h3>Trips</h3>
+      <h2>Trips</h2>
       <Link to="new">New Trip</Link>
       <hr />
       <Router>

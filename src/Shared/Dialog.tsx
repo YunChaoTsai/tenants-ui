@@ -106,7 +106,9 @@ export function Dialog({
       }}
       tabIndex={-1}
     >
-      <div style={{ background: "white", position: "relative" }}>
+      <div
+        style={{ background: "white", position: "relative", minWidth: "300px" }}
+      >
         {closeButton ? (
           <button
             style={{ position: "absolute", right: "5px", top: "5px" }}

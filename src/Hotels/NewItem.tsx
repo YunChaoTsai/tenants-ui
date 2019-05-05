@@ -14,7 +14,7 @@ import * as Validator from "yup"
 import Helmet from "react-helmet-async"
 import Button from "@tourepedia/button"
 
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
 import { store as mealPlanStore, SelectMealPlans } from "./../MealPlans"
 import { store as roomTypeStore, SelectRoomTypes } from "./../RoomTypes"
@@ -136,39 +136,27 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   placeholder="Taj Hotel"
                   required
                 />
-                <Field
+                <FormikFormGroup
                   name="location"
-                  render={({
-                    field: { name, value },
-                  }: FieldProps<NewItemCredentials>) => (
-                    <div>
-                      <SelectLocations
-                        label="Location"
-                        name="location"
-                        multiple={false}
-                        value={value}
-                        onChange={value => setFieldValue(name, value)}
-                      />
-                      <ErrorMessage name={name} />
-                    </div>
+                  render={({ field }: FieldProps<NewItemCredentials>) => (
+                    <SelectLocations
+                      {...field}
+                      label="Location"
+                      multiple={false}
+                      onChange={(value, name) => setFieldValue(name, value)}
+                    />
                   )}
                 />
-                <Field
+                <FormikFormGroup
                   name="payment_preference"
-                  render={({
-                    field: { name, value },
-                  }: FieldProps<NewItemCredentials>) => (
-                    <div>
-                      <SelectHotelPaymentPreferences
-                        label="Payment Preference"
-                        name="payment_preference"
-                        multiple={false}
-                        value={value}
-                        onChange={value => setFieldValue(name, value)}
-                        fetchOnMount
-                      />
-                      <ErrorMessage name={name} />
-                    </div>
+                  render={({ field }: FieldProps<NewItemCredentials>) => (
+                    <SelectHotelPaymentPreferences
+                      {...field}
+                      label="Payment Preference"
+                      multiple={false}
+                      onChange={(value, name) => setFieldValue(name, value)}
+                      fetchOnMount
+                    />
                   )}
                 />
                 <InputField
@@ -179,19 +167,15 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   max={5}
                   min={1}
                 />
-                <FieldArray
+                <FormikFormGroup
                   name="meal_plans"
-                  render={({ name }) => (
-                    <div>
-                      <SelectMealPlans
-                        label="Meal Plan(s) served"
-                        name={name}
-                        value={values.meal_plans}
-                        onChange={values => setFieldValue("meal_plans", values)}
-                        fetchOnMount
-                      />
-                      <ErrorMessage name={name} />
-                    </div>
+                  render={({ field }) => (
+                    <SelectMealPlans
+                      {...field}
+                      label="Meal Plan(s) served"
+                      onChange={(values, name) => setFieldValue(name, values)}
+                      fetchOnMount
+                    />
                   )}
                 />
                 <FieldArray
@@ -203,21 +187,19 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                         {values.room_types.map(
                           (room_type, index, room_types) => (
                             <li key={index}>
-                              <SelectRoomTypes
-                                multiple={false}
-                                label="Room Type"
+                              <FormikFormGroup
                                 name={`${name}.${index}.room_type`}
-                                value={room_type.room_type}
-                                fetchOnMount
-                                onChange={value =>
-                                  setFieldValue(
-                                    `${name}.${index}.room_type`,
-                                    value
-                                  )
-                                }
-                              />
-                              <ErrorMessage
-                                name={`${name}.${index}.room_type`}
+                                render={({ field }) => (
+                                  <SelectRoomTypes
+                                    {...field}
+                                    multiple={false}
+                                    label="Room Type"
+                                    fetchOnMount
+                                    onChange={(value, name) =>
+                                      setFieldValue(name, value)
+                                    }
+                                  />
+                                )}
                               />
                               <InputField
                                 label="Allowed extra bed(s)"

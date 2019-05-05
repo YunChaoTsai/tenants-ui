@@ -14,7 +14,7 @@ import Helmet from "react-helmet-async"
 import * as Validator from "yup"
 
 import { withXHR, XHRProps } from "./../xhr"
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectCountries, SelectStates, SelectCities } from "./List"
 import { ICountry, ICountryState, ICity } from "./store"
 
@@ -99,31 +99,27 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             {status ? <div>{status}</div> : null}
             <fieldset>
               <legend>Add New Location</legend>
-              <Field
+              <FormikFormGroup
                 name="country"
                 render={({ field }: FieldProps<NewItemCredentials>) => (
-                  <div>
-                    <SelectCountries
-                      multiple={false}
-                      label="Country"
-                      name={field.name}
-                      value={field.value}
-                      onChange={value => {
-                        setFieldValue(field.name, value)
-                        setFieldValue(
-                          "country_short_name",
-                          value ? value.short_name : null
-                        )
-                      }}
-                      placeholder="Type to search.. (e.g. India)"
-                    />
-                    <ErrorMessage name={field.name} />
-                  </div>
+                  <SelectCountries
+                    {...field}
+                    multiple={false}
+                    label="Country"
+                    placeholder="Type to search.. (e.g. India)"
+                    onChange={(value, name) => {
+                      setFieldValue(name, value)
+                      setFieldValue(
+                        "country_short_name",
+                        value ? value.short_name : null
+                      )
+                    }}
+                  />
                 )}
               />
               <Field
                 name="country"
-                render={({ field }: FieldProps<NewItemCredentials>) => (
+                render={(_: FieldProps<NewItemCredentials>) => (
                   <InputField
                     label="Country Short Name"
                     name="country_short_name"
@@ -132,51 +128,41 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   />
                 )}
               />
-              <Field
+              <FormikFormGroup
                 name="state"
                 render={({ field }: FieldProps<NewItemCredentials>) => (
-                  <div>
-                    <SelectStates
-                      multiple={false}
-                      label="State"
-                      name={field.name}
-                      value={field.value}
-                      onChange={value => setFieldValue(field.name, value)}
-                      placeholder="Type to search.. (e.g. Rajasthan)"
-                      creatable
-                    />
-                    <ErrorMessage name={field.name} />
-                  </div>
+                  <SelectStates
+                    {...field}
+                    multiple={false}
+                    label="State"
+                    onChange={(value, name) => setFieldValue(name, value)}
+                    placeholder="Type to search.. (e.g. Rajasthan)"
+                    creatable
+                  />
                 )}
               />
-              <Field
+              <FormikFormGroup
                 name="city"
                 render={({ field }: FieldProps<NewItemCredentials>) => (
-                  <div>
-                    <SelectCities
-                      multiple={false}
-                      label="City"
-                      name={field.name}
-                      value={field.value}
-                      onChange={value => setFieldValue(field.name, value)}
-                      placeholder="Type to search.. (e.g. Jaipur)"
-                      creatable
-                    />
-                    <ErrorMessage name={field.name} />
-                  </div>
+                  <SelectCities
+                    {...field}
+                    multiple={false}
+                    label="City"
+                    onChange={(value, name) => setFieldValue(name, value)}
+                    placeholder="Type to search.. (e.g. Jaipur)"
+                    creatable
+                  />
                 )}
               />
               <InputField
                 name="latitude"
                 label="Latitude"
                 placeholder="27° 2' 9.6252'' N"
-                type="string"
               />
               <InputField
                 name="longitude"
                 label="Longitude"
                 placeholder="88° 15' 45.6192'' E"
-                type="string"
               />
               <Button type="submit" disabled={isSubmitting}>
                 Save

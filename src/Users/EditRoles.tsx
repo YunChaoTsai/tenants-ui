@@ -8,6 +8,7 @@ import Button from "@tourepedia/button"
 import { withXHR, XHRProps } from "./../xhr"
 import { UserDataProvider } from "./Item"
 import { SelectRoles } from "./../Roles"
+import { FormikFormGroup } from "../Shared/InputField"
 
 interface EditRolesProps
   extends RouteComponentProps<{ userId: string }>,
@@ -37,7 +38,6 @@ export function EditRoles({ xhr, navigate, userId }: EditRolesProps) {
             <Helmet>
               <title>Edit {name}'s Roles</title>
             </Helmet>
-            <h3>Editing {name}'s roles</h3>
             <Formik
               initialValues={initialValues}
               onSubmit={(
@@ -70,21 +70,23 @@ export function EditRoles({ xhr, navigate, userId }: EditRolesProps) {
                 setFieldValue,
               }: FormikProps<EditRolesCredentials>) => (
                 <Form noValidate>
-                  {status ? <div>{status}</div> : null}
-                  <FieldArray
-                    name="roles"
-                    render={arrayHelpers => (
-                      <div>
+                  <fieldset>
+                    <legend>Editing {name}'s roles</legend>
+                    {status ? <div>{status}</div> : null}
+                    <FormikFormGroup
+                      name="roles"
+                      render={({ field }) => (
                         <SelectRoles
-                          value={values.roles}
-                          onChange={roles => setFieldValue("roles", roles)}
+                          {...field}
+                          label="Select Role(s)"
+                          onChange={(roles, name) => setFieldValue(name, roles)}
                         />
-                      </div>
-                    )}
-                  />
-                  <Button type="submit" disabled={isSubmitting}>
-                    Save
-                  </Button>{" "}
+                      )}
+                    />
+                    <Button type="submit" disabled={isSubmitting}>
+                      Save
+                    </Button>
+                  </fieldset>
                   <Link to="..">Cancel</Link>
                 </Form>
               )}

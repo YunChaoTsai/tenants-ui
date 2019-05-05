@@ -1,19 +1,12 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import {
-  Formik,
-  Form,
-  FormikProps,
-  FormikActions,
-  FieldArray,
-  ErrorMessage,
-} from "formik"
+import { Formik, Form, FormikProps, FormikActions, FieldArray } from "formik"
 import Button from "@tourepedia/button"
 import Helmet from "react-helmet-async"
 import * as Validator from "yup"
 
 import { withXHR, XHRProps } from "./../xhr"
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectHotelPaymentReferences } from "./List"
 
 interface NewItemCredentials {
@@ -110,23 +103,22 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 name="breakdowns"
                 render={({ name, push, remove }) => (
                   <ul>
-                    {values.breakdowns.map((breakdown, index, breakdowns) => (
+                    {values.breakdowns.map((_, index, breakdowns) => (
                       <li key={index}>
-                        <SelectHotelPaymentReferences
-                          label="Reference Event"
+                        <FormikFormGroup
                           name={`${name}.${index}.reference`}
-                          required
-                          value={breakdown.reference}
-                          fetchOnMount
-                          multiple={false}
-                          onChange={value =>
-                            setFieldValue(`${name}.${index}.reference`, value)
-                          }
-                        />
-                        <ErrorMessage
-                          name={`${name}.${index}.reference`}
-                          component="span"
-                          className="text--error"
+                          render={({ field }) => (
+                            <SelectHotelPaymentReferences
+                              {...field}
+                              label="Reference Event"
+                              required
+                              fetchOnMount
+                              multiple={false}
+                              onChange={(value, name) =>
+                                setFieldValue(name, value)
+                              }
+                            />
+                          )}
                         />
                         <InputField
                           label="Day offset from reference"

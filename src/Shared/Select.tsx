@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Omit } from "utility-types"
+import { contains } from "../dom-helpers"
+import { FormikFormGroup } from "./InputField"
 
 export interface SelectProps {
   multiple?: boolean
   name?: string
-  onChange: (value?: any[] | any) => void
+  onChange: (value: any[] | any, name: string) => void
   onQuery: (query: string) => void
   options?: any[]
   placeholder?: string
@@ -22,7 +24,7 @@ export interface SelectProps {
 
 export function Select({
   multiple,
-  name,
+  name: propName,
   onChange,
   onQuery,
   options = [],
@@ -38,12 +40,7 @@ export function Select({
   labelKey = "name",
   fetchOnMount,
 }: SelectProps) {
-  useEffect(() => {
-    if (fetchOnMount) {
-      onQuery(query || "")
-    }
-  }, [])
-  name = name || (multiple ? "select[]" : "select")
+  const name: string = propName || (multiple ? "select[]" : "select")
   value = value || (multiple ? [] : undefined)
   if (value) {
     let moreOptions = []
@@ -66,54 +63,121 @@ export function Select({
       created: true,
     })
   }
+  const groupRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isFocused, changeFocusState] = useState<boolean>(false)
+  useEffect(() => {
+    if (fetchOnMount) {
+      onQuery(query || "")
+    }
+  }, [])
+  function setIsFouced(isFocused: boolean) {
+    changeFocusState(isFocused)
+    if (!isFocused) {
+      onBlur && onBlur({ target: { name } })
+    }
+  }
+  useEffect(() => {
+    function handleClick(e: any) {
+      if (groupRef.current) {
+        const container = groupRef.current
+        if (contains(container, e.target)) {
+          if (!isFocused) {
+            setIsFouced(true)
+          }
+        } else if (isFocused) {
+          setIsFouced(false)
+        }
+      }
+    }
+    document.addEventListener("click", handleClick)
+    document.addEventListener("keyup", handleClick)
+    return () => {
+      document.removeEventListener("click", handleClick)
+      document.removeEventListener("keyup", handleClick)
+    }
+  }, [isFocused])
+  function handleChange(option: any, checked: boolean) {
+    const newValues = checked
+      ? Array.isArray(value)
+        ? value.concat([option])
+        : option
+      : Array.isArray(value)
+      ? value.filter(v => v.id !== option.id)
+      : undefined
+    onChange(newValues, name)
+    if (!multiple && newValues) {
+      setTimeout(() => {
+        setIsFouced(false)
+      })
+    }
+  }
   return (
-    <div>
-      {label ? <label>{label}</label> : null}
-      {searchable ? (
+    <div className="select" data-focused={isFocused}>
+      <div role="group" ref={groupRef}>
+        {label ? <label htmlFor={name}>{label}</label> : null}
         <input
-          value={query}
+          type="search"
+          value={
+            isFocused ? query : !multiple && value ? value[labelKey] : query
+          }
           onChange={e => {
             onQuery(e.target.value)
           }}
+          id={name}
           onFocus={onFocus}
-          onBlur={onBlur}
           required={required}
+          readOnly={!searchable}
           placeholder={placeholder}
+          aria-haspopup={true}
+          aria-autocomplete={searchable ? "inline" : "list"}
+          autoComplete="off"
+          ref={inputRef}
         />
-      ) : null}
-      {options.length ? (
-        <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {options.map(option => (
-            <li key={option.id} style={{ display: "inline-block" }}>
-              <label title={option.title || option.description}>
-                <input
-                  type={multiple ? "checkbox" : "radio"}
-                  name={name}
-                  value={JSON.stringify(option)}
-                  checked={
-                    value
-                      ? Array.isArray(value)
-                        ? value.some(v => v.id === option.id)
-                        : value.id === option.id
-                      : false
-                  }
-                  onChange={e => {
-                    onChange(
-                      e.target.checked
-                        ? Array.isArray(value)
-                          ? value.concat([option])
-                          : option
-                        : Array.isArray(value)
-                        ? value.filter(v => v.id !== option.id)
-                        : undefined
-                    )
-                  }}
-                />
+        <ol role="listbox" aria-multiselectable={multiple}>
+          {isFocused && options.length === 0 ? (
+            <li role="option" aria-readonly={true}>
+              Type to search...
+            </li>
+          ) : null}
+          {options.map(option => {
+            const checked = value
+              ? Array.isArray(value)
+                ? value.some(v => v.id === option.id)
+                : value.id === option.id
+              : false
+            return (
+              <li
+                key={option.id}
+                role="option"
+                aria-selected={checked}
+                title={option.title || option.description}
+                tabIndex={-1}
+                onClick={() => {
+                  handleChange(option, !checked)
+                }}
+              >
                 {option[labelKey]}
-              </label>
+              </li>
+            )
+          })}
+        </ol>
+      </div>
+      {value && Array.isArray(value) ? (
+        <ul className="selected-list">
+          {value.map(v => (
+            <li
+              key={v.id}
+              title="Click to unselect"
+              role="button"
+              onClick={() =>
+                onChange(value.filter((val: any) => val.id !== v.id), name)
+              }
+            >
+              {v[labelKey]}
             </li>
           ))}
-        </ol>
+        </ul>
       ) : null}
     </div>
   )
@@ -140,4 +204,5 @@ export function Async({ fetch, ...otherProps }: AsyncProps) {
     />
   )
 }
+
 export default Select

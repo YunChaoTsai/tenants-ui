@@ -1,5 +1,5 @@
 import React from "react"
-import { RouteComponentProps, Link } from "@reach/router"
+import { RouteComponentProps, Link, Location } from "@reach/router"
 import Button from "@tourepedia/button"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
@@ -23,6 +23,7 @@ import { InputField } from "./Shared/InputField"
 // schemas
 export interface IForgotPasswordCredentials {
   email: string
+  reset_password_link: string
 }
 export const forgotPasswordSchema = Validator.object().shape({
   email: Validator.string()
@@ -61,56 +62,72 @@ function ForgotPassword({
       <Helmet>
         <title>Forgot Password</title>
       </Helmet>
-      <h2>Forgot Password</h2>
-      <p>
-        Not problem? Just enter your email address and we will send the reset
-        password instructions to you.
-      </p>
-      <Formik
-        initialValues={{ email }}
-        validationSchema={forgotPasswordSchema}
-        onSubmit={(
-          values: IForgotPasswordCredentials,
-          actions: FormikActions<IForgotPasswordCredentials>
-        ) => {
-          actions.setStatus()
-          forgotPassword(values)
-            .then(() => {
-              alert(`Please check your inbox for password reset instructions.`)
-              actions.setSubmitting(false)
-              navigate && navigate("/login")
-            })
-            .catch(error => {
-              actions.setStatus(error.message)
-              actions.setSubmitting(false)
-            })
-        }}
-        render={({
-          errors,
-          status,
-          isSubmitting,
-        }: FormikProps<IForgotPasswordCredentials>) => (
-          <Form noValidate>
-            {status ? <div>{status}</div> : null}
-            <fieldset>
-              <InputField
-                name="email"
-                label="Email"
-                placeholder="username@domain.com"
-                autoComplete="username email"
-                required
-                autoFocus
-                type="email"
-                id="email"
-              />
-              <Button type="submit" disabled={isSubmitting}>
-                Send Instructions
-              </Button>
-            </fieldset>
-          </Form>
-        )}
-      />
-      or <Link to="/login">Login</Link> if you remember your password!
+      <div className="text--center">
+        <h1>Forgot Your Password?</h1>
+        <p>
+          No problem? Just enter your email address and we will send
+          instructions to reset your password.
+        </p>
+      </div>
+      <div className="w--sm">
+        <Formik
+          initialValues={{
+            email,
+            reset_password_link: `${location &&
+              location.origin}/reset-password`,
+          }}
+          validationSchema={forgotPasswordSchema}
+          onSubmit={(
+            values: IForgotPasswordCredentials,
+            actions: FormikActions<IForgotPasswordCredentials>
+          ) => {
+            actions.setStatus()
+            forgotPassword(values)
+              .then(() => {
+                alert(
+                  `Please check your inbox for password reset instructions.`
+                )
+                actions.setSubmitting(false)
+                navigate && navigate("/login")
+              })
+              .catch(error => {
+                actions.setStatus(error.message)
+                actions.setSubmitting(false)
+              })
+          }}
+          render={({
+            status,
+            isSubmitting,
+            values,
+          }: FormikProps<IForgotPasswordCredentials>) => (
+            <Form noValidate>
+              {status ? <div>{status}</div> : null}
+              <fieldset>
+                <InputField
+                  name="email"
+                  label="Email"
+                  placeholder="username@domain.com"
+                  autoComplete="username email"
+                  required
+                  autoFocus
+                  type="email"
+                  id="email"
+                />
+                <input
+                  type="hidden"
+                  name="reset_password_link"
+                  hidden
+                  value={values.reset_password_link}
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  Get Instructions
+                </Button>
+              </fieldset>
+            </Form>
+          )}
+        />
+        or <Link to="/login">Login</Link> if you remember your password!
+      </div>
     </RedirectIfAuthenticated>
   )
 }

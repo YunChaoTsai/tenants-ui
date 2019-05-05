@@ -111,10 +111,7 @@ export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
   })
 )(Roles)
 
-interface SelectRolesProps extends XHRProps, Omit<AsyncProps, "fetch"> {
-  value?: IRole[]
-  onChange: (roles: IRole[]) => void
-}
+interface SelectRolesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 
 export const SelectRoles = withXHR<SelectRolesProps>(function SelectRoles({
   xhr,
@@ -125,7 +122,7 @@ export const SelectRoles = withXHR<SelectRolesProps>(function SelectRoles({
       multiple
       fetch={q =>
         XHR(xhr)
-          .getRoles()
+          .getRoles({ q })
           .then(resp => resp.data)
       }
       {...otherProps}
@@ -133,15 +130,16 @@ export const SelectRoles = withXHR<SelectRolesProps>(function SelectRoles({
   )
 })
 
-interface SelectPermissionsProps extends XHRProps, Omit<AsyncProps, "fetch"> {
-  value?: IPermission[]
-  onChange: (permissions: IPermission[]) => void
-}
+interface SelectPermissionsProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 
 export const SelectPermissions = withXHR<SelectPermissionsProps>(
   function SelectPermissions({ xhr, ...otherProps }: SelectPermissionsProps) {
     return (
-      <Async multiple fetch={q => XHR(xhr).getPermissions()} {...otherProps} />
+      <Async
+        multiple
+        fetch={q => XHR(xhr).getPermissions({ q })}
+        {...otherProps}
+      />
     )
   }
 )

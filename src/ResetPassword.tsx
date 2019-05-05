@@ -11,12 +11,12 @@ import {
   Form,
   Field,
   FieldProps,
-  ErrorMessage,
 } from "formik"
 import * as Validator from "yup"
 
 import { searchToQuery } from "./utils"
 import { ThunkDispatch, ThunkAction } from "./types"
+import { InputField } from "./Shared/InputField"
 
 // schemas
 export interface IResetPasswordCredentials {
@@ -74,111 +74,92 @@ function ResetPassword({
       <Helmet>
         <title>Reset Password</title>
       </Helmet>
-      <h2>Reset Password</h2>
-      <Formik
-        initialValues={{
-          email,
-          token,
-          password: "",
-          password_confirmation: "",
-        }}
-        validationSchema={resetPasswordSchema}
-        onSubmit={(
-          values: IResetPasswordCredentials,
-          actions: FormikActions<IResetPasswordCredentials>
-        ) => {
-          actions.setStatus()
-          return resetPassword(values)
-            .then(() => {
-              alert(
-                "Your passwords updated successfully. You can now log in with the new password"
-              )
-              navigate && navigate("/login")
-            })
-            .catch(error => {
-              actions.setStatus(error.message)
-              actions.setSubmitting(false)
-            })
-        }}
-        render={({
-          isSubmitting,
-          status,
-        }: FormikProps<IResetPasswordCredentials>) => (
-          <Form noValidate>
-            {status ? <div>{status}</div> : null}
-            <Field
-              name="email"
-              render={({
-                field: { value, name },
-              }: FieldProps<IResetPasswordCredentials>) => (
-                <div>
-                  <label htmlFor="email">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    autoComplete="username email"
-                    readOnly
-                    name={name}
-                    value={value}
-                  />
-                  <ErrorMessage name="email" />
-                </div>
-              )}
-            />
-            <Field
-              name="token"
-              render={({
-                field: { value, name },
-              }: FieldProps<IResetPasswordCredentials>) => (
-                <input type="hidden" value={value} name={name} />
-              )}
-            />
-            <Field
-              name="password"
-              render={({ field }: FieldProps<IResetPasswordCredentials>) => (
-                <div>
-                  <label htmlFor="password">Password</label>
-                  <input
-                    type="password"
-                    id="password"
-                    autoFocus
-                    autoComplete="new-password"
-                    required
-                    {...field}
-                  />
-                  <ErrorMessage name="password" />
-                </div>
-              )}
-            />
-            <Field
-              name="password_confirmation"
-              render={({ field }: FieldProps<IResetPasswordCredentials>) => (
-                <div>
-                  <label htmlFor="password_confirmation">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password_confirmation"
-                    autoComplete="new-password"
-                    required
-                    {...field}
-                  />
-                  <ErrorMessage name="password_confirmation" />
-                </div>
-              )}
-            />
-            <footer>
-              <Button type="submit" disabled={isSubmitting}>
-                Reset Password
-              </Button>
-            </footer>
-          </Form>
-        )}
-      />
-      or get instructions{" "}
-      <Link to={`/forgot-password?email=${email}`}>again</Link> or{" "}
-      <Link to="/login">Login</Link> if you remember your password!
+      <div className="text--center">
+        <h1>Reset Password</h1>
+        <p>
+          Just enter your new password to reset the password for your email
+          address ({email})
+        </p>
+      </div>
+      <div className="w--sm">
+        <Formik
+          initialValues={{
+            email,
+            token,
+            password: "",
+            password_confirmation: "",
+          }}
+          validationSchema={resetPasswordSchema}
+          onSubmit={(
+            values: IResetPasswordCredentials,
+            actions: FormikActions<IResetPasswordCredentials>
+          ) => {
+            actions.setStatus()
+            return resetPassword(values)
+              .then(() => {
+                alert(
+                  "Your passwords updated successfully. You can now log in with the new password"
+                )
+                navigate && navigate("/login")
+              })
+              .catch(error => {
+                actions.setStatus(error.message)
+                actions.setSubmitting(false)
+              })
+          }}
+          render={({
+            isSubmitting,
+            status,
+          }: FormikProps<IResetPasswordCredentials>) => (
+            <Form noValidate>
+              <fieldset>
+                {status ? <div>{status}</div> : null}
+                <Field
+                  name="email"
+                  render={({
+                    field: { value, name },
+                  }: FieldProps<IResetPasswordCredentials>) => (
+                    <input type="hidden" hidden name={name} value={value} />
+                  )}
+                />
+                <Field
+                  name="token"
+                  render={({
+                    field: { value, name },
+                  }: FieldProps<IResetPasswordCredentials>) => (
+                    <input type="hidden" value={value} name={name} />
+                  )}
+                />
+                <InputField
+                  label="Password"
+                  name="password"
+                  type="password"
+                  id="password"
+                  autoFocus
+                  autoComplete="new-password"
+                  required
+                />
+                <InputField
+                  label="Confirm Password"
+                  name="password_confirmation"
+                  type="password"
+                  id="password_confirmation"
+                  autoComplete="new-password"
+                  required
+                />
+                <footer>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Reset Password
+                  </Button>
+                </footer>
+              </fieldset>
+            </Form>
+          )}
+        />
+        or get instructions{" "}
+        <Link to={`/forgot-password?email=${email}`}>again</Link> or{" "}
+        <Link to="/login">login</Link> if you remember your password!
+      </div>
     </div>
   )
 }

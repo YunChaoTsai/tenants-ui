@@ -22,7 +22,8 @@ import {
   store as transportServiceStore,
 } from "./../TransportServices"
 import { withXHR, XHRProps } from "./../xhr"
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -145,22 +146,23 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
         setFieldValue,
       }: FormikProps<AddPriceCredentials>) => (
         <Form noValidate>
-          <div className="table-responsive">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Cab Type</th>
-                  <th>Transport Service</th>
-                  <th>Price(for fixed/service type)</th>
-                  <th>/KM charges</th>
-                  <th>Minimum kms per day</th>
-                  <th>Toll factor</th>
-                  <th>Night factor</th>
-                  <th>Parking factor</th>
-                </tr>
-              </thead>
+          <fieldset style={{ minInlineSize: "auto" }}>
+            <legend>Add Transport Service Price</legend>
+            <Table
+              responsive
+              headers={[
+                "Start Date",
+                "End Date",
+                "Cab Type",
+                "Transport Service",
+                "Price(for fixed/service type)",
+                "/KM charges",
+                "Minimum kms per day",
+                "Toll factor",
+                "Night factor",
+                "Parking factor",
+              ]}
+            >
               <FieldArray
                 name="prices"
                 render={({ name, push, remove }) => (
@@ -182,44 +184,38 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                           />
                         </td>
                         <td>
-                          <Field
+                          <FormikFormGroup
                             name={`${name}.${index}.cab_type`}
                             render={({
                               field,
                             }: FieldProps<AddPriceCredentials>) => (
-                              <div>
-                                <SelectCabTypes
-                                  name={field.name}
-                                  multiple={false}
-                                  required
-                                  value={field.value}
-                                  onChange={value =>
-                                    setFieldValue(field.name, value)
-                                  }
-                                />
-                                <ErrorMessage name={field.name} />
-                              </div>
+                              <SelectCabTypes
+                                {...field}
+                                multiple={false}
+                                required
+                                fetchOnMount
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
                             )}
                           />
                         </td>
                         <td>
-                          <Field
+                          <FormikFormGroup
                             name={`${name}.${index}.transport_service`}
                             render={({
                               field,
                             }: FieldProps<AddPriceCredentials>) => (
-                              <div>
-                                <SelectServices
-                                  name={field.name}
-                                  multiple={false}
-                                  required
-                                  value={field.value}
-                                  onChange={value =>
-                                    setFieldValue(field.name, value)
-                                  }
-                                />
-                                <ErrorMessage name={field.name} />
-                              </div>
+                              <SelectServices
+                                {...field}
+                                multiple={false}
+                                required
+                                fetchOnMount
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
                             )}
                           />
                         </td>
@@ -286,12 +282,12 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                   </tbody>
                 )}
               />
-            </table>
-          </div>
-          {status ? <div>{status}</div> : null}
-          <Button type="submit" disabled={isSubmitting}>
-            Save
-          </Button>{" "}
+            </Table>
+            {status ? <div>{status}</div> : null}
+            <Button type="submit" disabled={isSubmitting}>
+              Save
+            </Button>
+          </fieldset>
           <Link to={".."}>Cancel</Link>
         </Form>
       )}

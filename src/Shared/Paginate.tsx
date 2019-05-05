@@ -24,21 +24,23 @@ export function Paginate({
   return (
     <span>
       {from}-{to} of {total}{" "}
-      <Button
-        disabled={isFetching || currentPage <= 1}
-        onClick={() => onChange(currentPage - 1)}
-      >
-        &lt;
-      </Button>
-      <Button disabled={isFetching} onClick={() => onChange(currentPage)}>
-        &#8635;
-      </Button>
-      <Button
-        disabled={isFetching || lastPage <= currentPage}
-        onClick={() => onChange(currentPage + 1)}
-      >
-        &gt;
-      </Button>
+      <span className="button-group">
+        <Button
+          disabled={isFetching || currentPage <= 1}
+          onClick={() => onChange(currentPage - 1)}
+        >
+          &lt;
+        </Button>
+        <Button disabled={isFetching} onClick={() => onChange(currentPage)}>
+          &#8635;
+        </Button>
+        <Button
+          disabled={isFetching || lastPage <= currentPage}
+          onClick={() => onChange(currentPage + 1)}
+        >
+          &gt;
+        </Button>
+      </span>
     </span>
   )
 }

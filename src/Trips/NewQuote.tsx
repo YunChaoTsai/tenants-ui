@@ -64,6 +64,7 @@ function NewQuote({ xhr, navigate, trip }: NewQuoteProps) {
         <label>Any Comment</label>
         <Input
           name="comments"
+          as="textarea"
           value={comments}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setComments(e.target.value)
