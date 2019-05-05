@@ -76,7 +76,7 @@ export function Table({
     </table>
   )
   if (responsive) {
-    return <div className="table--responsive">{$table}</div>
+    return <div className="table-responsive">{$table}</div>
   }
   return $table
 }

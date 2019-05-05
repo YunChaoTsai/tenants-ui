@@ -19,6 +19,7 @@ import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
+import { Table } from "../Shared/Table"
 
 type NewPriceCredentials = {
   prices: {
@@ -148,158 +149,161 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
           values,
         }: FormikProps<NewPriceCredentials>) => (
           <Form noValidate>
-            <FieldArray
-              name="prices"
-              render={({ name, remove, push }) => (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Start Date</th>
-                      <th>End Date</th>
-                      <th>Meal Plans</th>
-                      <th>Room Types</th>
-                      <th>Base Price</th>
-                      <th title="Number of persons this base price is applicable to">
-                        Persons
-                      </th>
-                      <th title="Adult with extra bed price">A.W.E.B. Price</th>
-                      <th title="Child with extra bed price">C.W.E.B. Price</th>
-                      <th title="Child without extra bed price">
-                        C.Wo.E.B. Price
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {values.prices.map((price, index) => (
-                      <tr key={index}>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.start_date`}
-                            type="date"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.end_date`}
-                            type="date"
-                          />
-                        </td>
-                        <td>
-                          <FormikFormGroup
-                            name={`prices.${index}.meal_plan`}
-                            render={({ field }) => (
-                              <SelectMealPlans
-                                {...field}
-                                searchable={false}
-                                multiple={false}
-                                options={hotel.meal_plans}
-                                onChange={(value, name) =>
-                                  setFieldValue(name, value)
-                                }
-                              />
-                            )}
-                          />
-                        </td>
-                        <td>
-                          <FormikFormGroup
-                            name={`prices.${index}.room_type`}
-                            render={({ field }) => (
-                              <SelectRoomTypes
-                                {...field}
-                                searchable={false}
-                                multiple={false}
-                                options={hotel.room_types}
-                                onChange={(value: IHotelRoomType, name) => {
-                                  setFieldValue(name, value)
-                                  if (!value || !value.allowed_extra_beds) {
-                                    setFieldValue(
-                                      `prices.${index}.adult_with_extra_bed_price`,
-                                      0
-                                    )
-                                    setFieldValue(
-                                      `prices.${index}.child_with_extra_bed_price`,
-                                      0
-                                    )
+            <fieldset style={{ minInlineSize: "auto" }}>
+              <legend>Add Hotel Price</legend>
+              <FieldArray
+                name="prices"
+                render={({ name, remove, push }) => (
+                  <Table
+                    responsive
+                    headers={[
+                      "Start Date",
+                      "End Date",
+                      "Meal Plans",
+                      "Room Types",
+                      "Base Price",
+                      "Persons",
+                      "A.W.E.B. Price",
+                      "C.W.E.B. Price",
+                      "C.Wo.E.B. Price",
+                    ]}
+                  >
+                    <tbody>
+                      {values.prices.map((price, index) => (
+                        <tr key={index}>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.start_date`}
+                              type="date"
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.end_date`}
+                              type="date"
+                            />
+                          </td>
+                          <td>
+                            <FormikFormGroup
+                              name={`prices.${index}.meal_plan`}
+                              render={({ field }) => (
+                                <SelectMealPlans
+                                  {...field}
+                                  searchable={false}
+                                  multiple={false}
+                                  options={hotel.meal_plans}
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
                                   }
-                                }}
-                              />
-                            )}
-                          />
-                        </td>
+                                />
+                              )}
+                            />
+                          </td>
+                          <td>
+                            <FormikFormGroup
+                              name={`prices.${index}.room_type`}
+                              render={({ field }) => (
+                                <SelectRoomTypes
+                                  {...field}
+                                  searchable={false}
+                                  multiple={false}
+                                  options={hotel.room_types}
+                                  onChange={(value: IHotelRoomType, name) => {
+                                    setFieldValue(name, value)
+                                    if (!value || !value.allowed_extra_beds) {
+                                      setFieldValue(
+                                        `prices.${index}.adult_with_extra_bed_price`,
+                                        0
+                                      )
+                                      setFieldValue(
+                                        `prices.${index}.child_with_extra_bed_price`,
+                                        0
+                                      )
+                                    }
+                                  }}
+                                />
+                              )}
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.base_price`}
+                              type="number"
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.persons`}
+                              type="number"
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.adult_with_extra_bed_price`}
+                              type="number"
+                              title={
+                                !price.room_type
+                                  ? "Please select a room type"
+                                  : !price.room_type.allowed_extra_beds
+                                  ? "No extra bed allowed"
+                                  : undefined
+                              }
+                              disabled={
+                                !price.room_type ||
+                                !price.room_type.allowed_extra_beds
+                              }
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.child_with_extra_bed_price`}
+                              type="number"
+                              title={
+                                !price.room_type
+                                  ? "Please select a room type"
+                                  : !price.room_type.allowed_extra_beds
+                                  ? "No extra bed allowed"
+                                  : undefined
+                              }
+                              disabled={
+                                !price.room_type ||
+                                !price.room_type.allowed_extra_beds
+                              }
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.child_without_extra_bed_price`}
+                              type="number"
+                            />
+                          </td>
+                          <td>
+                            {values.prices.length > 1 ? (
+                              <Button onClick={_ => remove(index)}>
+                                Remove
+                              </Button>
+                            ) : null}
+                            <Button onClick={_ => push(price)}>
+                              Duplicate
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr>
                         <td>
-                          <InputField
-                            name={`${name}.${index}.base_price`}
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.persons`}
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.adult_with_extra_bed_price`}
-                            type="number"
-                            title={
-                              !price.room_type
-                                ? "Please select a room type"
-                                : !price.room_type.allowed_extra_beds
-                                ? "No extra bed allowed"
-                                : undefined
-                            }
-                            disabled={
-                              !price.room_type ||
-                              !price.room_type.allowed_extra_beds
-                            }
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.child_with_extra_bed_price`}
-                            type="number"
-                            title={
-                              !price.room_type
-                                ? "Please select a room type"
-                                : !price.room_type.allowed_extra_beds
-                                ? "No extra bed allowed"
-                                : undefined
-                            }
-                            disabled={
-                              !price.room_type ||
-                              !price.room_type.allowed_extra_beds
-                            }
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.child_without_extra_bed_price`}
-                            type="number"
-                          />
-                        </td>
-                        <td>
-                          {values.prices.length > 1 ? (
-                            <Button onClick={_ => remove(index)}>Remove</Button>
-                          ) : null}
-                          <Button onClick={_ => push(price)}>Duplicate</Button>
+                          <Button onClick={_ => push(initialValues.prices[0])}>
+                            Add More
+                          </Button>
                         </td>
                       </tr>
-                    ))}
-                    <tr>
-                      <td>
-                        <Button onClick={_ => push(initialValues.prices[0])}>
-                          Add More
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              )}
-            />
-            <Button type="submit" disabled={isSubmitting}>
-              Save
-            </Button>{" "}
+                    </tbody>
+                  </Table>
+                )}
+              />
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+            </fieldset>
             <Link to="..">Cancel</Link>
           </Form>
         )}

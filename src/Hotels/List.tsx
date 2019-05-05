@@ -17,6 +17,7 @@ import { List as Listable } from "./../Shared/List"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import Helmet from "react-helmet-async"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -102,37 +103,22 @@ function List({ getHotels, hotels, ...otherProps }: ListProps) {
         />
       </div>
       <Listable isFetching={isFetching} total={total}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Meal Plans</th>
-              <th>Room Types</th>
-              <th>Child extra bed age</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hotels.map(hotel => (
-              <tr key={hotel.id}>
-                <td>
-                  <Link to={hotel.id.toString()}>{hotel.name}</Link>
-                  <br />
-                  {hotel.location.short_name} • {hotel.stars} stars
-                </td>
-                <td>
-                  {hotel.meal_plans.map(mealPlan => mealPlan.name).join(" • ")}
-                </td>
-                <td>
-                  {hotel.room_types.map(roomType => roomType.name).join(" • ")}
-                </td>
-                <td>
-                  {hotel.extra_bed_child_age_start}-
-                  {hotel.extra_bed_child_age_end}yo
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Name", "Meal Plans", "Room Type", "Child extra bed age"]}
+          rows={hotels.map(hotel => [
+            <Fragment>
+              <Link to={hotel.id.toString()}>{hotel.name}</Link>
+              <br />
+              {hotel.location.short_name} • {hotel.stars} stars
+            </Fragment>,
+            hotel.meal_plans.map(mealPlan => mealPlan.name).join(" • "),
+            hotel.room_types.map(roomType => roomType.name).join(" • "),
+            <Fragment>
+              {hotel.extra_bed_child_age_start}-{hotel.extra_bed_child_age_end}
+              yo
+            </Fragment>,
+          ])}
+        />
       </Listable>
     </Fragment>
   )

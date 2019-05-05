@@ -13,15 +13,16 @@ body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-weight: 400;
   margin: 0;
   color: #212529;
   text-align: left;
   font-size: 1rem;
   line-height: 1.5;
+}
+
+h1,
+h2 {
+  font-weight: 300;
 }
 
 * {
@@ -106,6 +107,9 @@ fieldset {
   border-radius: 0.5rem;
   margin-bottom: 20px;
 }
+form fieldset {
+  padding: 20px;
+}
 button {
   background: black;
   font-size: 1rem;
@@ -183,6 +187,10 @@ button {
 .fvh {
   min-height: 100vh;
 }
+.w--sm {
+  max-width: 500px;
+  margin: 0 auto;
+}
 
 /**
  * Components
@@ -236,7 +244,9 @@ button {
   transform-origin: center;
 }
 .drop-down:hover > .toggler:after,
-.drop-down:hover > a:first:after {
+.drop-down:hover > a:first:after,
+.drop-down > .toggler:focus:after,
+.drop-down > a:focus:first:after {
   transform: rotateX(0);
 }
 .drop-down > .menu,
@@ -251,10 +261,14 @@ button {
   min-width: 100px;
   white-space: nowrap;
   padding: 5px;
+  z-index: 2;
 }
 .drop-down:hover > .menu,
 .drop-down:hover > ul,
-.drop-down:hover > ol {
+.drop-down:hover > ol,
+.drop-down a:focus + .menu,
+.drop-down a:focus + ul,
+.drop-down a:focus + ol {
   display: block;
   border: 1px solid silver;
   background: white;
@@ -287,7 +301,12 @@ button {
   table-layout: fixed;
 }
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+}
+.form-group > label {
+  margin-bottom: 5px;
+  display: inline-block;
+  white-space: nowrap;
 }
 .form-group.is-touched.has-error input {
   border-color: #b10000;
@@ -340,7 +359,7 @@ button {
 .select > [role="group"] {
   position: relative;
   max-width: 300px;
-  min-width: 100px;
+  min-width: 150px;
 }
 .select [type="search"] {
   width: 100%;

@@ -81,56 +81,57 @@ function Login({ login, navigate, location }: LoginProps) {
         <title>Login</title>
       </Helmet>
       <h1 className="text--center">Tourepedia Admin Dashboard</h1>
-      <Formik
-        initialValues={initialValues}
-        onSubmit={(
-          values: ILoginCredentials,
-          actions: FormikActions<ILoginCredentials>
-        ) => {
-          actions.setStatus()
-          return login(values).catch(error => {
-            actions.setStatus(error.message)
-            actions.setSubmitting(false)
-          })
-        }}
-        validationSchema={loginCredentialsSchema}
-        render={({
-          errors,
-          isSubmitting,
-          touched,
-          isValid,
-          status,
-        }: FormikProps<ILoginCredentials>) => (
-          <Form noValidate>
-            {status ? <div>{status}</div> : null}
-            <fieldset>
-              <legend>Login</legend>
-              <InputField
-                label="Email"
-                name="email"
-                type="email"
-                autoFocus
-                id="email"
-                placeholder="username@domain.com"
-                autoComplete="username email"
-                required
-              />
-              <InputField
-                label="Password"
-                name="password"
-                type="password"
-                id="password"
-                required
-                autoComplete="current-password"
-              />
-              <Button type="submit" disabled={isSubmitting}>
-                Login
-              </Button>
-            </fieldset>
-          </Form>
-        )}
-      />
-      <Link to="/forgot-password">Forgot Password ?</Link>
+      <div className="w--sm">
+        <Formik
+          initialValues={initialValues}
+          onSubmit={(
+            values: ILoginCredentials,
+            actions: FormikActions<ILoginCredentials>
+          ) => {
+            actions.setStatus()
+            return login(values).catch(error => {
+              actions.setStatus(error.message)
+              actions.setSubmitting(false)
+            })
+          }}
+          validationSchema={loginCredentialsSchema}
+          render={({
+            errors,
+            isSubmitting,
+            touched,
+            isValid,
+            status,
+          }: FormikProps<ILoginCredentials>) => (
+            <Form noValidate>
+              {status ? <div>{status}</div> : null}
+              <fieldset>
+                <InputField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  autoFocus
+                  id="email"
+                  placeholder="username@domain.com"
+                  autoComplete="username email"
+                  required
+                />
+                <InputField
+                  label="Password"
+                  name="password"
+                  type="password"
+                  id="password"
+                  required
+                  autoComplete="current-password"
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  Login
+                </Button>
+              </fieldset>
+            </Form>
+          )}
+        />
+        <Link to="/forgot-password">Forgot Password ?</Link>
+      </div>
     </RedirectIfAuthenticated>
   )
 }

@@ -21,6 +21,7 @@ import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -252,273 +253,282 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
         isSubmitting,
         values,
         setFieldValue,
-        errors,
       }: FormikProps<CalculatePriceParams>) => {
         return (
           <Form noValidate>
-            <table>
-              <thead>
-                <tr>
-                  <th>Start Date</th>
-                  <th>Number of nights</th>
-                  <th>Hotel</th>
-                  <th>Meal Plan</th>
-                  <th>Room Details</th>
-                  <th>Calculated Price</th>
-                  <th>Given Price</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
-              <FieldArray
-                name="hotels"
-                render={({ name, push, remove }) => (
-                  <tbody>
-                    {values.hotels.map((hotel, index) => (
-                      <tr key={index}>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.start_date`}
-                            type="date"
-                          />
-                        </td>
-                        <td>
-                          <InputField
-                            name={`${name}.${index}.no_of_nights`}
-                            type="number"
-                            min={1}
-                            max={1000}
-                          />
-                        </td>
-                        <td>
-                          <FormikFormGroup
-                            name={`${name}.${index}.hotel`}
-                            render={({
-                              field,
-                            }: FieldProps<CalculatePriceParams>) => (
-                              <SelectHotels
-                                {...field}
-                                multiple={false}
-                                onChange={(value, name) =>
-                                  setFieldValue(name, value)
-                                }
-                              />
-                            )}
-                          />
-                        </td>
-                        <td>
-                          <FormikFormGroup
-                            name={`${name}.${index}.meal_plan`}
-                            render={({
-                              field,
-                            }: FieldProps<CalculatePriceParams>) => (
-                              <SelectMealPlans
-                                {...field}
-                                searchable={false}
-                                multiple={false}
-                                onChange={(value, name) =>
-                                  setFieldValue(name, value)
-                                }
-                                options={
-                                  hotel.hotel ? hotel.hotel.meal_plans : []
-                                }
-                              />
-                            )}
-                          />
-                        </td>
-                        <td>
-                          <FieldArray
-                            name={`${name}.${index}.room_details`}
-                            render={({ name, push, remove }) => (
-                              <div>
-                                <ul>
-                                  {hotel.room_details.map(
-                                    (roomDetail, index) => (
-                                      <li key={index}>
-                                        <FormikFormGroup
-                                          name={`${name}.${index}.room_type`}
-                                          render={({ field }) => (
-                                            <SelectRoomTypes
-                                              {...field}
-                                              label="Room Type"
-                                              options={
-                                                hotel.hotel
-                                                  ? hotel.hotel.room_types
-                                                  : []
-                                              }
-                                              searchable={false}
-                                              multiple={false}
-                                              onChange={(
-                                                value: IHotelRoomType,
-                                                n
-                                              ) => {
-                                                setFieldValue(n, value)
-                                                if (
-                                                  !value ||
-                                                  !value.allowed_extra_beds
-                                                ) {
-                                                  setFieldValue(
-                                                    `${name}.${index}.adults_with_extra_bed`,
-                                                    0
-                                                  )
-                                                  setFieldValue(
-                                                    `${name}.${index}.children_with_extra_bed`,
-                                                    0
-                                                  )
+            <fieldset style={{ minInlineSize: "auto" }}>
+              <legend>Calculate Price for hotels</legend>
+              <Table
+                responsive
+                headers={[
+                  "Start Date",
+                  "Number of nights",
+                  "Hotel",
+                  "Meal Plan",
+                  "Room Details",
+                  "Calculated Price",
+                  "Given Price",
+                  "Comments",
+                ]}
+              >
+                <FieldArray
+                  name="hotels"
+                  render={({ name, push, remove }) => (
+                    <tbody>
+                      {values.hotels.map((hotel, index) => (
+                        <tr key={index}>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.start_date`}
+                              type="date"
+                            />
+                          </td>
+                          <td>
+                            <InputField
+                              name={`${name}.${index}.no_of_nights`}
+                              type="number"
+                              min={1}
+                              max={1000}
+                            />
+                          </td>
+                          <td>
+                            <FormikFormGroup
+                              name={`${name}.${index}.hotel`}
+                              render={({
+                                field,
+                              }: FieldProps<CalculatePriceParams>) => (
+                                <SelectHotels
+                                  {...field}
+                                  multiple={false}
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                />
+                              )}
+                            />
+                          </td>
+                          <td>
+                            <FormikFormGroup
+                              name={`${name}.${index}.meal_plan`}
+                              render={({
+                                field,
+                              }: FieldProps<CalculatePriceParams>) => (
+                                <SelectMealPlans
+                                  {...field}
+                                  searchable={false}
+                                  multiple={false}
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                  options={
+                                    hotel.hotel ? hotel.hotel.meal_plans : []
+                                  }
+                                />
+                              )}
+                            />
+                          </td>
+                          <td>
+                            <FieldArray
+                              name={`${name}.${index}.room_details`}
+                              render={({ name, push, remove }) => (
+                                <div>
+                                  <ul>
+                                    {hotel.room_details.map(
+                                      (roomDetail, index) => (
+                                        <li key={index}>
+                                          <FormikFormGroup
+                                            name={`${name}.${index}.room_type`}
+                                            render={({ field }) => (
+                                              <SelectRoomTypes
+                                                {...field}
+                                                label="Room Type"
+                                                options={
+                                                  hotel.hotel
+                                                    ? hotel.hotel.room_types
+                                                    : []
                                                 }
-                                              }}
-                                            />
-                                          )}
-                                        />
-                                        <InputField
-                                          name={`${name}.${index}.no_of_rooms`}
-                                          label="Number of rooms"
-                                          type="number"
-                                          min={1}
-                                          max={1000}
-                                        />
-                                        <InputField
-                                          name={`${name}.${index}.adults_with_extra_bed`}
-                                          label="Adults with extra bed"
-                                          type="number"
-                                          min={0}
-                                          max={10}
-                                          disabled={
-                                            !roomDetail.room_type ||
-                                            !roomDetail.room_type
-                                              .allowed_extra_beds
-                                          }
-                                        />
-                                        <InputField
-                                          name={`${name}.${index}.children_with_extra_bed`}
-                                          label="Children with extra bed"
-                                          type="number"
-                                          min={0}
-                                          max={10}
-                                          disabled={
-                                            !roomDetail.room_type ||
-                                            !roomDetail.room_type
-                                              .allowed_extra_beds
-                                          }
-                                        />
-                                        <InputField
-                                          name={`${name}.${index}.children_without_extra_bed`}
-                                          label="Children without extra bed"
-                                          min={0}
-                                          max={10}
-                                          type="number"
-                                        />
-                                        {hotel.room_details.length > 1 ? (
-                                          <Button onClick={_ => remove(index)}>
-                                            Remove
+                                                searchable={false}
+                                                multiple={false}
+                                                onChange={(
+                                                  value: IHotelRoomType,
+                                                  n
+                                                ) => {
+                                                  setFieldValue(n, value)
+                                                  if (
+                                                    !value ||
+                                                    !value.allowed_extra_beds
+                                                  ) {
+                                                    setFieldValue(
+                                                      `${name}.${index}.adults_with_extra_bed`,
+                                                      0
+                                                    )
+                                                    setFieldValue(
+                                                      `${name}.${index}.children_with_extra_bed`,
+                                                      0
+                                                    )
+                                                  }
+                                                }}
+                                              />
+                                            )}
+                                          />
+                                          <InputField
+                                            name={`${name}.${index}.no_of_rooms`}
+                                            label="Number of rooms"
+                                            type="number"
+                                            min={1}
+                                            max={1000}
+                                          />
+                                          <InputField
+                                            name={`${name}.${index}.adults_with_extra_bed`}
+                                            label="Adults with extra bed"
+                                            type="number"
+                                            min={0}
+                                            max={10}
+                                            disabled={
+                                              !roomDetail.room_type ||
+                                              !roomDetail.room_type
+                                                .allowed_extra_beds
+                                            }
+                                          />
+                                          <InputField
+                                            name={`${name}.${index}.children_with_extra_bed`}
+                                            label="Children with extra bed"
+                                            type="number"
+                                            min={0}
+                                            max={10}
+                                            disabled={
+                                              !roomDetail.room_type ||
+                                              !roomDetail.room_type
+                                                .allowed_extra_beds
+                                            }
+                                          />
+                                          <InputField
+                                            name={`${name}.${index}.children_without_extra_bed`}
+                                            label="Children without extra bed"
+                                            min={0}
+                                            max={10}
+                                            type="number"
+                                          />
+                                          {hotel.room_details.length > 1 ? (
+                                            <Button
+                                              onClick={_ => remove(index)}
+                                            >
+                                              Remove
+                                            </Button>
+                                          ) : null}
+                                          <Button
+                                            onClick={e =>
+                                              push(hotel.room_details[index])
+                                            }
+                                          >
+                                            Duplicate
                                           </Button>
-                                        ) : null}
-                                        <Button
-                                          onClick={e =>
-                                            push(hotel.room_details[index])
-                                          }
-                                        >
-                                          Duplicate
-                                        </Button>
-                                      </li>
-                                    )
-                                  )}
-                                  <Button
-                                    onClick={_ =>
-                                      push(
-                                        initialValues.hotels[0].room_details[0]
+                                        </li>
                                       )
-                                    }
-                                  >
-                                    Add More
-                                  </Button>
-                                </ul>
-                              </div>
-                            )}
-                          />
-                        </td>
+                                    )}
+                                    <Button
+                                      onClick={_ =>
+                                        push(
+                                          initialValues.hotels[0]
+                                            .room_details[0]
+                                        )
+                                      }
+                                    >
+                                      Add More
+                                    </Button>
+                                  </ul>
+                                </div>
+                              )}
+                            />
+                          </td>
+                          <td>
+                            <Button disabled={isSubmitting} type="submit">
+                              Get Price
+                            </Button>
+                            <br />
+                            <div>{hotel.calculated_price}</div>
+                          </td>
+                          <td>
+                            <Input
+                              name={`${name}.${index}.given_price`}
+                              type="number"
+                              value={hotel.given_price}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                let value: number | undefined = parseInt(
+                                  e.target.value,
+                                  10
+                                )
+                                if (isNaN(value)) {
+                                  value = undefined
+                                }
+                                const flattenValues = {
+                                  hotels: values.hotels.map((hotel, i) =>
+                                    i !== index
+                                      ? hotel
+                                      : {
+                                          ...hotel,
+                                          given_price: value,
+                                        }
+                                  ),
+                                }
+                                notifyOnChange(flattenValues)
+                                setFieldValue(e.target.name, value)
+                              }}
+                              min={0}
+                            />
+                          </td>
+                          <td>
+                            <Input
+                              name={`${name}.${index}.comments`}
+                              as="textarea"
+                              maxLength={191}
+                              value={hotel.comments}
+                              placeholder="Regarding pricing difference or any other"
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                const value = e.target.value
+                                const flattenValues = {
+                                  hotels: values.hotels.map((hotel, i) =>
+                                    i !== index
+                                      ? hotel
+                                      : {
+                                          ...hotel,
+                                          comments: value,
+                                        }
+                                  ),
+                                }
+                                notifyOnChange(flattenValues)
+                                setFieldValue(e.target.name, value)
+                              }}
+                            />
+                          </td>
+                          <td>
+                            {values.hotels.length > 1 ? (
+                              <Button onClick={e => remove(index)}>
+                                Remove
+                              </Button>
+                            ) : null}
+                            <Button onClick={e => push(hotel)}>
+                              Duplicate
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr>
                         <td>
-                          <Button disabled={isSubmitting} type="submit">
-                            Get Price
+                          <Button onClick={e => push(initialValues.hotels[0])}>
+                            Add More Hotel
                           </Button>
-                          <br />
-                          <div>{hotel.calculated_price}</div>
-                        </td>
-                        <td>
-                          <Input
-                            name={`${name}.${index}.given_price`}
-                            type="number"
-                            value={hotel.given_price}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              let value: number | undefined = parseInt(
-                                e.target.value,
-                                10
-                              )
-                              if (isNaN(value)) {
-                                value = undefined
-                              }
-                              const flattenValues = {
-                                hotels: values.hotels.map((hotel, i) =>
-                                  i !== index
-                                    ? hotel
-                                    : {
-                                        ...hotel,
-                                        given_price: value,
-                                      }
-                                ),
-                              }
-                              notifyOnChange(flattenValues)
-                              setFieldValue(e.target.name, value)
-                            }}
-                            min={0}
-                          />
-                        </td>
-                        <td>
-                          <Input
-                            name={`${name}.${index}.comments`}
-                            as="textarea"
-                            maxLength={191}
-                            value={hotel.comments}
-                            placeholder="Regarding pricing difference or any other"
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              const value = e.target.value
-                              const flattenValues = {
-                                hotels: values.hotels.map((hotel, i) =>
-                                  i !== index
-                                    ? hotel
-                                    : {
-                                        ...hotel,
-                                        comments: value,
-                                      }
-                                ),
-                              }
-                              notifyOnChange(flattenValues)
-                              setFieldValue(e.target.name, value)
-                            }}
-                          />
-                        </td>
-                        <td>
-                          {values.hotels.length > 1 ? (
-                            <Button onClick={e => remove(index)}>Remove</Button>
-                          ) : null}
-                          <Button onClick={e => push(hotel)}>Duplicate</Button>
                         </td>
                       </tr>
-                    ))}
-                    <tr>
-                      <td>
-                        <Button onClick={e => push(initialValues.hotels[0])}>
-                          Add More Hotel
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                )}
-              />
-            </table>
+                    </tbody>
+                  )}
+                />
+              </Table>
+            </fieldset>
           </Form>
         )
       }}

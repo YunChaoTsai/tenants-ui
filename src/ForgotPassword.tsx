@@ -62,66 +62,72 @@ function ForgotPassword({
       <Helmet>
         <title>Forgot Password</title>
       </Helmet>
-      <h2>Forgot Your Password?</h2>
-      <p>
-        No problem? Just enter your email address and we will send instructions
-        to reset your password.
-      </p>
-      <Formik
-        initialValues={{
-          email,
-          reset_password_link: `${location && location.origin}/reset-password`,
-        }}
-        validationSchema={forgotPasswordSchema}
-        onSubmit={(
-          values: IForgotPasswordCredentials,
-          actions: FormikActions<IForgotPasswordCredentials>
-        ) => {
-          actions.setStatus()
-          forgotPassword(values)
-            .then(() => {
-              alert(`Please check your inbox for password reset instructions.`)
-              actions.setSubmitting(false)
-              navigate && navigate("/login")
-            })
-            .catch(error => {
-              actions.setStatus(error.message)
-              actions.setSubmitting(false)
-            })
-        }}
-        render={({
-          errors,
-          status,
-          isSubmitting,
-          values,
-        }: FormikProps<IForgotPasswordCredentials>) => (
-          <Form noValidate>
-            {status ? <div>{status}</div> : null}
-            <fieldset>
-              <InputField
-                name="email"
-                label="Email"
-                placeholder="username@domain.com"
-                autoComplete="username email"
-                required
-                autoFocus
-                type="email"
-                id="email"
-              />
-              <input
-                type="hidden"
-                name="reset_password_link"
-                hidden
-                value={values.reset_password_link}
-              />
-              <Button type="submit" disabled={isSubmitting}>
-                Send Instructions
-              </Button>
-            </fieldset>
-          </Form>
-        )}
-      />
-      or <Link to="/login">Login</Link> if you remember your password!
+      <div className="text--center">
+        <h1>Forgot Your Password?</h1>
+        <p>
+          No problem? Just enter your email address and we will send
+          instructions to reset your password.
+        </p>
+      </div>
+      <div className="w--sm">
+        <Formik
+          initialValues={{
+            email,
+            reset_password_link: `${location &&
+              location.origin}/reset-password`,
+          }}
+          validationSchema={forgotPasswordSchema}
+          onSubmit={(
+            values: IForgotPasswordCredentials,
+            actions: FormikActions<IForgotPasswordCredentials>
+          ) => {
+            actions.setStatus()
+            forgotPassword(values)
+              .then(() => {
+                alert(
+                  `Please check your inbox for password reset instructions.`
+                )
+                actions.setSubmitting(false)
+                navigate && navigate("/login")
+              })
+              .catch(error => {
+                actions.setStatus(error.message)
+                actions.setSubmitting(false)
+              })
+          }}
+          render={({
+            status,
+            isSubmitting,
+            values,
+          }: FormikProps<IForgotPasswordCredentials>) => (
+            <Form noValidate>
+              {status ? <div>{status}</div> : null}
+              <fieldset>
+                <InputField
+                  name="email"
+                  label="Email"
+                  placeholder="username@domain.com"
+                  autoComplete="username email"
+                  required
+                  autoFocus
+                  type="email"
+                  id="email"
+                />
+                <input
+                  type="hidden"
+                  name="reset_password_link"
+                  hidden
+                  value={values.reset_password_link}
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  Get Instructions
+                </Button>
+              </fieldset>
+            </Form>
+          )}
+        />
+        or <Link to="/login">Login</Link> if you remember your password!
+      </div>
     </RedirectIfAuthenticated>
   )
 }

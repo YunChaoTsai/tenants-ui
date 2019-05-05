@@ -107,7 +107,7 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
               latest_stage,
             }) => [
               <Link to={id.toString()}>
-                {trip_source.short_name}-{trip_id}
+                {trip_source.short_name}-{trip_id || id}
               </Link>,
               `${moment
                 .utc(start_date)

@@ -22,6 +22,7 @@ import {
 } from "./../TransportServices"
 import { InputField, Input, FormikFormGroup } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -195,160 +196,163 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
       }: FormikProps<CalculatePriceSchema>) => (
         <Form noValidate>
           {status ? <div>{status}</div> : null}
-          <table>
-            <thead>
-              <tr>
-                <th>Start Date</th>
-                <th>Number of days</th>
-                <th>Service</th>
-                <th>Cab Type</th>
-                <th>Number of cabs</th>
-                <th>Calculated Price</th>
-                <th>Given Price</th>
-                <th>Comments</th>
-              </tr>
-            </thead>
-            <FieldArray
-              name="cabs"
-              render={({ name, push, remove }) => (
-                <tbody>
-                  {values.cabs.map((cab, index) => (
-                    <tr key={index}>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.start_date`}
-                          type="date"
-                          required
-                        />
-                      </td>
-                      <td>
-                        <InputField
-                          name={`${name}.${index}.no_of_days`}
-                          type="number"
-                          required
-                        />
-                      </td>
-                      <td>
-                        <FormikFormGroup
-                          name={`${name}.${index}.transport_service`}
-                          render={({
-                            field,
-                          }: FieldProps<CalculatePriceSchema>) => (
-                            <SelectServices
-                              {...field}
-                              multiple={false}
-                              onChange={(value, name) =>
-                                setFieldValue(name, value)
+          <fieldset style={{ minInlineSize: "auto" }}>
+            <legend>Calculate Transport Prices</legend>
+            <Table
+              responsive
+              headers={[
+                "Start Date",
+                "Number of days",
+                "Service",
+                "Cab Type",
+                "Number of cabs",
+                "Calculated Price",
+                "Given Price",
+                "Comments",
+              ]}
+            >
+              <FieldArray
+                name="cabs"
+                render={({ name, push, remove }) => (
+                  <tbody>
+                    {values.cabs.map((cab, index) => (
+                      <tr key={index}>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.start_date`}
+                            type="date"
+                            required
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.no_of_days`}
+                            type="number"
+                            required
+                          />
+                        </td>
+                        <td>
+                          <FormikFormGroup
+                            name={`${name}.${index}.transport_service`}
+                            render={({
+                              field,
+                            }: FieldProps<CalculatePriceSchema>) => (
+                              <SelectServices
+                                {...field}
+                                multiple={false}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
+                          />
+                        </td>
+                        <td>
+                          <FormikFormGroup
+                            name={`${name}.${index}.cab_type`}
+                            render={({
+                              field,
+                            }: FieldProps<CalculatePriceSchema>) => (
+                              <SelectCabTypes
+                                {...field}
+                                multiple={false}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
+                          />
+                        </td>
+                        <td>
+                          <InputField
+                            name={`${name}.${index}.no_of_cabs`}
+                            type="number"
+                            required
+                          />
+                        </td>
+                        <td>
+                          <Button type="submit" disabled={isSubmitting}>
+                            Get Prices
+                          </Button>
+                          <div>{cab.calculated_price}</div>
+                        </td>
+                        <td>
+                          <Input
+                            name={`${name}.${index}.given_price`}
+                            type="number"
+                            value={cab.given_price}
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              let value: number | undefined = parseInt(
+                                e.target.value,
+                                10
+                              )
+                              if (isNaN(value)) {
+                                value = undefined
                               }
-                            />
-                          )}
-                        />
-                      </td>
-                      <td>
-                        <FormikFormGroup
-                          name={`${name}.${index}.cab_type`}
-                          render={({
-                            field,
-                          }: FieldProps<CalculatePriceSchema>) => (
-                            <SelectCabTypes
-                              {...field}
-                              multiple={false}
-                              onChange={(value, name) =>
-                                setFieldValue(name, value)
+                              const flattenValues = {
+                                cabs: values.cabs.map((cab, i) =>
+                                  i !== index
+                                    ? cab
+                                    : {
+                                        ...cab,
+                                        given_price: value,
+                                      }
+                                ),
                               }
-                            />
-                          )}
-                        />
-                      </td>
+                              notifyOnChange(flattenValues)
+                              setFieldValue(e.target.name, value)
+                            }}
+                            min={0}
+                          />
+                        </td>
+                        <td>
+                          <Input
+                            name={`${name}.${index}.comments`}
+                            as="textarea"
+                            maxLength={191}
+                            value={cab.comments}
+                            placeholder="Regarding pricing difference or any other"
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              const value = e.target.value
+                              const flattenValues = {
+                                cabs: values.cabs.map((cab, i) =>
+                                  i !== index
+                                    ? cab
+                                    : {
+                                        ...cab,
+                                        comments: value,
+                                      }
+                                ),
+                              }
+                              notifyOnChange(flattenValues)
+                              setFieldValue(e.target.name, value)
+                            }}
+                          />
+                        </td>
+                        <td>
+                          {values.cabs.length > 1 ? (
+                            <Button onClick={e => remove(index)}>Remove</Button>
+                          ) : null}
+                          <Button onClick={e => push(cab)}>Duplicate</Button>
+                        </td>
+                      </tr>
+                    ))}
+                    <tr>
                       <td>
-                        <InputField
-                          name={`${name}.${index}.no_of_cabs`}
-                          type="number"
-                          required
-                        />
-                      </td>
-                      <td>
-                        <Button type="submit" disabled={isSubmitting}>
-                          Get Prices
+                        <Button onClick={e => push(initialValues.cabs[0])}>
+                          Add More
                         </Button>
-                        <div>{cab.calculated_price}</div>
-                      </td>
-                      <td>
-                        <Input
-                          name={`${name}.${index}.given_price`}
-                          type="number"
-                          value={cab.given_price}
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            let value: number | undefined = parseInt(
-                              e.target.value,
-                              10
-                            )
-                            if (isNaN(value)) {
-                              value = undefined
-                            }
-                            const flattenValues = {
-                              cabs: values.cabs.map((cab, i) =>
-                                i !== index
-                                  ? cab
-                                  : {
-                                      ...cab,
-                                      given_price: value,
-                                    }
-                              ),
-                            }
-                            notifyOnChange(flattenValues)
-                            setFieldValue(e.target.name, value)
-                          }}
-                          min={0}
-                        />
-                      </td>
-                      <td>
-                        <Input
-                          name={`${name}.${index}.comments`}
-                          as="textarea"
-                          maxLength={191}
-                          value={cab.comments}
-                          placeholder="Regarding pricing difference or any other"
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>
-                          ) => {
-                            const value = e.target.value
-                            const flattenValues = {
-                              cabs: values.cabs.map((cab, i) =>
-                                i !== index
-                                  ? cab
-                                  : {
-                                      ...cab,
-                                      comments: value,
-                                    }
-                              ),
-                            }
-                            notifyOnChange(flattenValues)
-                            setFieldValue(e.target.name, value)
-                          }}
-                        />
-                      </td>
-                      <td>
-                        {values.cabs.length > 1 ? (
-                          <Button onClick={e => remove(index)}>Remove</Button>
-                        ) : null}
-                        <Button onClick={e => push(cab)}>Duplicate</Button>
                       </td>
                     </tr>
-                  ))}
-                  <tr>
-                    <td>
-                      <Button onClick={e => push(initialValues.cabs[0])}>
-                        Add More
-                      </Button>
-                    </td>
-                  </tr>
-                </tbody>
-              )}
-            />
-          </table>
+                  </tbody>
+                )}
+              />
+            </Table>
+          </fieldset>
         </Form>
       )}
     />
