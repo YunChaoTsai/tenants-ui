@@ -9,9 +9,8 @@ import { ThunkDispatch, ThunkAction } from "./../types"
 function XHR(xhr: AxiosInstance) {
   return {
     getUser(): Promise<IUser> {
-      return xhr.get("/me").then(({ data }: { data: { user: IUser } }) => {
-        const { user } = data
-        return user
+      return xhr.get("/me").then(({ data }: { data: { data: IUser } }) => {
+        return data.data
       })
     },
   }
