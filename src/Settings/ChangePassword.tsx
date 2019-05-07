@@ -77,6 +77,9 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
               navigate && navigate("/me")
             })
             .catch(error => {
+              if (error.formikErrors) {
+                actions.setErrors(error.formikErrors)
+              }
               actions.setStatus(error.message)
               actions.setSubmitting(false)
             })

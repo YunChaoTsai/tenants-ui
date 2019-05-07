@@ -103,6 +103,9 @@ function ResetPassword({
                 navigate && navigate("/login")
               })
               .catch(error => {
+                if (error.formikErrors) {
+                  actions.setErrors(error.formikErrors)
+                }
                 actions.setStatus(error.message)
                 actions.setSubmitting(false)
               })
@@ -113,7 +116,7 @@ function ResetPassword({
           }: FormikProps<IResetPasswordCredentials>) => (
             <Form noValidate>
               <fieldset>
-                {status ? <div>{status}</div> : null}
+                {status ? <p className="error">{status}</p> : null}
                 <Field
                   name="email"
                   render={({
