@@ -1,8 +1,24 @@
 html {
-  font-size: 16px;
+  font-size: 13px;
   background: black;
   font-family: sans-serif;
   line-height: 1.15;
+}
+
+@media (min-width: 576px) {
+  html {
+    font-size: 14px;
+  }
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+}
+@media (min-width: 992px) {
+  html {
+    font-size: 16px;
+  }
 }
 
 html,
@@ -38,8 +54,9 @@ h2 {
 }
 
 [disabled] {
-  background: silver !important;
+  background: #e8e8e8 !important;
   outline: none !important;
+  cursor: default !important;
 }
 
 table {
@@ -113,8 +130,9 @@ textarea,
 button,
 .btn,
 legend {
-  height: 38px;
-  line-height: 36px;
+  font-size: 1em;
+  height: 2.2em;
+  line-height: calc(2.2em - 2px);
   padding: 0 0.5em;
   border-radius: 0.3em;
   border: 1px solid #e8e8e8;
@@ -156,6 +174,7 @@ form fieldset footer {
   background: #fbfbfb;
   padding: 15px 20px;
   border-top: 1px solid #f1f1f1;
+  border-radius: 0 0 0.5em 0.5em;
 }
 footer button + button,
 footer .btn + button,
@@ -165,18 +184,18 @@ footer .btn + .btn {
 }
 textarea {
   height: auto;
+  width: 100%;
   line-height: 1.5;
   min-height: 100px;
   min-width: 200px;
-  display: block;
-  border-radius: 0.3em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
 .btn,
 button {
-  font-size: 0.9em;
   cursor: pointer;
-  padding-left: 1em;
-  padding-right: 1em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
   letter-spacing: 0.1px;
   box-shadow: none;
   background: inherit;
@@ -193,7 +212,8 @@ button:hover,
 
 .btn:focus,
 button:focus,
-input:focus {
+input:focus,
+textarea:focus {
   outline: none;
   box-shadow: 0 1px 3px 0 hsla(0, 0%, 0%, 0.3);
 }

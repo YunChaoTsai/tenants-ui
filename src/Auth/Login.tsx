@@ -80,7 +80,17 @@ function Login({ login, navigate, location }: LoginProps) {
       <Helmet>
         <title>Login</title>
       </Helmet>
-      <h1 className="text--center">Tourepedia Admin Dashboard</h1>
+      <div className="text--center">
+        <img
+          src={process.env.PUBLIC_URL + "/favicon.png"}
+          style={{
+            width: "70px",
+            height: "70px",
+            marginTop: "50px",
+          }}
+        />
+      </div>
+      <h1 className="text--center">Sign in to Tourepedia Admin Dashboard</h1>
       <div className="w--sm">
         <Formik
           initialValues={initialValues}
@@ -115,6 +125,9 @@ function Login({ login, navigate, location }: LoginProps) {
                   autoComplete="username email"
                   required
                 />
+                <Link to="/forgot-password" className="float--right">
+                  Forgot Password ?
+                </Link>
                 <InputField
                   label="Password"
                   name="password"
@@ -123,12 +136,9 @@ function Login({ login, navigate, location }: LoginProps) {
                   required
                   autoComplete="current-password"
                 />
-                <p className="text--right">
-                  <Link to="/forgot-password">Forgot Password ?</Link>
-                </p>
                 <footer>
                   <Button type="submit" disabled={isSubmitting}>
-                    Login
+                    Sign in
                   </Button>
                 </footer>
               </fieldset>

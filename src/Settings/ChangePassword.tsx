@@ -126,7 +126,9 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
                 id="password_confirmation"
                 autoComplete="new-password"
               />
-              <Button type="submit">Update</Button>
+              <footer>
+                <Button type="submit">Update</Button>
+              </footer>
             </fieldset>
           </Form>
         )}

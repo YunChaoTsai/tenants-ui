@@ -10,9 +10,6 @@ export default function CabTypesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <div className="float--right button-group">
-        <Link to="" className="btn">
-          Prices
-        </Link>
         <Link to="new" className="btn">
           Add Price
         </Link>

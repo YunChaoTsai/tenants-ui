@@ -112,6 +112,7 @@ function List({
       </div>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          responsive
           headers={[
             "Start Date",
             "End Date",

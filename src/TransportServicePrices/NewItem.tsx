@@ -24,6 +24,7 @@ import {
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -148,42 +149,30 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
         <Form noValidate>
           <fieldset style={{ minInlineSize: "auto" }}>
             <legend>Add Transport Service Price</legend>
-            <Table
-              responsive
-              headers={[
-                "Start Date",
-                "End Date",
-                "Cab Type",
-                "Transport Service",
-                "Price(for fixed/service type)",
-                "/KM charges",
-                "Minimum kms per day",
-                "Toll factor",
-                "Night factor",
-                "Parking factor",
-              ]}
-            >
-              <FieldArray
-                name="prices"
-                render={({ name, push, remove }) => (
-                  <tbody>
-                    {values.prices.map((price, index, prices) => (
-                      <tr key={index}>
-                        <td>
+            <FieldArray
+              name="prices"
+              render={({ name, push, remove }) => (
+                <ol className="list">
+                  {values.prices.map((price, index, prices) => (
+                    <li key={index}>
+                      <Grid>
+                        <Col>
                           <InputField
+                            label="Start Date"
                             name={`${name}.${index}.start_date`}
                             type="date"
                             required
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <InputField
+                            label="End Date"
                             name={`${name}.${index}.end_date`}
                             type="date"
                             required
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <FormikFormGroup
                             name={`${name}.${index}.cab_type`}
                             render={({
@@ -191,6 +180,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                             }: FieldProps<AddPriceCredentials>) => (
                               <SelectCabTypes
                                 {...field}
+                                label="Cab Type"
                                 multiple={false}
                                 required
                                 fetchOnMount
@@ -200,8 +190,8 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                               />
                             )}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <FormikFormGroup
                             name={`${name}.${index}.transport_service`}
                             render={({
@@ -209,6 +199,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                             }: FieldProps<AddPriceCredentials>) => (
                               <SelectServices
                                 {...field}
+                                label="Transport Service"
                                 multiple={false}
                                 required
                                 fetchOnMount
@@ -218,71 +209,85 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                               />
                             )}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                      </Grid>
+                      <Grid>
+                        <Col>
                           <InputField
+                            label="Price (fixed)"
                             name={`${name}.${index}.price`}
                             type="number"
                             min={0}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <InputField
+                            label="Charges per Km"
                             name={`${name}.${index}.per_km_charges`}
                             type="number"
                             min={0}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <InputField
+                            label="Minimum Kms per Day"
                             name={`${name}.${index}.minimum_km_per_day`}
                             type="number"
                             min={0}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <InputField
+                            label="Toll charges per Km"
                             name={`${name}.${index}.toll_charges`}
                             type="number"
                             min={0}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <InputField
+                            label="Night Charges per Km"
                             name={`${name}.${index}.night_charges`}
                             type="number"
                             min={0}
                           />
-                        </td>
-                        <td>
+                        </Col>
+                        <Col>
                           <InputField
+                            label="Parking Charges per km"
                             name={`${name}.${index}.parking_charges`}
                             type="number"
                             min={0}
                           />
-                        </td>
-
-                        <td>
-                          {prices.length > 1 ? (
-                            <Button onClick={() => remove(index)}>
-                              Remove
-                            </Button>
-                          ) : null}
-                          <Button onClick={() => push(price)}>Duplicate</Button>
-                        </td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <td>
-                        <Button onClick={() => push(initialValues.prices[0])}>
-                          Add More
+                        </Col>
+                      </Grid>
+                      <div className="button-group">
+                        <Button
+                          className="btn--secondary"
+                          onClick={() => push(price)}
+                        >
+                          + Duplicate
                         </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                )}
-              />
-            </Table>
+                        {prices.length > 1 ? (
+                          <Button
+                            className="btn--secondary"
+                            onClick={() => remove(index)}
+                          >
+                            &times; Remove
+                          </Button>
+                        ) : null}
+                      </div>
+                    </li>
+                  ))}
+                  <div className="form-group">
+                    <hr />
+                    <Button onClick={() => push(initialValues.prices[0])}>
+                      + Add More Transport Prices
+                    </Button>
+                  </div>
+                </ol>
+              )}
+            />
             {status ? <div>{status}</div> : null}
             <footer>
               <Button type="submit" disabled={isSubmitting}>
