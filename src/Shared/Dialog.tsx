@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import ReactDOM from "react-dom"
-import { useDidUpdate, useDidMount, useEnforceFocus } from "./../hooks"
+import { useEnforceFocus } from "./../hooks"
 
 export function useDialog(
   initialOpen: boolean = false
@@ -59,30 +59,23 @@ export function Dialog({
   closeButton,
 }: DialogProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
-  // set the styles
-  useDidMount(() => {
-    if (open) {
-      container.style.overflow = "hidden"
-    }
-  })
   // set the styles for the container
-  useDidUpdate(() => {
+  useEffect(() => {
     if (open) {
-      // hide the overflow of the container
       container.style.overflow = "hidden"
     } else {
-      // show the overflow of the container
+      container.style.overflow = "auto"
+    }
+    return () => {
       container.style.overflow = "auto"
     }
   }, [open])
   useEnforceFocus(wrapperRef, open, { enforceFocus, autoFocus })
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (!open) return
-    if (closeOnEscape) {
-      // handle the escape key
-      if (event.keyCode === 27) {
-        onClose && onClose()
-      }
+    if (!open || !closeOnEscape) return
+    // handle the escape key
+    if (event.keyCode === 27) {
+      onClose && onClose()
     }
   }
   if (!open) return null

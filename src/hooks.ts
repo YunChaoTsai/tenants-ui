@@ -16,6 +16,30 @@ export function useDidMount(fn: () => void): void {
   useEffect(() => fn(), [])
 }
 
+/**
+ * useOnce
+ * This hooks lets us do something in the first render call
+ *
+ * @param fn () => void - callback to run when first render
+ */
+export function useOnce(fn: () => void): void {
+  const didOnce = useRef(false)
+  if (!didOnce.current) {
+    didOnce.current = true
+    fn()
+  }
+}
+
+/**
+ * useEnforceFocus
+ * This hook lets us constrain the focus inside a container component based on a condition
+ * and return back to last focused element when the condition got true
+ *
+ * @param element React.RefObject<HTMLElement> - Ref object (useRef) to container element
+ * @param open boolean - Trigger for enforcement and return focus to last focused element
+ * @param config { autoFocus: boolean, enforceFocus: boolean } - Should the container element be auto focused (autoFocus)
+ * and should the last activeElement be focused back
+ */
 export function useEnforceFocus(
   element: React.RefObject<HTMLElement>,
   open = true,
@@ -25,27 +49,8 @@ export function useEnforceFocus(
   }
 ) {
   const lastActiveElementRef = useRef<HTMLElement | null>(null)
-  useDidMount(() => {
-    const currentActiveElement = activeElement()
-    lastActiveElementRef.current = currentActiveElement
-    if (
-      open &&
-      autoFocus &&
-      element.current &&
-      !contains(element.current, currentActiveElement)
-    ) {
-      element.current.focus()
-    }
-    // focus the last focused element when unmounting
-    return () => {
-      if (enforceFocus && lastActiveElementRef.current) {
-        lastActiveElementRef.current.focus()
-      }
-    }
-  })
-
   useDidUpdate(() => {
-    // focus the dialog when opening if autoFocus is set to true
+    // focus the container when opening if autoFocus is set to true
     if (open) {
       // store the last active element
       lastActiveElementRef.current = activeElement()
@@ -56,10 +61,17 @@ export function useEnforceFocus(
       ) {
         element.current.focus()
       }
+    } else {
+      // focus the last focused element when closing
+      if (enforceFocus && lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus()
+      }
     }
-    // focus the last focused element when closing
-    if (!open && enforceFocus && lastActiveElementRef.current) {
-      lastActiveElementRef.current.focus()
+    // focus the last focused element when unmounting
+    return () => {
+      if (enforceFocus && lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus()
+      }
     }
   }, [open])
 
