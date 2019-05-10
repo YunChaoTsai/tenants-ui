@@ -1,0 +1,14 @@
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+.table {
+  width: 100%;
+}
+.table--fixed {
+  width: 100%;
+  table-layout: fixed;
+}

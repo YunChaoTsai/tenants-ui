@@ -2,6 +2,8 @@ import React from "react"
 import { Omit } from "utility-types"
 import classNames from "classnames"
 
+import "./layout.css"
+
 export function Container({
   fluid,
   className,

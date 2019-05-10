@@ -1,0 +1,77 @@
+.select {
+  display: block;
+}
+.select > [role="group"] {
+  position: relative;
+  max-width: 300px;
+  min-width: 150px;
+}
+.select [type="search"] {
+  width: 100%;
+}
+.select label + [type="search"] {
+  margin-top: 5px;
+}
+.select [role="listbox"] {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  max-width: 100%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
+  background: white;
+  border: 1px solid black;
+  display: none;
+  overflow: auto;
+  max-height: 200px;
+  border-radius: 0 0 5px 5px;
+}
+.select[data-focused="true"] [role="listbox"] {
+  display: block;
+}
+.select[data-focused="true"] [type="search"] {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.select [role="listbox"] [role="option"] {
+  white-space: nowrap;
+  list-style: none;
+  display: block;
+  padding: 5px;
+  outline: none !important;
+}
+.select [aria-readonly="true"] {
+  color: silver;
+}
+.select [role="listbox"] [role="option"] + [role="option"] {
+  border-top: 1px solid silver;
+}
+.select [role="listbox"] [aria-selected="true"] {
+  background: black;
+  color: white;
+}
+.select [role="listbox"] [aria-selected="true"]:before {
+  content: "\2713 ";
+}
+.select ul {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 5px;
+}
+.select .selected-list li {
+  display: inline-block;
+  margin: 0 5px 5px 0;
+  padding: 3px 8px;
+  background: black;
+  color: white;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.select .selected-list li:before {
+  content: "\2713 ";
+}

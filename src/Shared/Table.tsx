@@ -1,6 +1,8 @@
 import React from "react"
 import { Omit } from "utility-types"
 
+import "./table.css"
+
 export function Table({
   fixedLayout,
   className,

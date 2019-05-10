@@ -8,6 +8,8 @@ import {
 } from "formik"
 import { Omit } from "utility-types"
 
+import "./input-field.css"
+
 export function ErrorMessage({ className = "", ...props }: ErrorMessageProps) {
   return (
     <FormikErrorMessage

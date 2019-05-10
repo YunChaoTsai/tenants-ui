@@ -2,11 +2,19 @@ import React, { useRef, useState, useEffect } from "react"
 import ReactDOM from "react-dom"
 import { useEnforceFocus } from "./../hooks"
 
+import "./dialog.css"
+
 export function useDialog(
   initialOpen: boolean = false
 ): [boolean, () => void, () => void] {
   const [isOpen, set] = useState<boolean>(initialOpen)
   return [isOpen, () => set(true), () => set(false)]
+}
+
+const DIALOG_OPEN_CONTAINER_CLASS_NAME = "dialog-open"
+
+export function Document({ children }: React.HTMLProps<HTMLElement>) {
+  return <div role="document">{children}</div>
 }
 
 interface DialogProps {
@@ -62,12 +70,12 @@ export function Dialog({
   // set the styles for the container
   useEffect(() => {
     if (open) {
-      container.style.overflow = "hidden"
+      container.classList.add(DIALOG_OPEN_CONTAINER_CLASS_NAME)
     } else {
-      container.style.overflow = "auto"
+      container.classList.remove(DIALOG_OPEN_CONTAINER_CLASS_NAME)
     }
     return () => {
-      container.style.overflow = "auto"
+      container.classList.remove(DIALOG_OPEN_CONTAINER_CLASS_NAME)
     }
   }, [open])
   useEnforceFocus(wrapperRef, open, { enforceFocus, autoFocus })
@@ -84,46 +92,13 @@ export function Dialog({
       ref={wrapperRef}
       onKeyDown={handleKeyDown}
       role="dialog"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-        background: "rgba(0, 0, 0, .5)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "auto",
-      }}
       tabIndex={-1}
+      aria-modal={true}
     >
-      {closeButton ? (
-        <button
-          style={{
-            position: "absolute",
-            right: "10px",
-            top: "10px",
-            background: "transparent",
-            color: "white",
-            fontSize: "3em",
-            border: "none",
-          }}
-          onClick={onClose}
-        >
-          &times;
-        </button>
-      ) : null}
-      <div
-        style={{
-          background: "white",
-          position: "relative",
-          minWidth: "320px",
-          borderRadius: ".4em",
-        }}
-      >
-        {children}
-      </div>
+      {closeButton ? <button onClick={onClose}>&times;</button> : null}
+      <Document>
+        <div>{children}</div>
+      </Document>
     </div>,
     container
   )

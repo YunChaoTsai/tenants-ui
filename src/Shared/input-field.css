@@ -1,0 +1,40 @@
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group > label {
+  margin-bottom: 5px;
+  display: inline-block;
+  white-space: nowrap;
+}
+.form-group.is-touched.has-error input {
+  border-color: #b10000;
+}
+.form-group .text--error,
+.form-group .error {
+  background: #b10000;
+  color: white;
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.9rem;
+  border-radius: 0.2rem;
+  margin-top: 5px;
+}
+.input-group {
+  display: flex;
+  align-items: center;
+}
+.input-group .form-group {
+  margin: 0;
+}
+.input-group input:not(:first-child),
+.input-group .form-group:not(:first-child) input,
+.input-group button:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.input-group input:not(:last-child),
+.input-group .form-group:not(:last-child) input,
+.input-group button:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
