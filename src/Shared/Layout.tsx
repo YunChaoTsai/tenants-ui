@@ -20,15 +20,17 @@ export function Container({
   )
 }
 
+interface GridProps {
+  as?: React.ReactType
+  noGutters?: boolean
+}
+
 export function Grid({
   className,
   noGutters,
   as: Component = "div",
   ...props
-}: Omit<React.HTMLProps<HTMLDivElement>, "as"> & {
-  noGutters?: boolean
-  as?: React.ReactType
-}) {
+}: Omit<React.HTMLProps<HTMLDivElement>, "as"> & GridProps) {
   return (
     <Component
       className={`row ${noGutters ? "no-gutters" : ""} ${
@@ -56,8 +58,8 @@ export function Col({
 }) {
   return (
     <Component
-      className={`col ${[sm, md, lg, xl]
-        .map(value => (!value ? "" : "col-" + value))
+      className={`col ${[["sm", sm], ["md", md], ["lg", lg], ["xl", xl]]
+        .map(([size, value]) => (!value ? "" : `col-${size}-${value}`))
         .join(" ")} ${className ? className : ""}`}
       {...props}
     />
