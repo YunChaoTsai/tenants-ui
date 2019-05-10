@@ -36,7 +36,7 @@ export function NewRole({ xhr, navigate }: NewRoleProps) {
           return xhr
             .post("/roles", values)
             .then(({ data }) => {
-              const { role } = data
+              const { data: role } = data
               navigate && navigate(`../${role.id}`)
               actions.setSubmitting(false)
             })
