@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import ReactDOM from "react-dom"
-import { contains, activeElement } from "./../dom-helpers"
 import { useDidUpdate, useDidMount, useEnforceFocus } from "./../hooks"
 
 export function useDialog(
@@ -106,17 +105,30 @@ export function Dialog({
       }}
       tabIndex={-1}
     >
+      {closeButton ? (
+        <button
+          style={{
+            position: "absolute",
+            right: "10px",
+            top: "10px",
+            background: "transparent",
+            color: "white",
+            fontSize: "3em",
+            border: "none",
+          }}
+          onClick={onClose}
+        >
+          &times;
+        </button>
+      ) : null}
       <div
-        style={{ background: "white", position: "relative", minWidth: "300px" }}
+        style={{
+          background: "white",
+          position: "relative",
+          minWidth: "320px",
+          borderRadius: ".4em",
+        }}
       >
-        {closeButton ? (
-          <button
-            style={{ position: "absolute", right: "5px", top: "5px" }}
-            onClick={onClose}
-          >
-            &times;
-          </button>
-        ) : null}
         {children}
       </div>
     </div>,
