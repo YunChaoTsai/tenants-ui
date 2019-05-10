@@ -78,7 +78,7 @@ export function EditPermissions({
                     <legend>Editing {name}'s permissions</legend>
                     {status ? <div>{status}</div> : null}
                     <FormikFormGroup
-                      name="roles"
+                      name="permissions"
                       render={({ field }) => (
                         <SelectPermissions
                           {...field}
@@ -87,11 +87,15 @@ export function EditPermissions({
                         />
                       )}
                     />
-                    <Button type="submit" disabled={isSubmitting}>
-                      Save
-                    </Button>
+                    <footer>
+                      <Button type="submit" disabled={isSubmitting}>
+                        Save
+                      </Button>
+                      <Link to=".." className="btn btn--secondary">
+                        Cancel
+                      </Link>
+                    </footer>
                   </fieldset>
-                  <Link to="..">Cancel</Link>
                 </Form>
               )}
             />

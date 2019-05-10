@@ -12,6 +12,7 @@ import { Async, AsyncProps } from "./../Shared/Select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -104,22 +105,14 @@ function List({
         />
       </div>
       <Listable total={total} isFetching={isFetching}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Distance(kms)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transportServices.map(transportService => (
-              <tr key={transportService.id}>
-                <td>{transportService.name}</td>
-                <td>{transportService.distance}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Destinations", "Total Distance (in kms)"]}
+          alignCols={{ 1: "right" }}
+          rows={transportServices.map(transportService => [
+            transportService.name,
+            transportService.distance,
+          ])}
+        />
       </Listable>
     </Fragment>
   )

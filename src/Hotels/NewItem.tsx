@@ -239,11 +239,15 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   type="number"
                   min={1}
                 />
-                <Button type="submit" disabled={isSubmitting}>
-                  Save
-                </Button>
+                <footer>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Save
+                  </Button>
+                  <Link to=".." className="btn btn--secondary">
+                    Cancel
+                  </Link>
+                </footer>
               </fieldset>
-              <Link to="..">Cancel</Link>
             </Form>
           )
         }}

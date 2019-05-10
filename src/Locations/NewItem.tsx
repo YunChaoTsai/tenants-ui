@@ -164,11 +164,15 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 label="Longitude"
                 placeholder="88° 15' 45.6192'' E"
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

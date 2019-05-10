@@ -145,35 +145,39 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
       <Helmet>
         <title>
           {locations.map(l => l.short_name).join(" • ")} (
-          {trip_source.short_name}-{trip_id})
+          {trip_source.short_name}-{trip_id || id.toString()})
         </title>
       </Helmet>
       <Grid>
         <Col>
-          <h3>
-            {locations.map(l => l.short_name).join(" • ")} (
-            {trip_source.short_name}-{trip_id}) from{" "}
-          </h3>
-          <dl>
-            <dt>Dates</dt>
-            <dd>
-              {moment
-                .utc(start_date)
-                .local()
-                .format("DD MMM, YYYY")}{" "}
-              to{" "}
-              {moment
-                .utc(end_date)
-                .local()
-                .format("DD MMM, YYYY")}
-            </dd>
-            <dt>Pax</dt>
-            <dd>
-              {no_of_adults} Adults
-              {children ? ` and ${children} children` : ""}
-            </dd>
-          </dl>
-          <h4>{converted_at ? "Converted" : null}</h4>
+          <fieldset>
+            <legend>
+              <h3>
+                {locations.map(l => l.short_name).join(" • ")} (
+                {trip_source.short_name}-{trip_id || id})
+              </h3>
+            </legend>
+            <dl>
+              <dt>Dates</dt>
+              <dd>
+                {moment
+                  .utc(start_date)
+                  .local()
+                  .format("DD MMM, YYYY")}{" "}
+                to{" "}
+                {moment
+                  .utc(end_date)
+                  .local()
+                  .format("DD MMM, YYYY")}
+              </dd>
+              <dt>Pax</dt>
+              <dd>
+                {no_of_adults} Adults
+                {children ? ` and ${children} children` : ""}
+              </dd>
+            </dl>
+            <h4>{converted_at ? "Converted" : null}</h4>
+          </fieldset>
         </Col>
         <Col md={4}>
           <fieldset>

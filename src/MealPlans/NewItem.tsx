@@ -60,11 +60,15 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 placeholder="Modified American Plan (Two meals: Breakfast and one of Lunch or Dinner)"
                 required
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

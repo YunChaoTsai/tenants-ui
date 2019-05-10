@@ -108,21 +108,30 @@ export default function Role({
               "Loading..."
             ) : role ? (
               <div>
-                Name: {role.name} <Link to="edit">Edit</Link> <br />
+                <h3>
+                  {role.name}{" "}
+                  <Link to="edit" title="Edit Role">
+                    &#9998;
+                  </Link>
+                </h3>
                 Created at:{" "}
                 {moment
                   .utc(role.created_at)
                   .local()
-                  .toLocaleString()}
+                  .format("Do MMM YYYY \\at hh:mm A")}
                 <br />
-                Permissions:{" "}
-                {(role.permissions || []).map((p, i, arr) => (
-                  <span key={p.id}>
-                    {p.name}
-                    {i !== arr.length - 1 ? " • " : ""}
-                  </span>
-                ))}{" "}
-                <Link to="edit-permissions">Edit</Link>
+                <p>
+                  <b>Permissions</b>:{" "}
+                  {(role.permissions || []).map((p, i, arr) => (
+                    <span key={p.id}>
+                      {p.name}
+                      {i !== arr.length - 1 ? " • " : ""}
+                    </span>
+                  ))}{" "}
+                  <Link to="edit-permissions" title="Edit Permissions">
+                    &#9998;
+                  </Link>
+                </p>
               </div>
             ) : (
               <Redirect noThrow to="/users" />

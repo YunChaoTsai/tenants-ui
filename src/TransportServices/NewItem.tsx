@@ -12,6 +12,7 @@ import {
 import { SelectLocations, store as locationStore } from "./../Locations"
 import { withXHR, XHRProps } from "./../xhr"
 import Helmet from "react-helmet-async"
+import { Grid, Col } from "../Shared/Layout"
 
 const validationSchema = Validator.object().shape({
   via: Validator.array()
@@ -83,42 +84,58 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
                 name="via"
                 render={({ name, remove, push }) => (
                   <div className="form-group">
-                    <label>Destinations</label>
-                    {values.via.map((_, index, locations) => (
-                      <div key={index}>
-                        <FormikFormGroup
-                          name={`${name}.${index}`}
-                          render={({ field }) => (
-                            <SelectLocations
-                              {...field}
-                              multiple={false}
-                              onChange={(value, name) =>
-                                setFieldValue(name, value)
-                              }
-                            />
-                          )}
-                        />
-                        {locations.length > 2 ? (
-                          <Button onClick={_ => remove(index)}>Remove</Button>
-                        ) : null}
-                      </div>
-                    ))}
-                    <Button onClick={_ => push(undefined)}>Add More</Button>
+                    <p>Add destinations for the transportation</p>
+                    <Grid>
+                      {values.via.map((_, index, locations) => (
+                        <Col
+                          md={3}
+                          key={index}
+                          style={{ marginBottom: "10px" }}
+                        >
+                          <FormikFormGroup
+                            name={`${name}.${index}`}
+                            render={({ field }) => (
+                              <SelectLocations
+                                {...field}
+                                label="Destination"
+                                multiple={false}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
+                          />
+                          {locations.length > 2 ? (
+                            <Button onClick={_ => remove(index)}>
+                              &times; Remove
+                            </Button>
+                          ) : null}
+                        </Col>
+                      ))}
+                    </Grid>
+                    <hr />
+                    <Button onClick={_ => push(undefined)}>
+                      + Add More Destinations
+                    </Button>
                   </div>
                 )}
               />
               <InputField
                 name="distance"
                 type="number"
-                label="Distance (in kms)"
+                label="Total distance for the transportation (in kms)"
                 placeholder="420"
                 required
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

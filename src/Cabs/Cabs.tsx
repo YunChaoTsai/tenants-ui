@@ -9,8 +9,10 @@ import NewItem from "./New"
 export default function CabsModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
+      <Link to="new" className="btn float--right">
+        New Cab
+      </Link>
       <h2>Cabs</h2>
-      <Link to="new">New Cab</Link>
       <hr />
       <Router>
         <NewItem path="/new" />

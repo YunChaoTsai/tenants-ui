@@ -3,12 +3,14 @@ import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
+import moment from "moment"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { IUser, actions, IStateWithKey, selectors } from "./store"
 import { List } from "./../Shared/List"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -68,28 +70,22 @@ export function Users({ getUsers, users, ...otherProps }: UsersProps) {
         />
       </div>
       <List isFetching={isFetching} total={total}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Email Verified At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(r => (
-              <tr key={r.id}>
-                <td>
-                  <Link to={r.id.toString()}>{r.name}</Link>
-                  <br />
-                  {r.roles.map(r => r.name).join(" • ")}
-                </td>
-                <td>{r.email}</td>
-                <td>{r.email_verified_at}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Name", "Email", "Roles", "Email Verified At"]}
+          rows={users.map(r => [
+            <Link to={r.id.toString()}>{r.name}</Link>,
+            <span>{r.email}</span>,
+            <span>{r.roles.map(r => r.name).join(" • ")}</span>,
+            <span>
+              {r.email_verified_at
+                ? moment
+                    .utc(r.email_verified_at)
+                    .local()
+                    .format("Do MMM, YYYY \\at hh:mm A")
+                : "Not Verified Yet"}
+            </span>,
+          ])}
+        />
       </List>
     </Fragment>
   )

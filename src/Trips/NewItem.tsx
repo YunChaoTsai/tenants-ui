@@ -177,9 +177,9 @@ function NewItem({ xhr, navigate }: NewItemProps) {
         setFieldValue,
       }: FormikProps<NewItemSchema>) => (
         <Form noValidate>
-          {status ? <div>{status}</div> : null}
           <fieldset>
-            <legend>Destination Details</legend>
+            <legend>Add New Trip</legend>
+            {status ? <div>{status}</div> : null}
             <FormikFormGroup
               name="destinations"
               render={({ field }) => (
@@ -217,92 +217,93 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               )}
             />
             <InputField name="trip_id" label="Trip ID" placeholder="1231231" />
-          </fieldset>
-          <fieldset>
-            <legend>Contact Details</legend>
-            <FieldArray
-              name="contact"
-              render={({ name }) => (
-                <Fragment>
-                  <InputField
-                    name={`${name}.name`}
-                    label="Contact Name"
-                    required
-                  />
-                  <InputField
-                    name={`${name}.email`}
-                    label="Email"
-                    required
-                    type="email"
-                  />
-                  <FormikFormGroup
-                    name={`${name}.phone_number_country_dial_code`}
-                    render={({ field }) => (
-                      <SelectCountryDialCodes
-                        {...field}
-                        label="Country code"
-                        placeholder="Type here... eg India or +91"
-                        required
-                        onChange={(value, name) => setFieldValue(name, value)}
-                      />
-                    )}
-                  />
-                  <InputField
-                    name={`${name}.phone_number`}
-                    label="Phone Number"
-                    type="number"
-                    required
-                  />
-                </Fragment>
-              )}
-            />
-          </fieldset>
-          <fieldset>
-            <legend>Pax</legend>
-            <InputField
-              name="no_of_adults"
-              label="Number of adults"
-              type="number"
-              min={1}
-              required
-            />
-            <FieldArray
-              name="children"
-              render={({ name, remove, push }) => (
-                <fieldset>
-                  <legend>Children</legend>
-                  <ul className="list">
-                    {values.children.map((_, index) => (
-                      <li key={index}>
-                        <InputField
-                          label="Age"
-                          name={`${name}.${index}.age`}
-                          type="number"
-                          min={1}
+            <fieldset>
+              <legend>Pax Details</legend>
+              <FieldArray
+                name="contact"
+                render={({ name }) => (
+                  <Fragment>
+                    <InputField
+                      name={`${name}.name`}
+                      label="Contact Name"
+                      required
+                    />
+                    <InputField
+                      name={`${name}.email`}
+                      label="Email"
+                      required
+                      type="email"
+                    />
+                    <FormikFormGroup
+                      name={`${name}.phone_number_country_dial_code`}
+                      render={({ field }) => (
+                        <SelectCountryDialCodes
+                          {...field}
+                          label="Country code"
+                          placeholder="Type here... eg India or +91"
                           required
+                          onChange={(value, name) => setFieldValue(name, value)}
                         />
-                        <InputField
-                          label="Count"
-                          name={`${name}.${index}.count`}
-                          type="number"
-                          min={1}
-                          required
-                        />
-                        <Button onClick={_ => remove(index)}>Remove</Button>
-                      </li>
-                    ))}
-                    <Button onClick={_ => push({ count: 1, age: 6 })}>
-                      Add More
-                    </Button>
-                  </ul>
-                </fieldset>
-              )}
-            />
+                      )}
+                    />
+                    <InputField
+                      name={`${name}.phone_number`}
+                      label="Phone Number"
+                      type="number"
+                      required
+                    />
+                  </Fragment>
+                )}
+              />
+              <InputField
+                name="no_of_adults"
+                label="Number of adults"
+                type="number"
+                min={1}
+                required
+              />
+              <FieldArray
+                name="children"
+                render={({ name, remove, push }) => (
+                  <fieldset>
+                    <legend>Children</legend>
+                    <ul className="list">
+                      {values.children.map((_, index) => (
+                        <li key={index}>
+                          <InputField
+                            label="Age"
+                            name={`${name}.${index}.age`}
+                            type="number"
+                            min={1}
+                            required
+                          />
+                          <InputField
+                            label="Count"
+                            name={`${name}.${index}.count`}
+                            type="number"
+                            min={1}
+                            required
+                          />
+                          <Button onClick={_ => remove(index)}>Remove</Button>
+                        </li>
+                      ))}
+                      <Button onClick={_ => push({ count: 1, age: 6 })}>
+                        Add More
+                      </Button>
+                    </ul>
+                  </fieldset>
+                )}
+              />
+            </fieldset>
+            <footer>
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+              <Link to=".." className="btn btn--secondary">
+                Cancel
+              </Link>
+            </footer>
           </fieldset>
-          <Button type="submit" disabled={isSubmitting}>
-            Save
-          </Button>
-          <Link to="..">Cancel</Link>
         </Form>
       )}
     />

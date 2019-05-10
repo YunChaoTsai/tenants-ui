@@ -104,11 +104,15 @@ export function NewCab({ xhr, navigate }: NewCabProps) {
                 required
                 placeholder="RJ18 CC 7838"
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Submit
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Submit
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

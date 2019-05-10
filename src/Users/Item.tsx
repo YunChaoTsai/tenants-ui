@@ -109,22 +109,37 @@ export default function User({
               "Loading..."
             ) : user ? (
               <div>
-                Name: {user.name} <Link to="edit">Edit</Link>
+                <h3>
+                  {user.name}{" "}
+                  <Link to="edit" title="Edit Name">
+                    &#9998;
+                  </Link>
+                </h3>
+                <p>
+                  Roles:{" "}
+                  {(user.roles || []).map((r, i, arr) => (
+                    <span key={r.id}>
+                      {r.name}
+                      {i !== arr.length - 1 ? " • " : ""}
+                    </span>
+                  ))}
+                  <Link to="edit-roles" title="Edit Roles">
+                    &#9998;
+                  </Link>
+                </p>
+                Email Verified on:{" "}
+                {user.email_verified_at
+                  ? moment
+                      .utc(user.email_verified_at)
+                      .local()
+                      .format("Do MMM, YYYY \\at hh:mm A")
+                  : "Not verified yet"}
                 <br />
-                Created at:{" "}
+                Invited on:{" "}
                 {moment
                   .utc(user.created_at)
                   .local()
-                  .toLocaleString()}
-                <br />
-                Roles:{" "}
-                {(user.roles || []).map((r, i, arr) => (
-                  <span key={r.id}>
-                    {r.name}
-                    {i !== arr.length - 1 ? " • " : ""}
-                  </span>
-                ))}{" "}
-                <Link to="edit-roles">Edit Roles</Link>
+                  .format("Do MMM, YYYY \\at hh:mm A")}
               </div>
             ) : (
               <Redirect noThrow to="/users" />

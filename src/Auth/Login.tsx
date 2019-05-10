@@ -103,8 +103,8 @@ function Login({ login, navigate, location }: LoginProps) {
             status,
           }: FormikProps<ILoginCredentials>) => (
             <Form noValidate>
-              {status ? <div>{status}</div> : null}
               <fieldset>
+                {status ? <p className="error">{status}</p> : null}
                 <InputField
                   label="Email"
                   name="email"
@@ -123,14 +123,18 @@ function Login({ login, navigate, location }: LoginProps) {
                   required
                   autoComplete="current-password"
                 />
-                <Button type="submit" disabled={isSubmitting}>
-                  Login
-                </Button>
+                <p className="text--right">
+                  <Link to="/forgot-password">Forgot Password ?</Link>
+                </p>
+                <footer>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Login
+                  </Button>
+                </footer>
               </fieldset>
             </Form>
           )}
         />
-        <Link to="/forgot-password">Forgot Password ?</Link>
       </div>
     </RedirectIfAuthenticated>
   )

@@ -17,7 +17,7 @@ export interface IUser extends IBaseItem {
   id: number
   name: string
   email: string
-  email_verified_at: boolean
+  email_verified_at?: string
   created_at: string
   updated_at: string
   roles: IRole[]

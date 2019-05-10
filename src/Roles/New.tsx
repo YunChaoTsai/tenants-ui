@@ -59,11 +59,15 @@ export function NewRole({ xhr, navigate }: NewRoleProps) {
                 required
                 placeholder="Manager"
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Submit
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Submit
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />
