@@ -28,6 +28,8 @@ import { HotelBookingStages } from "./HotelBookingStages"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
+import "./main.css"
+import "./typography.css"
 
 interface HeaderProps extends AuthProps {}
 

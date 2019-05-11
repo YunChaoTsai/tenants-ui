@@ -84,13 +84,11 @@ function Login({ login, navigate, location }: LoginProps) {
         <img
           src={process.env.PUBLIC_URL + "/favicon.png"}
           style={{
-            width: "70px",
-            height: "70px",
             marginTop: "50px",
           }}
         />
       </div>
-      <h1 className="text--center">Sign in to Tourepedia Admin Dashboard</h1>
+      <h1 className="text--center">Sign in to TAD</h1>
       <div className="w--sm">
         <Formik
           initialValues={initialValues}

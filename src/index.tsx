@@ -26,7 +26,6 @@ import { store as hotelPaymentPreferenceStore } from "./HotelPaymentPreferences"
 import { store as hotelBookingStageStore } from "./HotelBookingStages"
 import { IAppState } from "./types"
 import xhr, { XHRContext } from "./xhr"
-import "./main.css"
 
 const rootReducer = combineReducers<IAppState>({
   [authStore.key]: authStore.reducer,
