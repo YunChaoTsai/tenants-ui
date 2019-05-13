@@ -71,6 +71,7 @@ export function Users({ getUsers, users, ...otherProps }: UsersProps) {
       </div>
       <List isFetching={isFetching} total={total}>
         <Table
+          responsive
           headers={["Name", "Email", "Roles", "Email Verified At"]}
           rows={users.map(r => [
             <Link to={r.id.toString()}>{r.name}</Link>,
