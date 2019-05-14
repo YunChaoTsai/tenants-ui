@@ -9,7 +9,7 @@ import moment from "moment"
 import { ITrip, IQuote, IGivenQuote } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Dialog, useDialog } from "./../Shared/Dialog"
-import { InputField } from "./../Shared/InputField"
+import { InputField, FormGroup } from "./../Shared/InputField"
 import { Grid, Col } from "../Shared/Layout"
 
 interface IInstalment {
@@ -72,7 +72,7 @@ export const Quote = withXHR(function Quote({
   return (
     <div>
       <h5>Total Price: {total_price}</h5>
-      <p>Comments: {comments}</p>
+      {comments ? <blockquote>{comments}</blockquote> : null}
       <div>By: {created_by.name}</div>
       <h5>Hotels</h5>
       <ul>
@@ -170,7 +170,7 @@ export const Quote = withXHR(function Quote({
               <Form noValidate style={{ padding: "20px" }}>
                 <h3>Give this quote (price: {quote.total_price})</h3>
                 <hr />
-                <div>
+                <FormGroup>
                   <label>Multiplication Factor</label>
                   <select
                     name="factor"
@@ -189,13 +189,18 @@ export const Quote = withXHR(function Quote({
                     <option value={1.4}>1.4</option>
                     <option value={1.5}>1.5</option>
                   </select>
-                </div>
+                </FormGroup>
                 <InputField
                   name="given_price"
                   label="Given Price"
                   type="number"
                 />
-                <InputField name="comments" label="Any Comments" />
+                <InputField
+                  name="comments"
+                  as="textarea"
+                  label="Any Comments"
+                  placeholder="Write comments regarding prices or anything else..."
+                />
                 <Button type="submit" disabled={isSubmitting}>
                   Give Quote
                 </Button>
@@ -238,12 +243,12 @@ function Quotes({ xhr, trip }: QuotesProps) {
             ({ id, given_price, quote, comments, created_by }) => (
               <li key={id}>
                 <h4>Given Price: {given_price}</h4>
-                <p>Comments: {comments}</p>
+                {comments ? <blockquote>{comments}</blockquote> : null}
                 <div>Given by: {created_by.name}</div>
-                <h4>Give Quote</h4>
-                <div style={{ background: "whitesmoke" }}>
+                <fieldset>
+                  <legend>Given Quote</legend>
                   <Quote quote={quote} />
-                </div>
+                </fieldset>
               </li>
             )
           )}

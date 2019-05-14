@@ -92,6 +92,7 @@ input[type="date"],
 input[type="password"],
 input[type="search"],
 input[type="number"],
+select,
 textarea {
   font-size: 1rem;
   display: block;
@@ -112,6 +113,7 @@ input[type="search"],
 textarea,
 button,
 .btn,
+select,
 legend {
   font-size: 1rem;
   height: 2.2em;
@@ -220,6 +222,14 @@ nav a:hover {
 
 nav a[aria-current="page"] {
   background: #e3e7ea;
+}
+
+blockquote {
+  border-left: 0.25em solid #dfe2e5;
+  color: #6a737d;
+  padding: 0 1em;
+  margin: 0 0 1em 0;
+  white-space: pre-wrap;
 }
 
 /**
