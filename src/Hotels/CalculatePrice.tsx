@@ -329,7 +329,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 <ol className="list">
                                   {hotel.room_details.map(
                                     (roomDetail, index) => (
-                                      <li>
+                                      <li key={index}>
                                         <Grid
                                           key={index}
                                           style={{ marginTop: "15px" }}

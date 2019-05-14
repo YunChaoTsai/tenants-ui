@@ -207,7 +207,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
               render={({ name, push, remove }) => (
                 <div>
                   {values.cabs.map((cab, index) => (
-                    <fieldset>
+                    <fieldset key={index}>
                       <Grid>
                         <Col>
                           <InputField
