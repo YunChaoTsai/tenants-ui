@@ -10,6 +10,7 @@ body {
   height: 100%;
   overflow: auto;
   background: white;
+  box-sizing: border-box;
 }
 
 body {
@@ -20,10 +21,11 @@ body {
   line-height: 1.5;
 }
 
-* {
-  box-sizing: border-box;
+*,
+::after,
+::before {
+  box-sizing: inherit;
 }
-
 [role="status"] {
   color: orangered;
 }
@@ -40,8 +42,7 @@ body {
 
 table {
   border-collapse: collapse;
-  margin-bottom: 20px;
-  margin-top: 20px;
+  margin-bottom: 1.5em;
   background: white;
   border: 1px solid #e3e7ea;
 }
@@ -60,8 +61,12 @@ tr:nth-child(2n) > td {
   background: #f6f8fa;
 }
 
+table caption {
+  text-align: left;
+}
+
 dt {
-  font-weight: bold;
+  margin-bottom: 0.3rem;
 }
 dd {
   margin-bottom: 0.5rem;
@@ -86,7 +91,6 @@ input[type="search"],
 input[type="number"],
 select,
 textarea {
-  font-size: 1rem;
   display: block;
 }
 input[type="email"],
@@ -107,9 +111,9 @@ button,
 .btn,
 select,
 legend {
-  font-size: 1rem;
-  height: 2.2em;
-  line-height: calc(2.2em - 2px);
+  font-size: 0.9rem;
+  height: 2.4em;
+  line-height: calc(2.4em - 2px);
   padding: 0 0.5em;
   border-radius: 0.3em;
   border: 1px solid #e8e8e8;
@@ -132,6 +136,7 @@ fieldset {
   box-shadow: 0 1px 3px 0 hsla(0, 0%, 0%, 0.2);
   margin-bottom: 20px;
   background: white;
+  padding: 1em;
 }
 fieldset fieldset {
   box-shadow: none;
@@ -142,24 +147,23 @@ legend {
   height: auto;
   background: white;
   box-shadow: 0 1px 3px 0 hsla(0, 0%, 0%, 0.2);
+  margin-bottom: 1em;
 }
 legend h1,
 legend h2,
-legend h3 {
+legend h3,
+legend h4,
+legend h5,
+legend h6 {
   margin: 0;
   padding: 0;
 }
-form {
-  margin-bottom: 20px;
-}
-form fieldset {
-  padding: 20px;
-}
-form fieldset footer {
-  margin: 0 -20px -20px;
+
+fieldset > footer {
+  margin: 1em -1em -1em;
   background: #fbfbfb;
-  padding: 15px 20px;
-  border-top: 1px solid #f1f1f1;
+  padding: 0.8em 1em;
+  border-top: 1px solid #eee;
   border-radius: 0 0 0.5em 0.5em;
 }
 footer button + button,
@@ -223,6 +227,16 @@ blockquote {
   margin: 0 0 1em 0;
   white-space: pre-wrap;
 }
+blockquote footer {
+  font-size: 80%;
+  display: block;
+  color: #777;
+}
+
+mark {
+  padding: 0.2em;
+  background-color: #fff1a8;
+}
 
 /**
  * Utility classes
@@ -270,6 +284,9 @@ blockquote {
   max-width: 500px;
   margin: 0 auto;
 }
+.white-space--pre {
+  white-space: pre;
+}
 
 /**
  * Components
@@ -278,13 +295,17 @@ blockquote {
   display: block;
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 1em;
+}
+.list--bordered {
+  border: 1px solid #e3e7ea;
+  border-radius: 0.5em;
 }
 .list > li {
-  padding: 10px;
+  padding: 1em;
 }
 .list > li + li {
-  border-top: 1px solid silver;
+  border-top: 2px solid #e3e7ea;
 }
 .list--inline {
   display: inline-block;
@@ -306,9 +327,11 @@ blockquote {
 .button-group .btn:not(:first-child) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+  margin-left: 0 !important;
 }
 .button-group button:not(:last-child),
 .button-group .btn:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  margin-right: 0 !important;
 }
