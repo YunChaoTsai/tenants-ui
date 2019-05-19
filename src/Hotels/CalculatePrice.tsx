@@ -312,6 +312,10 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                   {...field}
                                   label="Meal Plan"
                                   multiple={false}
+                                  searchable={false}
+                                  options={
+                                    hotel.hotel ? hotel.hotel.meal_plans : []
+                                  }
                                   onChange={(value, name) =>
                                     setFieldValue(name, value)
                                   }
@@ -341,6 +345,12 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                                 <SelectRoomTypes
                                                   {...field}
                                                   label="Room Type"
+                                                  options={
+                                                    hotel.hotel
+                                                      ? hotel.hotel.room_types
+                                                      : []
+                                                  }
+                                                  searchable={false}
                                                   multiple={false}
                                                   onChange={(
                                                     value: IHotelRoomType,

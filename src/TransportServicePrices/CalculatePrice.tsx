@@ -286,7 +286,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 : cab.calculated_price}
                             </Button>
                           ) : null}
-                          <div>{cab.calculated_price}</div>
                         </div>
                       </FormGroup>
                       <Grid>
@@ -396,7 +395,7 @@ export default function CalculatePrice(props: RouteComponentProps) {
     <div>
       <Link to="..">Back</Link>
       <CalculatePriceForm onChange={price => setPrice(price)} />
-      Price is: {price}
+      <mark>Price is: {price}</mark>
     </div>
   )
 }

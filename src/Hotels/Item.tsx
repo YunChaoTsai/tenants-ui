@@ -180,8 +180,10 @@ export function Item({
                     onClose={hideAddContact}
                     closeButton
                   >
-                    <div style={{ padding: "10px" }}>
-                      <h3>Add Contact</h3>
+                    <Dialog.Header>
+                      <Dialog.Title>Add Contact</Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.Body>
                       <AddContactForm
                         onCancel={hideAddContact}
                         onCreate={({
@@ -205,7 +207,7 @@ export function Item({
                             })
                         }}
                       />
-                    </div>
+                    </Dialog.Body>
                   </Dialog>
                   <Button onClick={showAddContact}>Add Contact</Button>
                 </fieldset>
