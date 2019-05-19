@@ -1,6 +1,6 @@
 import qs from "qs"
 import React, { Context } from "react"
-import { Subtract, SetIntersection } from "utility-types"
+import { Subtract, Diff } from "utility-types"
 
 export function searchToQuery(
   search: string = "?",
@@ -76,3 +76,37 @@ export function withContext<BaseContext, Key extends string>(
     return Connected
   }
 }
+
+/**
+ * Get the props of any tag (HTML Tag, React Component)
+ */
+export type PropsOf<
+  Tag extends React.ReactType
+> = Tag extends keyof JSX.IntrinsicElements
+  ? JSX.IntrinsicElements[Tag]
+  : Tag extends React.SFC<infer Props>
+  ? Props & React.Attributes
+  : Tag extends React.ComponentClass<infer Props2>
+  ? (Tag extends new (...args: any[]) => infer Instance
+      ? Props2 & React.ClassAttributes<Instance>
+      : never)
+  : never
+
+/**
+ * OverwriteAssign
+ *
+ * Overwrite props in `To` by `By` props
+ * @example
+ *
+ *  // Expect: { name: string, email: number, phone: number }
+ *  OverwriteAssign<{ name: string, email: string }, { email: number, phone: number }>
+ */
+export type OverwriteAssign<
+  To extends React.ReactType,
+  By extends object = {}
+> = Diff<PropsOf<To>, By> & By
+
+export type AsProp<
+  As extends React.ReactType,
+  P extends object = {}
+> = OverwriteAssign<As, { as?: As } & P>
