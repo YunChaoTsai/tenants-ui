@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { activeElement, contains, ownerDocument } from "./dom-helpers"
 
 export function useDidUpdate(fn: () => void, conditions: any = []): void {
@@ -95,4 +95,45 @@ export function useEnforceFocus(
       }
     }
   }, [open])
+}
+
+export function useFetch<ReturnType>(
+  fetchFn: (data: any) => Promise<ReturnType>,
+  initialValues: {
+    isFetching?: boolean
+  } = {
+    isFetching: false,
+  }
+): [
+  ReturnType | undefined,
+  (data?: any) => Promise<ReturnType>,
+  { isFetching: boolean; errors: any }
+] {
+  const [isFetching, changeIsFetching] = useState<boolean>(
+    initialValues.isFetching || false
+  )
+  const [data, setData] = useState<ReturnType | undefined>(undefined)
+  const [errors, setErrors] = useState<any>(undefined)
+  return [
+    data,
+    (...args: any) => {
+      changeIsFetching(true)
+      setErrors(undefined)
+      return fetchFn(args)
+        .then(data => {
+          setData(data)
+          changeIsFetching(false)
+          return data
+        })
+        .catch(error => {
+          setErrors(error)
+          changeIsFetching(false)
+          return Promise.reject(error)
+        })
+    },
+    {
+      isFetching,
+      errors,
+    },
+  ]
 }
