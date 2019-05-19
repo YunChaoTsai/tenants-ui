@@ -64,6 +64,7 @@ export interface IQuote {
   cabs: IQuoteCab[]
   created_by: userStore.IUser
   updated_by: userStore.IUser
+  created_at: string
 }
 
 export interface IGivenQuote {

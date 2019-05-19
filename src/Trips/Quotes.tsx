@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, Fragment } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
 import Button from "@tourepedia/button"
@@ -10,7 +10,10 @@ import { ITrip, IQuote, IGivenQuote } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Dialog, useDialog } from "./../Shared/Dialog"
 import { InputField, FormGroup } from "./../Shared/InputField"
-import { Grid, Col } from "../Shared/Layout"
+import { Table } from "../Shared/Table"
+import { $PropertyType } from "utility-types"
+import { useFetch } from "../hooks"
+import Spinner from "./../Shared/Spinner"
 
 interface IInstalment {
   amount: number
@@ -23,9 +26,6 @@ export function XHR(xhr: AxiosInstance) {
       return xhr
         .get(`/trips/${tripId}/quotes`, { params })
         .then(resp => resp.data.data)
-    },
-    getGivenQuotes(params?: any): Promise<IGivenQuote[]> {
-      return xhr.get("/given-quotes", { params }).then(resp => resp.data.data)
     },
     giveQuote(data: any): Promise<IGivenQuote> {
       return xhr.post(`/given-quotes`, data).then(resp => resp.data.data)
@@ -52,10 +52,32 @@ const giveQuoteSchema = Validator.object()
 export const Quote = withXHR(function Quote({
   quote,
   xhr,
+  readOnly = false,
+  navigate,
 }: XHRProps & {
   quote: IQuote
+  readOnly?: boolean
+  navigate?: $PropertyType<RouteComponentProps, "navigate">
 }) {
-  const [instalments, setInstalments] = useState<IInstalment[]>([])
+  const {
+    id,
+    total_price,
+    hotels,
+    cabs,
+    comments,
+    created_by,
+    created_at,
+  } = quote
+  const [showGiveQuote, open, close] = useDialog()
+  const [
+    instalments,
+    fetchInstalments,
+    { isFetching: isFetchingInstalments },
+  ] = useFetch<IInstalment[]>(() =>
+    XHR(xhr)
+      .getInstalments(id)
+      .then(resp => resp.data)
+  )
   function giveQuote(
     quoteId: number,
     givenPrice: number,
@@ -67,149 +89,202 @@ export const Quote = withXHR(function Quote({
       comments,
     })
   }
-  const { id, total_price, hotels, cabs, comments, created_by } = quote
-  const [showGiveQuote, open, close] = useDialog()
   return (
     <div>
-      <h5>Total Price: {total_price}</h5>
-      {comments ? <blockquote>{comments}</blockquote> : null}
-      <div>By: {created_by.name}</div>
-      <h5>Hotels</h5>
-      <ul>
-        {hotels.map(
-          ({
-            id,
-            hotel,
-            date,
-            meal_plan,
-            room_type,
-            no_of_rooms,
-            comments,
-            given_price,
-          }) => (
-            <li key={id}>
-              {moment
-                .utc(date)
-                .local()
-                .format("DD MMM, YYYY")}{" "}
-              - {hotel.name} {hotel.location.short_name} - {meal_plan.name} -{" "}
-              {room_type.name} - {no_of_rooms} rooms - Rs: {given_price} /-
-              {comments ? <p>Comments: {comments}</p> : null}
-            </li>
-          )
-        )}
-      </ul>
-      <h5>Cabs</h5>
-      <ul>
-        {cabs.map(
-          ({
-            id,
-            date,
-            cab_type,
-            transport_service,
-            no_of_cabs,
-            comments,
-            given_price,
-          }) => (
-            <li key={id}>
-              {moment
-                .utc(date)
-                .local()
-                .format("DD MMM, YYYY")}{" "}
-              - {cab_type.name} - {transport_service.name} - {no_of_cabs} cabs -
-              Rs: {given_price} /-
-              {comments ? <p>Comments: {comments}</p> : null}
-            </li>
-          )
-        )}
-      </ul>
-      <Button onClick={open}>Give this quote</Button>
-      <Button
-        onClick={() => {
-          XHR(xhr)
-            .getInstalments(id)
-            .then(resp => setInstalments(resp.data))
-        }}
-      >
-        Get Instalments
-      </Button>
-      {instalments ? (
-        <div>
-          {instalments
-            .map(
-              i =>
-                `${i.amount} - ${moment
+      <header>
+        <h6>Cost Price: INR {total_price} /-</h6>
+        {comments ? <blockquote>{comments}</blockquote> : null}
+        <p>
+          on{" "}
+          {moment
+            .utc(created_at)
+            .local()
+            .format("DD MMM, YYYY [at] hh:mm A")}{" "}
+          by {created_by.name}&lt;{created_by.email}&gt;
+        </p>
+      </header>
+      <section>
+        <h6>Hotels</h6>
+        <Table
+          caption={
+            "Bellow are the details of daywise hotel accomodation and their prices"
+          }
+          responsive
+          headers={["Date", "Hotels", "Meal Plan", "Rooms", "Price"]}
+          alignCols={{ 4: "right" }}
+          rows={hotels.map(
+            ({
+              hotel,
+              date,
+              meal_plan,
+              room_type,
+              no_of_rooms,
+              comments,
+              given_price,
+            }) => [
+              <span className="white-space--pre">
+                {moment
+                  .utc(date)
+                  .local()
+                  .format("DD MMM [\n] YYYY")}
+              </span>,
+              <div>
+                <b>{hotel.name}</b>
+                <br />
+                <small>
+                  {hotel.location.short_name}, {hotel.stars} Star
+                </small>
+                {comments ? <blockquote>{comments}</blockquote> : null}
+              </div>,
+              <div>{meal_plan.name}</div>,
+              <div>
+                {room_type.name}
+                <br />
+                <small>{no_of_rooms} Rooms</small>
+              </div>,
+              <div>{given_price}</div>,
+            ]
+          )}
+        />
+      </section>
+      <section>
+        <h6>Transport</h6>
+        <Table
+          caption={
+            "Bellow are the details for the daywise transportation and their prices"
+          }
+          responsive
+          headers={["Date", "Service", "Cabs", "Price"]}
+          alignCols={{ 3: "right" }}
+          rows={cabs.map(
+            ({
+              date,
+              cab_type,
+              transport_service,
+              no_of_cabs,
+              comments,
+              given_price,
+            }) => [
+              <span className="white-space--pre">
+                {moment
+                  .utc(date)
+                  .local()
+                  .format("DD MMM [\n] YYYY")}
+              </span>,
+              <div>
+                {transport_service.name}
+                {comments ? <blockquote>{comments}</blockquote> : null}
+              </div>,
+              <div>
+                {cab_type.name}
+                <br />
+                <small>{no_of_cabs} cabs</small>
+              </div>,
+              <div>{given_price}</div>,
+            ]
+          )}
+        />
+      </section>
+      {!readOnly ? (
+        <footer>
+          <div className="button-group">
+            <Button onClick={open}>Give this quote</Button>
+            <Dialog open={showGiveQuote} onClose={close}>
+              <Dialog.Header>
+                <Dialog.Title as="h4">
+                  Give this quote (price: {quote.total_price})
+                </Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Formik
+                  initialValues={{
+                    comments: "",
+                    factor: 1.1,
+                    given_price: quote.total_price * 1.1,
+                  }}
+                  validationSchema={giveQuoteSchema}
+                  onSubmit={(values, actions) => {
+                    if (
+                      confirm(
+                        "Are you sure you want to give this quote to the customer?"
+                      )
+                    ) {
+                      giveQuote(id, values.given_price, values.comments)
+                        .then(close)
+                        .then(() => {
+                          navigate && navigate("../given-quotes")
+                        })
+                    } else {
+                      actions.setSubmitting(false)
+                    }
+                  }}
+                  render={({ isSubmitting, values, setFieldValue }) => (
+                    <Form noValidate>
+                      <FormGroup>
+                        <label>Multiplication Factor</label>
+                        <select
+                          name="factor"
+                          value={values.factor}
+                          onChange={e => {
+                            setFieldValue(
+                              "given_price",
+                              quote.total_price * parseFloat(e.target.value)
+                            )
+                            setFieldValue(e.target.name, e.target.value)
+                          }}
+                        >
+                          <option value={1.1}>1.1</option>
+                          <option value={1.2}>1.2</option>
+                          <option value={1.3}>1.3</option>
+                          <option value={1.4}>1.4</option>
+                          <option value={1.5}>1.5</option>
+                        </select>
+                      </FormGroup>
+                      <InputField
+                        name="given_price"
+                        label="Given Price"
+                        type="number"
+                      />
+                      <InputField
+                        name="comments"
+                        as="textarea"
+                        label="Any Comments"
+                        placeholder="Write comments regarding prices or anything else..."
+                      />
+                      <Dialog.Footer>
+                        <Button type="submit" disabled={isSubmitting}>
+                          Give Quote
+                        </Button>
+                        <Button onClick={close} className="btn--secondary">
+                          Cancel
+                        </Button>
+                      </Dialog.Footer>
+                    </Form>
+                  )}
+                />
+              </Dialog.Body>
+            </Dialog>
+            <Button onClick={fetchInstalments}>
+              Get Instalments for Hotels and Cabs{" "}
+              {isFetchingInstalments ? <Spinner /> : null}
+            </Button>
+          </div>
+          {instalments ? (
+            <Table
+              headers={["Amount", "Due Date"]}
+              alignCols={{ 0: "right" }}
+              autoWidth
+              rows={instalments.map(i => [
+                i.amount.toFixed(2),
+                moment
                   .utc(i.due_date)
                   .local()
-                  .format("DD/MM/YYYY")}`
-            )
-            .join(" • ")}
-        </div>
+                  .format("DD/MM/YYYY"),
+              ])}
+            />
+          ) : null}
+        </footer>
       ) : null}
-      <Dialog open={showGiveQuote} onClose={close}>
-        <div>
-          <Formik
-            initialValues={{
-              comments: "",
-              factor: 1.1,
-              given_price: quote.total_price * 1.1,
-            }}
-            validationSchema={giveQuoteSchema}
-            onSubmit={(values, actions) => {
-              if (
-                confirm(
-                  "Are you sure you want to give this quote to the customer?"
-                )
-              ) {
-                giveQuote(id, values.given_price, values.comments).then(close)
-              } else {
-                actions.setSubmitting(false)
-              }
-            }}
-            render={({ isSubmitting, values, setFieldValue }) => (
-              <Form noValidate style={{ padding: "20px" }}>
-                <h3>Give this quote (price: {quote.total_price})</h3>
-                <hr />
-                <FormGroup>
-                  <label>Multiplication Factor</label>
-                  <select
-                    name="factor"
-                    value={values.factor}
-                    onChange={e => {
-                      setFieldValue(
-                        "given_price",
-                        quote.total_price * parseFloat(e.target.value)
-                      )
-                      setFieldValue(e.target.name, e.target.value)
-                    }}
-                  >
-                    <option value={1.1}>1.1</option>
-                    <option value={1.2}>1.2</option>
-                    <option value={1.3}>1.3</option>
-                    <option value={1.4}>1.4</option>
-                    <option value={1.5}>1.5</option>
-                  </select>
-                </FormGroup>
-                <InputField
-                  name="given_price"
-                  label="Given Price"
-                  type="number"
-                />
-                <InputField
-                  name="comments"
-                  as="textarea"
-                  label="Any Comments"
-                  placeholder="Write comments regarding prices or anything else..."
-                />
-                <Button type="submit" disabled={isSubmitting}>
-                  Give Quote
-                </Button>
-                <Button onClick={close}>Cancel</Button>
-              </Form>
-            )}
-          />
-        </div>
-      </Dialog>
     </div>
   )
 })
@@ -217,54 +292,31 @@ export const Quote = withXHR(function Quote({
 interface QuotesProps extends RouteComponentProps, XHRProps {
   trip: ITrip
 }
-function Quotes({ xhr, trip }: QuotesProps) {
+function Quotes({ xhr, trip, navigate }: QuotesProps) {
   const [quotes, setQuotes] = useState<IQuote[]>([])
-  const [giveQuotes, setGivenQuotes] = useState<IGivenQuote[]>([])
   function getQuotes() {
     XHR(xhr)
       .getQuotes(trip.id)
       .then(setQuotes)
   }
-  function getGivenQuotes() {
-    XHR(xhr)
-      .getGivenQuotes({ trip_id: trip.id })
-      .then(setGivenQuotes)
-  }
   useEffect(() => {
-    getGivenQuotes()
     getQuotes()
   }, [])
   return (
-    <Grid>
-      <Col as="fieldset">
-        <legend>Given Quotes</legend>
-        <ul className="list">
-          {giveQuotes.map(
-            ({ id, given_price, quote, comments, created_by }) => (
-              <li key={id}>
-                <h4>Given Price: {given_price}</h4>
-                {comments ? <blockquote>{comments}</blockquote> : null}
-                <div>Given by: {created_by.name}</div>
-                <fieldset>
-                  <legend>Given Quote</legend>
-                  <Quote quote={quote} />
-                </fieldset>
-              </li>
-            )
-          )}
-        </ul>
-      </Col>
-      <Col as="fieldset">
-        <legend>Quotes</legend>
-        <ul className="list">
+    <Fragment>
+      <h4>Quotes</h4>
+      {quotes.length === 0 ? (
+        <p className="text--center">No quote created for this trip</p>
+      ) : (
+        <ol className="list list--bordered">
           {quotes.map(quote => (
             <li key={quote.id}>
-              <Quote quote={quote} />
+              <Quote quote={quote} navigate={navigate} />
             </li>
           ))}
-        </ul>
-      </Col>
-    </Grid>
+        </ol>
+      )}
+    </Fragment>
   )
 }
 
