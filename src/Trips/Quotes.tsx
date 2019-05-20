@@ -6,14 +6,16 @@ import { Formik, Form } from "formik"
 import * as Validator from "yup"
 import moment from "moment"
 
-import { ITrip, IQuote, IGivenQuote } from "./store"
+import { ITrip, IQuote, IGivenQuote, IQuoteHotel } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Dialog, useDialog } from "./../Shared/Dialog"
-import { InputField, FormGroup } from "./../Shared/InputField"
+import { InputField, FormGroup, FormikFormGroup } from "./../Shared/InputField"
 import { Table } from "../Shared/Table"
 import { $PropertyType } from "utility-types"
 import { useFetch } from "../hooks"
 import Spinner from "./../Shared/Spinner"
+import { numberToLocalString } from "../utils"
+import { SelectHotelBookingStages } from "../HotelBookingStages"
 
 interface IInstalment {
   amount: number
@@ -38,8 +40,86 @@ export function XHR(xhr: AxiosInstance) {
     }> {
       return xhr.get(`/quote-instalments/${quoteId}`).then(resp => resp.data)
     },
+    changeHotelBookingStage(
+      quoteHotelId: number,
+      stageId: number
+    ): Promise<any> {
+      return xhr.patch("/quote-hotel-booking-stages", {
+        items: [quoteHotelId],
+        stage: stageId,
+      })
+    },
   }
 }
+
+export const QuoteHotelBookingStage = withXHR(function QuoteHotelBookingStage({
+  xhr,
+  quoteHotel,
+}: XHRProps & { quoteHotel: IQuoteHotel }) {
+  const { id, latest_booking_stage } = quoteHotel
+  const [showEdit, setShowEdit] = useState<boolean>(false)
+  if (showEdit) {
+    return (
+      <span>
+        <Formik
+          initialValues={{ stage: latest_booking_stage }}
+          validationSchema={Validator.object().shape({
+            stage: Validator.object().required("Stage field is required"),
+          })}
+          onSubmit={(values, actions) => {
+            if (!values.stage) {
+              actions.setSubmitting(false)
+              return
+            }
+            XHR(xhr)
+              .changeHotelBookingStage(id, values.stage.id)
+              .then(() => {
+                window.location = window.location
+              })
+          }}
+          render={({ isSubmitting, setFieldValue }) => (
+            <Form noValidate>
+              <fieldset>
+                <legend>Change Booking Stage</legend>
+                <FormikFormGroup
+                  name="stage"
+                  render={({ field }) => (
+                    <SelectHotelBookingStages
+                      {...field}
+                      label="Select the booking stage"
+                      multiple={false}
+                      fetchOnMount
+                      onChange={(value, name) => setFieldValue(name, value)}
+                    />
+                  )}
+                />
+                <footer>
+                  <Button disabled={isSubmitting} type="submit">
+                    Save
+                  </Button>
+                  <Button
+                    className="btn--secondary"
+                    onClick={() => setShowEdit(false)}
+                  >
+                    Cancel
+                  </Button>
+                </footer>
+              </fieldset>
+            </Form>
+          )}
+        />
+      </span>
+    )
+  }
+  return (
+    <span>
+      {latest_booking_stage ? latest_booking_stage.name : null}
+      <Button className="btn--secondary" onClick={() => setShowEdit(true)}>
+        &#9998;
+      </Button>
+    </span>
+  )
+})
 
 const giveQuoteSchema = Validator.object()
   .shape({
@@ -54,10 +134,12 @@ export const Quote = withXHR(function Quote({
   xhr,
   readOnly = false,
   navigate,
+  showHotelBookingStatus,
 }: XHRProps & {
   quote: IQuote
   readOnly?: boolean
   navigate?: $PropertyType<RouteComponentProps, "navigate">
+  showHotelBookingStatus?: boolean
 }) {
   const {
     id,
@@ -92,7 +174,7 @@ export const Quote = withXHR(function Quote({
   return (
     <div>
       <header>
-        <h6>Cost Price: INR {total_price} /-</h6>
+        <h6>Cost Price: INR {numberToLocalString(total_price)} /-</h6>
         {comments ? <blockquote>{comments}</blockquote> : null}
         <p>
           on{" "}
@@ -110,10 +192,12 @@ export const Quote = withXHR(function Quote({
             "Bellow are the details of daywise hotel accomodation and their prices"
           }
           responsive
-          headers={["Date", "Hotels", "Meal Plan", "Rooms", "Price"]}
-          alignCols={{ 4: "right" }}
-          rows={hotels.map(
-            ({
+          headers={["Date", "Hotels", "Meal Plan", "Rooms", "Price"].concat(
+            showHotelBookingStatus ? ["Booking Stage"] : []
+          )}
+          alignCols={{ 4: "right", 5: "center" }}
+          rows={hotels.map(quoteHotel => {
+            const {
               hotel,
               date,
               meal_plan,
@@ -121,7 +205,8 @@ export const Quote = withXHR(function Quote({
               no_of_rooms,
               comments,
               given_price,
-            }) => [
+            } = quoteHotel
+            return [
               <span className="white-space--pre">
                 {moment
                   .utc(date)
@@ -136,15 +221,19 @@ export const Quote = withXHR(function Quote({
                 </small>
                 {comments ? <blockquote>{comments}</blockquote> : null}
               </div>,
-              <div>{meal_plan.name}</div>,
+              meal_plan.name,
               <div>
                 {room_type.name}
                 <br />
                 <small>{no_of_rooms} Rooms</small>
               </div>,
-              <div>{given_price}</div>,
-            ]
-          )}
+              numberToLocalString(given_price),
+            ].concat(
+              showHotelBookingStatus
+                ? [<QuoteHotelBookingStage quoteHotel={quoteHotel} />]
+                : []
+            )
+          })}
         />
       </section>
       <section>
@@ -180,7 +269,7 @@ export const Quote = withXHR(function Quote({
                 <br />
                 <small>{no_of_cabs} cabs</small>
               </div>,
-              <div>{given_price}</div>,
+              numberToLocalString(given_price),
             ]
           )}
         />
@@ -200,7 +289,7 @@ export const Quote = withXHR(function Quote({
                   initialValues={{
                     comments: "",
                     factor: 1.1,
-                    given_price: quote.total_price * 1.1,
+                    given_price: Math.ceil(quote.total_price * 1.1),
                   }}
                   validationSchema={giveQuoteSchema}
                   onSubmit={(values, actions) => {
@@ -228,7 +317,9 @@ export const Quote = withXHR(function Quote({
                           onChange={e => {
                             setFieldValue(
                               "given_price",
-                              quote.total_price * parseFloat(e.target.value)
+                              Math.ceil(
+                                quote.total_price * parseFloat(e.target.value)
+                              )
                             )
                             setFieldValue(e.target.name, e.target.value)
                           }}
@@ -311,7 +402,11 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
         <ol className="list list--bordered">
           {quotes.map(quote => (
             <li key={quote.id}>
-              <Quote quote={quote} navigate={navigate} />
+              <Quote
+                quote={quote}
+                navigate={navigate}
+                readOnly={!!trip.converted_at}
+              />
             </li>
           ))}
         </ol>

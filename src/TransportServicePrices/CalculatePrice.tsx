@@ -178,7 +178,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             flattenValues.cabs = flattenValues.cabs.map((cab, i) => ({
               ...cab,
               calculated_price: data.cab_prices_per_row[i],
-              given_price: cab.given_price || data.cab_prices_per_row[i],
+              given_price: data.cab_prices_per_row[i],
             }))
             actions.setValues(flattenValues)
             actions.setSubmitting(false)

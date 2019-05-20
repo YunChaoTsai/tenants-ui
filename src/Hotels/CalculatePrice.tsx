@@ -238,7 +238,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             flattenValues.hotels = flattenValues.hotels.map((hotel, i) => ({
               ...hotel,
               calculated_price: data.hotel_prices_per_row[i],
-              given_price: hotel.given_price || data.hotel_prices_per_row[i],
+              given_price: data.hotel_prices_per_row[i],
             }))
             actions.setValues(flattenValues)
             // we get the prices

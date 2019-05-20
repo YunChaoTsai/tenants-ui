@@ -10,6 +10,7 @@ import Button from "@tourepedia/button"
 import { Table } from "../Shared/Table"
 import { useFetch } from "../hooks"
 import Spinner from "./../Shared/Spinner"
+import { numberToLocalString } from "../utils"
 
 export interface IInstalment {
   amount: number
@@ -37,7 +38,13 @@ export function XHR(xhr: AxiosInstance) {
 export const GivenQuote = withXHR(function GivenQuote({
   givenQuote,
   xhr,
-}: XHRProps & { givenQuote: IGivenQuote }) {
+  readOnly,
+  showHotelBookingStatus,
+}: XHRProps & {
+  givenQuote: IGivenQuote
+  readOnly?: boolean
+  showHotelBookingStatus?: boolean
+}) {
   const {
     id,
     given_price,
@@ -58,7 +65,7 @@ export const GivenQuote = withXHR(function GivenQuote({
   return (
     <div>
       <h5>
-        Given Price: <mark>INR {given_price} /-</mark>
+        Given Price: <mark>INR {numberToLocalString(given_price)} /-</mark>
       </h5>
       {comments ? <blockquote>{comments}</blockquote> : null}
       <p>
@@ -71,11 +78,17 @@ export const GivenQuote = withXHR(function GivenQuote({
           by {created_by.name}&lt;{created_by.email}&gt;
         </em>
       </p>
-      <Quote quote={quote} readOnly />
-      <Button onClick={fetchInstalments}>
-        Get Instalments for Customer{" "}
-        {isFetchingInstalments ? <Spinner /> : null}
-      </Button>
+      <Quote
+        quote={quote}
+        readOnly
+        showHotelBookingStatus={showHotelBookingStatus}
+      />
+      {readOnly ? null : (
+        <Button onClick={fetchInstalments}>
+          Get Instalments for Customer{" "}
+          {isFetchingInstalments ? <Spinner /> : null}
+        </Button>
+      )}
       {instalments ? (
         <Table
           headers={["Amount", "Due Date"]}

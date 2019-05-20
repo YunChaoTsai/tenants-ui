@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, Fragment } from "react"
 import { RouteComponentProps, Link, Router, Redirect } from "@reach/router"
 import Button from "@tourepedia/button"
 import { AxiosInstance } from "axios"
@@ -29,12 +29,11 @@ import NewQuote from "./NewQuote"
 import { Dialog, useDialog } from "./../Shared/Dialog"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
-import EmptyRouter from "../Shared/EmptyRouter"
 import { useFetch } from "../hooks"
 import Spinner from "../Shared/Spinner"
 import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
-import { $PropertyType } from "utility-types"
+import { numberToLocalString } from "./../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -63,6 +62,39 @@ export const getTrip = (tripId: string): ThunkAction<Promise<ITrip>> => (
       dispatch(actions.item.failure(error))
       return Promise.reject(error)
     })
+}
+
+function TripPayments<T>({
+  payments,
+  caption,
+}: {
+  caption: string
+  payments?: Array<paymentStore.IPayment<T>>
+}) {
+  return payments && payments.length ? (
+    <Table
+      autoWidth
+      caption={caption}
+      headers={["Due Amount", "Due Date"]}
+      alignCols={{ 0: "right" }}
+      rows={payments
+        .reduce(
+          (
+            instalments: Array<paymentStore.IInstalment>,
+            payment
+          ): Array<paymentStore.IInstalment> =>
+            instalments.concat(payment.instalments),
+          []
+        )
+        .map(instalment => [
+          numberToLocalString(instalment.amount - instalment.paid_amount),
+          moment
+            .utc(instalment.due_date)
+            .local()
+            .format("DD MMM, YYYY"),
+        ])}
+    />
+  ) : null
 }
 
 interface StateProps {
@@ -94,6 +126,265 @@ const connectWithItem = connect<
   })
 )
 
+function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
+  const [isConvertVisible, showConvert, hideConvert] = useDialog()
+  useEffect(() => {
+    tripId && getTrip(tripId)
+  }, [])
+  if (!tripId) {
+    navigate && navigate("..")
+    return null
+  }
+  if (isFetching) return <span>Loading...</span>
+  if (!trip) {
+    navigate && navigate("..")
+    return null
+  }
+  const {
+    id,
+    start_date,
+    end_date,
+    locations,
+    no_of_adults,
+    children,
+    trip_source,
+    trip_id,
+    latest_given_quote,
+    contacts,
+    converted_at,
+    customer_payments: payments,
+    cab_payments,
+    hotel_payments,
+  } = trip
+  return (
+    <div>
+      <Helmet>
+        <title>
+          {locations.map(l => l.short_name).join(" • ")} (
+          {trip_source.short_name}-{trip_id || id.toString()})
+        </title>
+      </Helmet>
+      <Link to="..">Back to Listing</Link>
+      <div>
+        <h3>
+          {locations.map(l => l.short_name).join(" • ")} (
+          {trip_source.short_name}-{trip_id || id})
+        </h3>
+        <dl>
+          <Grid>
+            <Col>
+              <dt>Dates</dt>
+              <dd className="white-space--pre">
+                {moment
+                  .utc(start_date)
+                  .local()
+                  .format("DD MMM, YYYY")}{" "}
+                to{" "}
+                {moment
+                  .utc(end_date)
+                  .local()
+                  .format("DD MMM, YYYY")}
+              </dd>
+            </Col>
+            <Col>
+              <dt>Pax</dt>
+              <dd>
+                {no_of_adults} Adults
+                <br />
+                {children ? `${children} Children` : ""}
+              </dd>
+            </Col>
+            <Col>
+              <dt>Travelers</dt>
+              <dd>
+                <ul className="list">
+                  {contacts.map(contact => (
+                    <li key={contact.id}>
+                      <b>{contact.name}</b>
+                      <br />
+                      <span>
+                        <a href={`tel:${contact.phone_number}`}>
+                          {contact.phone_number}
+                        </a>
+                        {contact.email ? (
+                          <span>
+                            {" "}
+                            • 
+                            <a href={`mailto:${contact.email}`}>
+                              {contact.email}
+                            </a>
+                          </span>
+                        ) : null}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </Col>
+          </Grid>
+        </dl>
+        <h4>{converted_at ? "Converted" : null}</h4>
+        <Grid>
+          {payments && payments.length ? (
+            <Col sm="auto">
+              <Table
+                autoWidth
+                caption={"Payments towards customer"}
+                headers={["Due Amount", "Due Date"]}
+                alignCols={{ 0: "right" }}
+                rows={payments
+                  .reduce(
+                    (
+                      instalments: Array<paymentStore.IInstalment>,
+                      payment
+                    ): Array<paymentStore.IInstalment> =>
+                      instalments.concat(payment.instalments),
+                    []
+                  )
+                  .map(instalment => [
+                    numberToLocalString(
+                      instalment.amount - instalment.paid_amount
+                    ),
+                    moment
+                      .utc(instalment.due_date)
+                      .local()
+                      .format("DD MMM, YYYY"),
+                  ])}
+              />
+            </Col>
+          ) : null}
+          {cab_payments ? (
+            <Col sm="auto">
+              <Table
+                caption="Payments for Transportation"
+                headers={["Transportation", "Amount", "Due Date"]}
+                striped={false}
+                bordered
+              >
+                <tbody>
+                  {cab_payments.map(payment => {
+                    const cabType = payment.paymentable.cab_type
+                    const transportService =
+                      payment.paymentable.transport_service
+                    return (
+                      <Fragment key={payment.id}>
+                        {payment.instalments.map(
+                          (instalment, i, instalments) => (
+                            <tr key={instalment.id}>
+                              {i == 0 ? (
+                                <td
+                                  rowSpan={instalments.length}
+                                  className="vertical-align--middle"
+                                >
+                                  <b>{transportService.name}</b>
+                                  <br />
+                                  <small>{cabType.name}</small>
+                                </td>
+                              ) : null}
+                              <td>{numberToLocalString(instalment.amount)}</td>
+                              <td>
+                                {moment
+                                  .utc(instalment.due_date)
+                                  .local()
+                                  .format("Do MMM, YYYY")}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </Fragment>
+                    )
+                  })}
+                </tbody>
+              </Table>
+            </Col>
+          ) : null}
+          {hotel_payments ? (
+            <Col sm="auto">
+              <Table
+                caption="Payments for accomodation"
+                headers={["Hotel", "Amount", "Due Date"]}
+                striped={false}
+                bordered
+              >
+                <tbody>
+                  {hotel_payments.map(payment => {
+                    const hotel = payment.paymentable.hotel
+                    return (
+                      <Fragment key={payment.id}>
+                        {payment.instalments.map(
+                          (instalment, i, instalments) => (
+                            <tr key={instalment.id}>
+                              {i == 0 ? (
+                                <td
+                                  rowSpan={instalments.length}
+                                  className="vertical-align--middle"
+                                >
+                                  <b>{hotel.name}</b>
+                                  <br />
+                                  <small>
+                                    {hotel.location.short_name}, {hotel.stars}{" "}
+                                    Star
+                                  </small>
+                                </td>
+                              ) : null}
+                              <td>{numberToLocalString(instalment.amount)}</td>
+                              <td>
+                                {moment
+                                  .utc(instalment.due_date)
+                                  .local()
+                                  .format("Do MMM, YYYY")}
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </Fragment>
+                    )
+                  })}
+                </tbody>
+              </Table>
+            </Col>
+          ) : null}
+        </Grid>
+        {latest_given_quote ? (
+          <fieldset>
+            <legend>
+              <h4>
+                {converted_at
+                  ? "Quote used for conversion"
+                  : "Latest Given Quote"}
+              </h4>
+            </legend>
+            <GivenQuote
+              givenQuote={latest_given_quote}
+              readOnly={!!converted_at}
+              showHotelBookingStatus={!!converted_at}
+            />
+            <ConvertTrip
+              trip={trip}
+              isConvertVisible={isConvertVisible}
+              hideConvert={hideConvert}
+              onConvert={(data: any) => XHR(xhr).convertTrip(data)}
+            />
+            {converted_at ? null : (
+              <footer>
+                <Button onClick={showConvert}>Mark as converted</Button>
+              </footer>
+            )}
+          </fieldset>
+        ) : null}
+      </div>
+      <Link to="given-quotes">Given Quotes</Link> •{" "}
+      <Link to="quotes">Quotes</Link> • <Link to="new-quote">New Quote</Link>
+      <Router>
+        <GivenQuotes path="given-quotes" trip={trip} />
+        <GivenQuotes path="/" trip={trip} />
+        <Quotes path="quotes" trip={trip} />
+        <NewQuote path="new-quote" trip={trip} />
+      </Router>
+    </div>
+  )
+}
+
 const tripConversionValidationSchema = Validator.object()
   .shape({
     instalments: Validator.array()
@@ -122,160 +413,6 @@ interface ITripConversionSchema {
   details_verified: boolean
   instalments: { percentage: number; amount: number; due_date: string }[]
   comments: string
-}
-
-function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
-  const [isConvertVisible, showConvert, hideConvert] = useDialog()
-  useEffect(() => {
-    tripId && getTrip(tripId)
-  }, [])
-  if (!tripId) {
-    navigate && navigate("..")
-    return null
-  }
-  if (isFetching) return <span>Loading...</span>
-  if (!trip) {
-    navigate && navigate("..")
-    return null
-  }
-  const {
-    id,
-    start_date,
-    end_date,
-    locations,
-    no_of_adults,
-    children,
-    trip_source,
-    trip_id,
-    latest_given_quote,
-    contacts,
-    converted_at,
-    payments,
-  } = trip
-  return (
-    <div>
-      <Helmet>
-        <title>
-          {locations.map(l => l.short_name).join(" • ")} (
-          {trip_source.short_name}-{trip_id || id.toString()})
-        </title>
-      </Helmet>
-      <Link to="..">Back</Link> • <Link to="">Basic Details</Link> •{" "}
-      <Link to="given-quotes">Given Quotes</Link> •{" "}
-      <Link to="quotes">Quotes</Link> • <Link to="new-quote">New Quote</Link>
-      <Router>
-        <Quotes path="quotes" trip={trip} />
-        <GivenQuotes path="given-quotes" trip={trip} />
-        <NewQuote path="new-quote" trip={trip} />
-        <EmptyRouter
-          path="/"
-          render={() => (
-            <div>
-              <h3>
-                {locations.map(l => l.short_name).join(" • ")} (
-                {trip_source.short_name}-{trip_id || id})
-              </h3>
-              <dl>
-                <Grid>
-                  <Col>
-                    <dt>Dates</dt>
-                    <dd className="white-space--pre">
-                      {moment
-                        .utc(start_date)
-                        .local()
-                        .format("DD MMM, YYYY")}{" "}
-                      to{" "}
-                      {moment
-                        .utc(end_date)
-                        .local()
-                        .format("DD MMM, YYYY")}
-                    </dd>
-                  </Col>
-                  <Col>
-                    <dt>Pax</dt>
-                    <dd>
-                      {no_of_adults} Adults
-                      <br />
-                      {children ? `${children} Children` : ""}
-                    </dd>
-                  </Col>
-                  <Col>
-                    <dt>Travelers</dt>
-                    <dd>
-                      <ul className="list">
-                        {contacts.map(contact => (
-                          <li key={contact.id}>
-                            <b>{contact.name}</b>
-                            <br />
-                            <span>
-                              <a href={`tel:${contact.phone_number}`}>
-                                {contact.phone_number}
-                              </a>
-                              {contact.email ? (
-                                <span>
-                                  {" "}
-                                  • 
-                                  <a href={`mailto:${contact.email}`}>
-                                    {contact.email}
-                                  </a>
-                                </span>
-                              ) : null}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </dd>
-                  </Col>
-                </Grid>
-              </dl>
-              <h4>{converted_at ? "Converted" : null}</h4>
-              {payments && payments.length ? (
-                <Table
-                  autoWidth
-                  caption="Instalments from customer"
-                  headers={["Due Amount", "Due Date"]}
-                  alignCols={{ 0: "right" }}
-                  rows={payments
-                    .reduce(
-                      (
-                        instalments: Array<paymentStore.IInstalment>,
-                        payment
-                      ): Array<paymentStore.IInstalment> =>
-                        instalments.concat(payment.instalments),
-                      []
-                    )
-                    .map(instalment => [
-                      instalment.amount - instalment.paid_amount,
-                      moment
-                        .utc(instalment.due_date)
-                        .local()
-                        .format("DD MMM, YYYY"),
-                    ])}
-                />
-              ) : null}
-              {latest_given_quote ? (
-                <fieldset>
-                  <legend>
-                    <h4>Latest Given Quote</h4>
-                  </legend>
-                  <GivenQuote givenQuote={latest_given_quote} />
-                  <ConvertTrip
-                    trip={trip}
-                    isConvertVisible={isConvertVisible}
-                    hideConvert={hideConvert}
-                    onConvert={(data: any) => XHR(xhr).convertTrip(data)}
-                  />
-                  <footer>
-                    <Button onClick={showConvert}>Mark as converted</Button>
-                  </footer>
-                </fieldset>
-              ) : null}
-            </div>
-          )}
-        />
-      </Router>
-    </div>
-  )
 }
 
 export const ConvertTrip = withXHR(function ConvertTrip({

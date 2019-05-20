@@ -40,31 +40,6 @@ body {
   cursor: default !important;
 }
 
-table {
-  border-collapse: collapse;
-  margin-bottom: 1.5em;
-  background: white;
-  border: 1px solid #e3e7ea;
-}
-
-th,
-td {
-  vertical-align: top;
-  padding: 0.75rem;
-}
-thead th {
-  vertical-align: bottom;
-  border-bottom: 2px solid #dee2e6;
-}
-
-tr:nth-child(2n) > td {
-  background: #f6f8fa;
-}
-
-table caption {
-  text-align: left;
-}
-
 dt {
   margin-bottom: 0.3rem;
 }
@@ -266,6 +241,9 @@ mark {
 }
 .vertical-align--top {
   vertical-align: top;
+}
+.vertical-align--middle {
+  vertical-align: middle;
 }
 .width--100 {
   width: 100%;

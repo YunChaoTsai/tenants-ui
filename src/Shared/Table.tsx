@@ -14,6 +14,8 @@ export function Table({
   responsive,
   caption,
   autoWidth,
+  striped = true,
+  bordered,
   ...otherProps
 }: Omit<React.HTMLProps<HTMLTableElement>, "headers" | "rows"> & {
   /**
@@ -50,6 +52,14 @@ export function Table({
    * Width Auto
    */
   autoWidth?: boolean
+  /**
+   * Add zebra-striping
+   */
+  striped?: boolean
+  /**
+   * Add border around each data cell
+   */
+  bordered?: boolean
 }) {
   const $table = (
     <table
@@ -57,6 +67,8 @@ export function Table({
         "table",
         fixedLayout ? "table--fixed" : undefined,
         autoWidth ? "table--auto" : undefined,
+        striped ? "table--striped" : undefined,
+        bordered ? "table--bordered" : undefined,
         className
       )}
       {...otherProps}
