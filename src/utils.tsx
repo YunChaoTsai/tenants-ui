@@ -110,3 +110,14 @@ export type AsProp<
   As extends React.ReactType,
   P extends object = {}
 > = OverwriteAssign<As, { as?: As } & P>
+
+/**
+ * Convert a number to local string (add commas)
+ */
+export function numberToLocalString(n: number): string {
+  const str = n.toString()
+  // we dont want to add commas in the after the decimal point
+  const parts = str.split(".")
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  return parts.join(".")
+}
