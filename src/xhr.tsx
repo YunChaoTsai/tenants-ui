@@ -115,6 +115,17 @@ function errorTransformInterceptor(error: AxiosError): any {
 }
 
 /**
+ * Handle the maintaince error response
+ */
+function maintainceErrorInterceptor(error: AxiosError): any {
+  const e = error.response && error.response.data && error.response.data.error
+  if (e.status_code === 503) {
+    alert(e.message)
+  }
+  return error
+}
+
+/**
  * Base url for requests
  *
  * This is simply a helper for requests so that we don't have to use the env all over the places.
@@ -133,7 +144,10 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
   compose(accessTokenInterceptor),
-  compose(errorTransformInterceptor)
+  compose(
+    errorTransformInterceptor,
+    maintainceErrorInterceptor
+  )
 )
 
 /**
