@@ -40,7 +40,17 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
     <header>
       <nav>
         <ul className="list--inline">
-          <NavLink to="/">Tourepedia Dashboard</NavLink>
+          <NavLink to="/">
+            <img
+              src={process.env.PUBLIC_URL + "/logo.jpg"}
+              style={{
+                maxHeight: "1.5em",
+                marginRight: "1em",
+                verticalAlign: "middle",
+              }}
+            />
+            Tourepedia Dashboard
+          </NavLink>
           <Dropdown as="li">
             <Link to="/trips">Trips</Link>
             <ul>

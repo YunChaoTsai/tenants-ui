@@ -5,6 +5,12 @@ html {
   font-size: 14px;
 }
 
+@media (max-width: 425px) {
+  html {
+    font-size: 12px;
+  }
+}
+
 html,
 body {
   height: 100%;

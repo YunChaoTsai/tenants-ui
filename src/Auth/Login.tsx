@@ -82,9 +82,10 @@ function Login({ login, navigate, location }: LoginProps) {
       </Helmet>
       <div className="text--center">
         <img
-          src={process.env.PUBLIC_URL + "/favicon.png"}
+          src={process.env.PUBLIC_URL + "/logo.jpg"}
           style={{
-            marginTop: "50px",
+            marginTop: "4rem",
+            maxWidth: "5rem",
           }}
         />
       </div>
