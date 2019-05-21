@@ -154,7 +154,14 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                       </Grid>
                     ))}
                     <li key="add_more">
-                      <Button onClick={() => push(values.breakdowns[0])}>
+                      <Button
+                        onClick={() =>
+                          push({
+                            amount_share:
+                              100 - values.breakdowns[0].amount_share,
+                          })
+                        }
+                      >
                         + Add More
                       </Button>
                     </li>
