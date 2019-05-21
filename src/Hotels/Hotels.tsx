@@ -10,9 +10,15 @@ import CalculatePrice from "./CalculatePrice"
 export default function HotelsModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
+      <div className="float--right button-group">
+        <Link to="new" className="btn">
+          New Hotel
+        </Link>
+        <Link to="calculate-price" className="btn">
+          Calculate Price
+        </Link>
+      </div>
       <h2>Hotels</h2>
-      <Link to="new">New Hotel</Link> •{" "}
-      <Link to="calculate-price">Calculate Price</Link>
       <hr />
       <Router>
         <NewItem path="new" />

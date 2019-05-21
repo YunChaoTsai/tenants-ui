@@ -89,11 +89,15 @@ export function EditUser({ xhr, navigate, userId }: EditUserProps) {
                       placeholder="Manager"
                       required
                     />
-                    <Button type="submit" disabled={isSubmitting}>
-                      Submit
-                    </Button>
+                    <footer>
+                      <Button type="submit" disabled={isSubmitting}>
+                        Submit
+                      </Button>
+                      <Link to=".." className="btn btn--secondary">
+                        Cancel
+                      </Link>
+                    </footer>
                   </fieldset>
-                  <Link to="..">Cancel</Link>
                 </Form>
               )}
             />

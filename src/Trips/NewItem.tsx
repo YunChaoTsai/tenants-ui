@@ -20,6 +20,7 @@ import { SelectTripSources, store as tripSourceStore } from "./../TripSources"
 import { withXHR, XHRProps } from "./../xhr"
 import { ICountryDialCode } from "../CountryDialCodes/store"
 import { SelectCountryDialCodes } from "../CountryDialCodes"
+import { Grid, Col } from "../Shared/Layout"
 
 const validationSchema = Validator.object().shape({
   trip_id: Validator.string(),
@@ -177,132 +178,184 @@ function NewItem({ xhr, navigate }: NewItemProps) {
         setFieldValue,
       }: FormikProps<NewItemSchema>) => (
         <Form noValidate>
-          {status ? <div>{status}</div> : null}
           <fieldset>
-            <legend>Destination Details</legend>
-            <FormikFormGroup
-              name="destinations"
-              render={({ field }) => (
-                <SelectLocations
-                  {...field}
-                  label="Destinations"
-                  onChange={(value, name) => setFieldValue(name, value)}
+            <legend>Add New Trip</legend>
+            {status ? <div>{status}</div> : null}
+            <Grid>
+              <Col>
+                <FormikFormGroup
+                  name="destinations"
+                  render={({ field }) => (
+                    <SelectLocations
+                      {...field}
+                      label="Destinations"
+                      onChange={(value, name) => setFieldValue(name, value)}
+                    />
+                  )}
                 />
-              )}
-            />
-            <InputField
-              name="start_date"
-              label="Start Date"
-              type="date"
-              required
-            />
-            <InputField
-              name="no_of_nights"
-              label="Number of nights"
-              type="number"
-              min={1}
-              required
-            />
-            <FormikFormGroup
-              name="trip_source"
-              render={({ field }: FieldProps<NewItemSchema>) => (
-                <SelectTripSources
-                  {...field}
-                  label="Trip Source"
+              </Col>
+              <Col>
+                <InputField
+                  name="start_date"
+                  label="Start Date"
+                  type="date"
                   required
-                  fetchOnMount
-                  onChange={(value, name) => setFieldValue(name, value)}
-                  multiple={false}
                 />
-              )}
-            />
-            <InputField name="trip_id" label="Trip ID" placeholder="1231231" />
-          </fieldset>
-          <fieldset>
-            <legend>Contact Details</legend>
-            <FieldArray
-              name="contact"
-              render={({ name }) => (
-                <Fragment>
+              </Col>
+              <Col>
+                <InputField
+                  name="no_of_nights"
+                  label="Number of nights"
+                  type="number"
+                  min={1}
+                  required
+                />
+              </Col>
+              <Col>
+                <FormikFormGroup
+                  name="trip_source"
+                  render={({ field }: FieldProps<NewItemSchema>) => (
+                    <SelectTripSources
+                      {...field}
+                      label="Trip Source"
+                      required
+                      fetchOnMount
+                      onChange={(value, name) => setFieldValue(name, value)}
+                      multiple={false}
+                    />
+                  )}
+                />
+              </Col>
+              <Col>
+                <InputField
+                  name="trip_id"
+                  label="Trip ID"
+                  placeholder="1231231"
+                />
+              </Col>
+            </Grid>
+            <Grid>
+              <Col>
+                <fieldset>
+                  <legend>Pax Details</legend>
                   <InputField
-                    name={`${name}.name`}
-                    label="Contact Name"
+                    name="no_of_adults"
+                    label="Number of adults"
+                    type="number"
+                    min={1}
                     required
                   />
-                  <InputField
-                    name={`${name}.email`}
-                    label="Email"
-                    required
-                    type="email"
-                  />
-                  <FormikFormGroup
-                    name={`${name}.phone_number_country_dial_code`}
-                    render={({ field }) => (
-                      <SelectCountryDialCodes
-                        {...field}
-                        label="Country code"
-                        placeholder="Type here... eg India or +91"
-                        required
-                        onChange={(value, name) => setFieldValue(name, value)}
-                      />
+                  <FieldArray
+                    name="children"
+                    render={({ name, remove, push }) => (
+                      <fieldset>
+                        <legend>Children</legend>
+                        <ul className="list">
+                          {values.children.map((_, index) => (
+                            <Grid as="li" key={index}>
+                              <Col xs="auto">
+                                <InputField
+                                  label="Age"
+                                  name={`${name}.${index}.age`}
+                                  type="number"
+                                  min={1}
+                                  max={20}
+                                  required
+                                />
+                              </Col>
+                              <Col xs="auto">
+                                <InputField
+                                  label="Count"
+                                  name={`${name}.${index}.count`}
+                                  type="number"
+                                  min={1}
+                                  max={10000}
+                                  required
+                                />
+                              </Col>
+                              <Col
+                                xs="auto"
+                                className="d-flex align-items-center"
+                              >
+                                <Button
+                                  className="btn--secondary"
+                                  onClick={_ => remove(index)}
+                                >
+                                  &times; Remove
+                                </Button>
+                              </Col>
+                            </Grid>
+                          ))}
+                          <Button onClick={_ => push({ count: 1, age: 6 })}>
+                            + Add Children Details
+                          </Button>
+                        </ul>
+                      </fieldset>
                     )}
                   />
-                  <InputField
-                    name={`${name}.phone_number`}
-                    label="Phone Number"
-                    type="number"
-                    required
-                  />
-                </Fragment>
-              )}
-            />
-          </fieldset>
-          <fieldset>
-            <legend>Pax</legend>
-            <InputField
-              name="no_of_adults"
-              label="Number of adults"
-              type="number"
-              min={1}
-              required
-            />
-            <FieldArray
-              name="children"
-              render={({ name, remove, push }) => (
-                <fieldset>
-                  <legend>Children</legend>
-                  <ul className="list">
-                    {values.children.map((_, index) => (
-                      <li key={index}>
-                        <InputField
-                          label="Age"
-                          name={`${name}.${index}.age`}
-                          type="number"
-                          min={1}
-                          required
-                        />
-                        <InputField
-                          label="Count"
-                          name={`${name}.${index}.count`}
-                          type="number"
-                          min={1}
-                          required
-                        />
-                        <Button onClick={_ => remove(index)}>Remove</Button>
-                      </li>
-                    ))}
-                    <Button onClick={_ => push({ count: 1, age: 6 })}>
-                      Add More
-                    </Button>
-                  </ul>
                 </fieldset>
-              )}
-            />
+              </Col>
+              <Col sm={6}>
+                <fieldset>
+                  <legend>Contact Details</legend>
+                  <FieldArray
+                    name="contact"
+                    render={({ name }) => (
+                      <Grid>
+                        <Col sm={"auto"}>
+                          <InputField
+                            name={`${name}.name`}
+                            label="Contact Name"
+                            required
+                          />
+                        </Col>
+                        <Col sm="auto">
+                          <InputField
+                            name={`${name}.email`}
+                            label="Email"
+                            required
+                            type="email"
+                          />
+                        </Col>
+                        <Col>
+                          <FormikFormGroup
+                            name={`${name}.phone_number_country_dial_code`}
+                            render={({ field }) => (
+                              <SelectCountryDialCodes
+                                {...field}
+                                label="Country code"
+                                placeholder="Type here... eg India or +91"
+                                required
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
+                          />
+                        </Col>
+                        <Col>
+                          <InputField
+                            name={`${name}.phone_number`}
+                            label="Phone Number"
+                            type="number"
+                            required
+                          />
+                        </Col>
+                      </Grid>
+                    )}
+                  />
+                </fieldset>
+              </Col>
+            </Grid>
+            <footer>
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+              <Link to=".." className="btn btn--secondary">
+                Cancel
+              </Link>
+            </footer>
           </fieldset>
-          <Button type="submit" disabled={isSubmitting}>
-            Save
-          </Button>
-          <Link to="..">Cancel</Link>
         </Form>
       )}
     />

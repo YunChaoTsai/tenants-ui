@@ -92,6 +92,7 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
       </div>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          responsive
           headers={["ID", "Dates", "Stages", "Destinations", "Traveler", "Pax"]}
           rows={trips.map(
             ({

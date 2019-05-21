@@ -5,17 +5,19 @@ import { RedirectUnlessAuthenticated } from "./../Auth"
 import List from "./List"
 import NewItem from "./NewItem"
 import CalculatePrice from "./CalculatePrice"
-import NavLink from "../Shared/NavLink"
 
 export default function CabTypesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
+      <div className="float--right button-group">
+        <Link to="new" className="btn">
+          Add Price
+        </Link>
+        <Link to="calculate-price" className="btn">
+          Calculate Price
+        </Link>
+      </div>
       <h2>Transport Service Price</h2>
-      <ul className="list--inline">
-        <NavLink to="">Prices</NavLink>
-        <NavLink to="new">Add Price</NavLink>
-        <NavLink to="calculate-price">Calculate Price</NavLink>
-      </ul>
       <hr />
       <Router>
         <NewItem path="/new" />

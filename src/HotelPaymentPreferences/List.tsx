@@ -17,6 +17,7 @@ import Select, { Async, AsyncProps, SelectProps } from "./../Shared/Select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -120,13 +121,12 @@ function List({
         />
       </div>
       <Listable total={total} isFetching={isFetching}>
-        <ul>
-          {hotelPaymentPreferences.map(hotelPaymentPreference => (
-            <li key={hotelPaymentPreference.id}>
-              {hotelPaymentPreference.name}
-            </li>
-          ))}
-        </ul>
+        <Table
+          headers={["Description"]}
+          rows={hotelPaymentPreferences.map(hotelPaymentPreference => [
+            hotelPaymentPreference.name,
+          ])}
+        />
       </Listable>
     </Fragment>
   )

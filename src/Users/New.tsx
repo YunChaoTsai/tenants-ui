@@ -84,6 +84,7 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
           <Form noValidate>
             {status ? <div>{status}</div> : null}
             <fieldset>
+              <legend>Invite New User</legend>
               <InputField
                 label="Name"
                 name="name"
@@ -119,11 +120,15 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
                 name="email_verified_link"
                 value={values.email_verified_link}
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Submit
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Submit
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

@@ -8,6 +8,7 @@ import * as Validator from "yup"
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectHotelPaymentReferences } from "./List"
+import { Grid, Col } from "../Shared/Layout"
 
 interface NewItemCredentials {
   breakdowns: {
@@ -102,55 +103,74 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               <FieldArray
                 name="breakdowns"
                 render={({ name, push, remove }) => (
-                  <ul>
+                  <ul className="list">
                     {values.breakdowns.map((_, index, breakdowns) => (
-                      <li key={index}>
-                        <FormikFormGroup
-                          name={`${name}.${index}.reference`}
-                          render={({ field }) => (
-                            <SelectHotelPaymentReferences
-                              {...field}
-                              label="Reference Event"
-                              required
-                              fetchOnMount
-                              multiple={false}
-                              onChange={(value, name) =>
-                                setFieldValue(name, value)
-                              }
-                            />
-                          )}
-                        />
-                        <InputField
-                          label="Day offset from reference"
-                          name={`${name}.${index}.day_offset`}
-                          required
-                          type="number"
-                        />
-                        <InputField
-                          label="Amount share from total amount"
-                          name={`${name}.${index}.amount_share`}
-                          required
-                          type="number"
-                          min={1}
-                          max={100}
-                        />
-                        {breakdowns.length > 1 ? (
-                          <Button onClick={() => remove(index)}>Remove</Button>
-                        ) : null}
-                      </li>
+                      <Grid as="li" key={index}>
+                        <Col md={3}>
+                          <FormikFormGroup
+                            name={`${name}.${index}.reference`}
+                            render={({ field }) => (
+                              <SelectHotelPaymentReferences
+                                {...field}
+                                label="Reference Event"
+                                required
+                                fetchOnMount
+                                multiple={false}
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
+                          />
+                        </Col>
+                        <Col md={3}>
+                          <InputField
+                            label="Day offset from reference"
+                            name={`${name}.${index}.day_offset`}
+                            required
+                            type="number"
+                          />
+                        </Col>
+                        <Col md={3}>
+                          <InputField
+                            label="Amount share from total amount"
+                            name={`${name}.${index}.amount_share`}
+                            required
+                            type="number"
+                            min={1}
+                            max={100}
+                          />
+                        </Col>
+                        <Col md={3} className="d-flex align-items-center">
+                          {breakdowns.length > 1 ? (
+                            <Button
+                              className="btn--secondary"
+                              onClick={() => remove(index)}
+                            >
+                              &times; Remove
+                            </Button>
+                          ) : null}
+                        </Col>
+                      </Grid>
                     ))}
-                    <Button onClick={() => push(values.breakdowns[0])}>
-                      Add More
-                    </Button>
+                    <li key="add_more">
+                      <Button onClick={() => push(values.breakdowns[0])}>
+                        + Add More
+                      </Button>
+                    </li>
                   </ul>
                 )}
               />
               {status ? <div className="text--error">{status}</div> : null}
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

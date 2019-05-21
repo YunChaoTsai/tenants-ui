@@ -1,5 +1,8 @@
 import React from "react"
 import { Omit } from "utility-types"
+import classNames from "classnames"
+
+import "./table.css"
 
 export function Table({
   fixedLayout,
@@ -9,6 +12,10 @@ export function Table({
   alignCols = {},
   rows,
   responsive,
+  caption,
+  autoWidth,
+  striped = true,
+  bordered,
   ...otherProps
 }: Omit<React.HTMLProps<HTMLTableElement>, "headers" | "rows"> & {
   /**
@@ -36,12 +43,37 @@ export function Table({
    * @default false
    */
   responsive?: boolean
+  /**
+   * Caption for the table
+   * @default ""
+   */
+  caption?: string
+  /**
+   * Width Auto
+   */
+  autoWidth?: boolean
+  /**
+   * Add zebra-striping
+   */
+  striped?: boolean
+  /**
+   * Add border around each data cell
+   */
+  bordered?: boolean
 }) {
   const $table = (
     <table
-      className={`table ${fixedLayout ? "table--fixed" : ""} ${className}`}
+      className={classNames(
+        "table",
+        fixedLayout ? "table--fixed" : undefined,
+        autoWidth ? "table--auto" : undefined,
+        striped ? "table--striped" : undefined,
+        bordered ? "table--bordered" : undefined,
+        className
+      )}
       {...otherProps}
     >
+      {caption ? <caption>{caption}</caption> : null}
       {headers ? (
         <thead>
           <tr>

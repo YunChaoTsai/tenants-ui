@@ -115,6 +115,46 @@ function errorTransformInterceptor(error: AxiosError): any {
 }
 
 /**
+ * Handle the maintaince error response
+ */
+function maintainceErrorInterceptor(error: AxiosError): any {
+  const response = error.response
+  if (response) {
+    const e = response.data && response.data.error
+    if (e.status_code === 503) {
+      if (response.headers && response.headers["retry-after"]) {
+        const retryAfter = response.headers["retry-after"]
+        setTimeout(() => {
+          window.location = window.location
+        }, parseInt(retryAfter) * 1000)
+      }
+      alert(e.message)
+    }
+  }
+  return error
+}
+
+/**
+ * Handle the maintaince error response
+ */
+function rateLimitErrorInterceptor(error: AxiosError): any {
+  const response = error.response
+  if (response) {
+    const e = response.data && response.data.error
+    if (e.status_code === 429) {
+      if (response.headers && response.headers["retry-after"]) {
+        const retryAfter = response.headers["retry-after"]
+        setTimeout(() => {
+          window.location = window.location
+        }, parseInt(retryAfter) * 1000)
+      }
+      alert(e.message)
+    }
+  }
+  return error
+}
+
+/**
  * Base url for requests
  *
  * This is simply a helper for requests so that we don't have to use the env all over the places.
@@ -133,7 +173,11 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
   compose(accessTokenInterceptor),
-  compose(errorTransformInterceptor)
+  compose(
+    errorTransformInterceptor,
+    maintainceErrorInterceptor,
+    rateLimitErrorInterceptor
+  )
 )
 
 /**

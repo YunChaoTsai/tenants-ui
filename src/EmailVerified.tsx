@@ -4,15 +4,16 @@ import { RouteComponentProps, Link } from "@reach/router"
 export function EmailVerified(props: RouteComponentProps) {
   return (
     <div className="d-flex align-items-center justify-content-center fvh">
-      <fieldset className="text--center container--fluid">
-        <legend>Tourepedia Admin Dashboard</legend>
+      <div className="text--center container--fluid">
         <div>
-          <h1>Email Verified Successfully.</h1>
+          <h1>Your Email Verified Successfully.</h1>
+          <hr />
           <p>
-            You can now <Link to="/">login</Link> to the Dashboard.
+            You can now <Link to="/">login</Link> to the Tourepedia Admin
+            Dashboard.
           </p>
         </div>
-      </fieldset>
+      </div>
     </div>
   )
 }

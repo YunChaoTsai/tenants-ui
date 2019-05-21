@@ -74,18 +74,20 @@ function Dashboard({ xhr }: DashboardProps) {
       <h3>Due payments</h3>
       <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
         <table>
-          <tbody>
+          <thead>
             <tr>
               <th>Due Date</th>
               {duePayments.map((a, i) => (
-                <td key={i}>
+                <th key={i}>
                   {moment
                     .utc(a.due_date)
                     .local()
                     .format("DD/MM/YYYY")}
-                </td>
+                </th>
               ))}
             </tr>
+          </thead>
+          <tbody>
             <tr>
               <th>Amount</th>
               {duePayments.map((a, i) => (
@@ -104,18 +106,20 @@ function Dashboard({ xhr }: DashboardProps) {
       </div>
       <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
         <table>
-          <tbody>
+          <thead>
             <tr>
               <th>Date</th>
               {transactions.data.map((a, i) => (
-                <td key={i}>
+                <th key={i}>
                   {moment
                     .utc(a.date)
                     .local()
                     .format("DD/MM/YYYY")}
-                </td>
+                </th>
               ))}
             </tr>
+          </thead>
+          <tbody>
             <tr>
               <th>Amount</th>
               {transactions.data.map((a, i) => (

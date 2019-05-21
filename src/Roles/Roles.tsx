@@ -11,8 +11,10 @@ import EditPermissions from "./EditPermissions"
 export default function RolesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
+      <Link to="new" className="btn float--right">
+        New Role
+      </Link>
       <h2>Roles</h2>
-      <Link to="new">New Role</Link>
       <hr />
       <Router>
         <Item path=":roleId" />

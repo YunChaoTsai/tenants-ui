@@ -20,6 +20,7 @@ import { store as userStore } from "./../Users"
 import { store as contactStore } from "./../Contacts"
 import { store as tripStageStore } from "./../TripStages"
 import { store as paymentStore } from "./../Payments"
+import { store as hotelBookingStageStore } from "./../HotelBookingStages"
 
 export const key = "TRIP_LIST_STATE"
 
@@ -40,6 +41,8 @@ export interface IQuoteHotel {
   calculated_price?: number
   given_price: number
   comments: string
+  booking_stages: hotelBookingStageStore.IHotelBookingStage[]
+  latest_booking_stage?: hotelBookingStageStore.IHotelBookingStage
 }
 export interface IQuoteCab {
   id: number
@@ -64,6 +67,7 @@ export interface IQuote {
   cabs: IQuoteCab[]
   created_by: userStore.IUser
   updated_by: userStore.IUser
+  created_at: string
 }
 
 export interface IGivenQuote {
@@ -95,9 +99,9 @@ export interface ITrip extends IBaseItem {
   stages: tripStageStore.ITripStage[]
   latest_stage?: tripStageStore.ITripStage
   converted_at?: string
-  payments?: paymentStore.IPayment<ITrip>[]
-  hotel_payments?: paymentStore.IPayment<hotelStore.IHotel>[]
-  cab_payments?: paymentStore.IPayment<cabTypeStore.ICabType>[]
+  customer_payments?: paymentStore.IPayment<ITrip>[]
+  hotel_payments?: paymentStore.IPayment<IQuoteHotel>[]
+  cab_payments?: paymentStore.IPayment<IQuoteCab>[]
 }
 
 export interface ITrips extends IBaseState<ITrip> {}

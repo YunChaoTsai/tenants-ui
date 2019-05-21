@@ -7,7 +7,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { ITrip, IQuote } from "./store"
 import { CalculatePriceForm as CalculateHotelPrice } from "./../Hotels"
 import { CalculatePriceForm as CalculateCabPrice } from "./../TransportServicePrices"
-import { Input } from "./../Shared/InputField"
+import { Input, FormGroup } from "./../Shared/InputField"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -49,7 +49,7 @@ function NewQuote({ xhr, navigate, trip }: NewQuoteProps) {
           setHotels(hotels)
         }}
       />
-      <footer>Price: {hotelPrice}</footer>
+      <mark>Hotel Price: {hotelPrice}</mark>
       <h4>Calculate Prices for Cabs</h4>
       <CalculateCabPrice
         onChange={(cabPrice, cabs) => {
@@ -57,10 +57,13 @@ function NewQuote({ xhr, navigate, trip }: NewQuoteProps) {
           setCabs(cabs)
         }}
       />
-      <footer>Price: {cabPrice}</footer>
+      <mark>Cab Price: {cabPrice}</mark>
       <hr />
-      <b>Total: {hotelPrice + cabPrice}</b>
-      <div>
+      <h3>
+        <mark>Total Price: {hotelPrice + cabPrice}</mark>
+      </h3>
+      <hr />
+      <FormGroup>
         <label>Any Comment</label>
         <Input
           name="comments"
@@ -71,7 +74,7 @@ function NewQuote({ xhr, navigate, trip }: NewQuoteProps) {
           }
           maxLength={191}
         />
-      </div>
+      </FormGroup>
       <Button onClick={saveQuote}>Save Quote</Button>
     </div>
   )

@@ -23,9 +23,9 @@ import { store as tripStageStore } from "./TripStages"
 import { store as transportServiceStore } from "./TransportServices"
 import { store as transportServicePriceStore } from "./TransportServicePrices"
 import { store as hotelPaymentPreferenceStore } from "./HotelPaymentPreferences"
+import { store as hotelBookingStageStore } from "./HotelBookingStages"
 import { IAppState } from "./types"
 import xhr, { XHRContext } from "./xhr"
-import "./main.css"
 
 const rootReducer = combineReducers<IAppState>({
   [authStore.key]: authStore.reducer,
@@ -43,6 +43,7 @@ const rootReducer = combineReducers<IAppState>({
   [transportServiceStore.key]: transportServiceStore.reducer,
   [transportServicePriceStore.key]: transportServicePriceStore.reducer,
   [hotelPaymentPreferenceStore.key]: hotelPaymentPreferenceStore.reducer,
+  [hotelBookingStageStore.key]: hotelBookingStageStore.reducer,
 })
 
 const store = configureStore<IAppState>(rootReducer, {

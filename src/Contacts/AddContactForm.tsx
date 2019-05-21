@@ -63,8 +63,18 @@ export function AddContactForm({ onCreate, onCancel }: AddContactFormProps) {
       }}
       render={({ setFieldValue, isSubmitting }) => (
         <Form noValidate>
-          <InputField name="name" label="Name" required />
-          <InputField name="email" label="Email" type="email" />
+          <InputField
+            name="name"
+            label="Name"
+            required
+            placeholder="Johhny Dep"
+          />
+          <InputField
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="user@domain.com"
+          />
           <FormikFormGroup
             name="phone_number_dial_code"
             render={({ field }) => (
@@ -75,11 +85,21 @@ export function AddContactForm({ onCreate, onCancel }: AddContactFormProps) {
               />
             )}
           />
-          <InputField name="phone_number" label="Phone Number" type="number" />
-          <Button disabled={isSubmitting} type="submit">
-            Save
-          </Button>{" "}
-          <Button onClick={onCancel}>Cancel</Button>
+          <InputField
+            name="phone_number"
+            label="Phone Number"
+            type="number"
+            placeholder="9911929399"
+          />
+          <hr />
+          <footer>
+            <Button disabled={isSubmitting} type="submit">
+              Save
+            </Button>{" "}
+            <Button onClick={onCancel} className="btn--secondary">
+              Cancel
+            </Button>
+          </footer>
         </Form>
       )}
     />

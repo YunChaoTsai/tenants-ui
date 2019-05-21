@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Omit } from "utility-types"
+
 import { contains } from "../dom-helpers"
-import { FormikFormGroup } from "./InputField"
+import "./select.css"
 
 export interface SelectProps {
   multiple?: boolean

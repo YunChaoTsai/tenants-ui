@@ -12,6 +12,7 @@ import { Async, AsyncProps } from "./../Shared/Select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -74,24 +75,13 @@ export function Roles({ getRoles, roles, ...otherProps }: RolesProps) {
         />
       </div>
       <Listable total={total} isFetching={isFetching}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Permission</th>
-            </tr>
-          </thead>
-          <tbody>
-            {roles.map(r => (
-              <tr key={r.id}>
-                <td>
-                  <Link to={r.id.toString()}>{r.name}</Link>
-                </td>
-                <td>{(r.permissions || []).map(p => p.name).join(" • ")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Name", "Permissions"]}
+          rows={roles.map(r => [
+            <Link to={r.id.toString()}>{r.name}</Link>,
+            (r.permissions || []).map(p => p.name).join(" • "),
+          ])}
+        />
       </Listable>
     </Fragment>
   )

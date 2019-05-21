@@ -1,0 +1,52 @@
+.drop-down {
+  display: inline-block;
+  position: relative;
+}
+.drop-down > .toggler,
+.drop-down > a:first-child {
+  cursor: pointer;
+}
+.drop-down > .toggler:after,
+.drop-down > a:first-child:after {
+  content: "\005E";
+  display: inline-block;
+  margin-left: 3px;
+  transition: transform 0.15s ease-in;
+  transform: rotateX(180deg);
+  transform-origin: center;
+}
+.drop-down:hover > .toggler:after,
+.drop-down:hover > a:first-child:after,
+.drop-down > .toggler:focus:after,
+.drop-down > a:focus:first-child:after {
+  transform: rotateX(0);
+}
+.drop-down > .menu,
+.drop-down > ul,
+.drop-down > ol {
+  position: absolute;
+  top: 100%;
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 100px;
+  white-space: nowrap;
+  z-index: 2;
+}
+.drop-down > .menu a,
+.drop-down > ul a,
+.drop-down > ol a {
+  width: 100%;
+}
+.drop-down:hover > .menu,
+.drop-down:hover > ul,
+.drop-down:hover > ol,
+.drop-down a:focus + .menu,
+.drop-down a:focus + ul,
+.drop-down a:focus + ol {
+  display: block;
+  background: white;
+  border-radius: 0 0 0.2em 0.2em;
+  box-shadow: 0 1px 2px 0 hsla(0, 0%, 0%, 0.2);
+}

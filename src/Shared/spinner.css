@@ -1,0 +1,12 @@
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1turn);
+  }
+}
+.spin {
+  animation: fa-spin 0.6s infinite linear;
+  display: inline-block;
+}

@@ -1,7 +1,11 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import ReactDOM from "react-dom"
-import { contains, activeElement } from "./../dom-helpers"
-import { useDidUpdate, useDidMount, useEnforceFocus } from "./../hooks"
+import classNames from "classnames"
+
+import { useEnforceFocus } from "./../hooks"
+import { AsProp } from "./../utils"
+
+import "./dialog.css"
 
 export function useDialog(
   initialOpen: boolean = false
@@ -10,7 +14,72 @@ export function useDialog(
   return [isOpen, () => set(true), () => set(false)]
 }
 
-interface DialogProps {
+const DIALOG_OPEN_CONTAINER_CLASS_NAME = "dialog-open"
+
+export function DialogDocument({
+  className,
+  children,
+}: React.HTMLProps<HTMLElement>) {
+  return (
+    <div role="document" className={classNames("dialog__document", className)}>
+      {children}
+    </div>
+  )
+}
+
+export function DialogHeader<As extends React.ReactType = "header">({
+  children,
+  className,
+  as,
+}: AsProp<As>) {
+  const Component = as || "header"
+  return (
+    <Component className={classNames("dialog__header", className)}>
+      {children}
+    </Component>
+  )
+}
+
+export function DialogTitle<As extends React.ReactType = "h3">({
+  children,
+  className,
+  as,
+}: AsProp<As>) {
+  const Component = as || "h3"
+  return (
+    <Component className={classNames("dialog__title", className)}>
+      {children}
+    </Component>
+  )
+}
+
+export function DialogBody<As extends React.ReactType = "main">({
+  className,
+  children,
+  as,
+}: AsProp<As>) {
+  const Component = as || "main"
+  return (
+    <Component className={classNames("dialog__body", className)}>
+      {children}
+    </Component>
+  )
+}
+
+export function DialogFooter<As extends React.ReactType = "footer">({
+  className,
+  children,
+  as,
+}: AsProp<As>) {
+  const Component = as || "footer"
+  return (
+    <Component className={classNames("dialog__footer", className)}>
+      {children}
+    </Component>
+  )
+}
+
+interface DialogProps extends React.HTMLProps<HTMLDialogElement> {
   /**
    * Contianer element where we should render the dialog
    * @default document.body
@@ -58,70 +127,52 @@ export function Dialog({
   enforceFocus = true,
   closeOnEscape = true,
   closeButton,
+  className,
 }: DialogProps) {
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  // set the styles
-  useDidMount(() => {
-    if (open) {
-      container.style.overflow = "hidden"
-    }
-  })
+  const wrapperRef = useRef<HTMLDialogElement>(null)
   // set the styles for the container
-  useDidUpdate(() => {
+  useEffect(() => {
     if (open) {
-      // hide the overflow of the container
-      container.style.overflow = "hidden"
+      container.classList.add(DIALOG_OPEN_CONTAINER_CLASS_NAME)
     } else {
-      // show the overflow of the container
-      container.style.overflow = "auto"
+      container.classList.remove(DIALOG_OPEN_CONTAINER_CLASS_NAME)
+    }
+    return () => {
+      container.classList.remove(DIALOG_OPEN_CONTAINER_CLASS_NAME)
     }
   }, [open])
   useEnforceFocus(wrapperRef, open, { enforceFocus, autoFocus })
-  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (!open) return
-    if (closeOnEscape) {
-      // handle the escape key
-      if (event.keyCode === 27) {
-        onClose && onClose()
-      }
-    }
-  }
   if (!open) return null
   return ReactDOM.createPortal(
-    <div
+    <dialog
+      open={open}
       ref={wrapperRef}
-      onKeyDown={handleKeyDown}
-      role="dialog"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-        background: "rgba(0, 0, 0, .5)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "auto",
+      onKeyDown={event => {
+        if (!open || !closeOnEscape) return
+        // handle the escape key
+        if (event.keyCode === 27) {
+          onClose && onClose()
+        }
       }}
+      role="dialog"
       tabIndex={-1}
+      aria-modal={true}
+      className={classNames("dialog", className)}
     >
-      <div
-        style={{ background: "white", position: "relative", minWidth: "300px" }}
-      >
-        {closeButton ? (
-          <button
-            style={{ position: "absolute", right: "5px", top: "5px" }}
-            onClick={onClose}
-          >
-            &times;
-          </button>
-        ) : null}
-        {children}
-      </div>
-    </div>,
+      {closeButton ? (
+        <button onClick={onClose} className="dialog__close">
+          &times;
+        </button>
+      ) : null}
+      <DialogDocument>{children}</DialogDocument>
+    </dialog>,
     container
   )
 }
+
+Dialog.Header = DialogHeader
+Dialog.Title = DialogTitle
+Dialog.Footer = DialogFooter
+Dialog.Body = DialogBody
 
 export default Dialog

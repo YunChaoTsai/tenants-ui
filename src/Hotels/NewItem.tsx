@@ -23,6 +23,7 @@ import {
   store as hotelPaymentPreferenceStore,
   SelectHotelPaymentPreferences,
 } from "../HotelPaymentPreferences"
+import { Grid, Col } from "../Shared/Layout"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
@@ -42,7 +43,9 @@ const validationSchema = Validator.object().shape({
   room_types: Validator.array()
     .of(
       Validator.object().shape({
-        room_type: Validator.object().required("Please select a room type"),
+        room_types: Validator.array()
+          .min(1, "Please select atleast one room type")
+          .required("Please select a room type"),
         allowed_extra_beds: Validator.number()
           .typeError("Allowed extra bed must be a number")
           .integer("Allowed extra beds should be an integer")
@@ -60,7 +63,7 @@ interface NewItemCredentials {
   eb_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
   room_types: {
-    room_type?: roomTypeStore.IRoomType
+    room_types: roomTypeStore.IRoomType[]
     allowed_extra_beds: number
   }[]
   location?: locationStore.ILocation
@@ -72,7 +75,7 @@ const initialValues: NewItemCredentials = {
   eb_child_age_start: 6,
   eb_child_age_end: 12,
   meal_plans: [],
-  room_types: [{ room_type: undefined, allowed_extra_beds: 1 }],
+  room_types: [{ room_types: [], allowed_extra_beds: 1 }],
   location: undefined,
 }
 
@@ -95,11 +98,21 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             .post("/hotels", {
               ...values,
               meal_plans: values.meal_plans.map(mealPlan => mealPlan.id),
-              room_types: values.room_types.map(
-                ({ room_type, allowed_extra_beds }) => ({
-                  room_type_id: room_type && room_type.id,
-                  allowed_extra_beds: allowed_extra_beds,
-                })
+              room_types: values.room_types.reduce(
+                (
+                  rooms: Array<{
+                    room_type_id: number
+                    allowed_extra_beds: number
+                  }>,
+                  { room_types, allowed_extra_beds }
+                ) =>
+                  rooms.concat(
+                    room_types.map(room_type => ({
+                      room_type_id: room_type.id,
+                      allowed_extra_beds: allowed_extra_beds,
+                    }))
+                  ),
+                []
               ),
               location_id: values.location ? values.location.id : undefined,
               payment_preference_id: values.payment_preference
@@ -130,54 +143,68 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               {status ? <div>{status}</div> : null}
               <fieldset>
                 <legend>Add Hotel</legend>
-                <InputField
-                  label="Name"
-                  name="name"
-                  placeholder="Taj Hotel"
-                  required
-                />
-                <FormikFormGroup
-                  name="location"
-                  render={({ field }: FieldProps<NewItemCredentials>) => (
-                    <SelectLocations
-                      {...field}
-                      label="Location"
-                      multiple={false}
-                      onChange={(value, name) => setFieldValue(name, value)}
+                <Grid>
+                  <Col lg md={4} sm={6} xs={12}>
+                    <InputField
+                      label="Name"
+                      name="name"
+                      placeholder="Taj Hotel"
+                      required
                     />
-                  )}
-                />
-                <FormikFormGroup
-                  name="payment_preference"
-                  render={({ field }: FieldProps<NewItemCredentials>) => (
-                    <SelectHotelPaymentPreferences
-                      {...field}
-                      label="Payment Preference"
-                      multiple={false}
-                      onChange={(value, name) => setFieldValue(name, value)}
-                      fetchOnMount
+                  </Col>
+                  <Col lg md={4} sm={6} xs={12}>
+                    <FormikFormGroup
+                      name="location"
+                      render={({ field }: FieldProps<NewItemCredentials>) => (
+                        <SelectLocations
+                          {...field}
+                          label="Location"
+                          multiple={false}
+                          onChange={(value, name) => setFieldValue(name, value)}
+                        />
+                      )}
                     />
-                  )}
-                />
-                <InputField
-                  label="Stars"
-                  name="stars"
-                  type="number"
-                  required
-                  max={5}
-                  min={1}
-                />
-                <FormikFormGroup
-                  name="meal_plans"
-                  render={({ field }) => (
-                    <SelectMealPlans
-                      {...field}
-                      label="Meal Plan(s) served"
-                      onChange={(values, name) => setFieldValue(name, values)}
-                      fetchOnMount
+                  </Col>
+                  <Col lg md={4} sm={6}>
+                    <FormikFormGroup
+                      name="payment_preference"
+                      render={({ field }: FieldProps<NewItemCredentials>) => (
+                        <SelectHotelPaymentPreferences
+                          {...field}
+                          label="Payment Preference"
+                          multiple={false}
+                          onChange={(value, name) => setFieldValue(name, value)}
+                          fetchOnMount
+                        />
+                      )}
                     />
-                  )}
-                />
+                  </Col>
+                  <Col lg md={4} sm={4} xs={8}>
+                    <FormikFormGroup
+                      name="meal_plans"
+                      render={({ field }) => (
+                        <SelectMealPlans
+                          {...field}
+                          label="Meal Plan(s) served"
+                          onChange={(values, name) =>
+                            setFieldValue(name, values)
+                          }
+                          fetchOnMount
+                        />
+                      )}
+                    />
+                  </Col>
+                  <Col lg={1} md={4} sm={2} xs={4}>
+                    <InputField
+                      label="Stars"
+                      name="stars"
+                      type="number"
+                      required
+                      max={5}
+                      min={1}
+                    />
+                  </Col>
+                </Grid>
                 <FieldArray
                   name="room_types"
                   render={({ name, push, remove }) => (
@@ -187,63 +214,86 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                         {values.room_types.map(
                           (room_type, index, room_types) => (
                             <li key={index}>
-                              <FormikFormGroup
-                                name={`${name}.${index}.room_type`}
-                                render={({ field }) => (
-                                  <SelectRoomTypes
-                                    {...field}
-                                    multiple={false}
-                                    label="Room Type"
-                                    fetchOnMount
-                                    onChange={(value, name) =>
-                                      setFieldValue(name, value)
-                                    }
+                              <Grid>
+                                <Col xs="auto">
+                                  <FormikFormGroup
+                                    name={`${name}.${index}.room_types`}
+                                    render={({ field }) => (
+                                      <SelectRoomTypes
+                                        {...field}
+                                        label="Room Types"
+                                        fetchOnMount
+                                        onChange={(value, name) =>
+                                          setFieldValue(name, value)
+                                        }
+                                      />
+                                    )}
                                   />
-                                )}
-                              />
-                              <InputField
-                                label="Allowed extra bed(s)"
-                                type="number"
-                                name={`${name}.${index}.allowed_extra_beds`}
-                                value={room_type.allowed_extra_beds}
-                                min={0}
-                              />
-                              {room_types.length > 1 ? (
-                                <Button onClick={_ => remove(index)}>
-                                  Remove
-                                </Button>
-                              ) : null}
+                                </Col>
+                                <Col xs="auto">
+                                  <InputField
+                                    label="Allowed extra bed(s)"
+                                    type="number"
+                                    name={`${name}.${index}.allowed_extra_beds`}
+                                    value={room_type.allowed_extra_beds}
+                                    min={0}
+                                  />
+                                </Col>
+                                <Col
+                                  xs="auto"
+                                  className="d-flex align-items-center"
+                                >
+                                  {room_types.length > 1 ? (
+                                    <Button
+                                      onClick={_ => remove(index)}
+                                      className="btn--secondary"
+                                    >
+                                      &times; Remove
+                                    </Button>
+                                  ) : null}
+                                </Col>
+                              </Grid>
                             </li>
                           )
                         )}
                         <li>
                           <Button onClick={_ => push(values.room_types[0])}>
-                            Add More
+                            + Add More Room Types
                           </Button>
                         </li>
                       </ul>
                     </fieldset>
                   )}
                 />
-                <InputField
-                  label="Extra bed child start age"
-                  name="eb_child_age_start"
-                  required
-                  type="number"
-                  min={1}
-                />
-                <InputField
-                  label="Extra bed child end age"
-                  name="eb_child_age_end"
-                  required
-                  type="number"
-                  min={1}
-                />
-                <Button type="submit" disabled={isSubmitting}>
-                  Save
-                </Button>
+                <Grid>
+                  <Col sm="auto">
+                    <InputField
+                      label="Extra bed child start age"
+                      name="eb_child_age_start"
+                      required
+                      type="number"
+                      min={1}
+                    />
+                  </Col>
+                  <Col sm="auto">
+                    <InputField
+                      label="Extra bed child end age"
+                      name="eb_child_age_end"
+                      required
+                      type="number"
+                      min={1}
+                    />
+                  </Col>
+                </Grid>
+                <footer>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Save
+                  </Button>
+                  <Link to=".." className="btn btn--secondary">
+                    Cancel
+                  </Link>
+                </footer>
               </fieldset>
-              <Link to="..">Cancel</Link>
             </Form>
           )
         }}

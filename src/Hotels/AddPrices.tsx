@@ -20,6 +20,7 @@ import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 type NewPriceCredentials = {
   prices: {
@@ -154,40 +155,30 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
               <FieldArray
                 name="prices"
                 render={({ name, remove, push }) => (
-                  <Table
-                    responsive
-                    headers={[
-                      "Start Date",
-                      "End Date",
-                      "Meal Plans",
-                      "Room Types",
-                      "Base Price",
-                      "Persons",
-                      "A.W.E.B. Price",
-                      "C.W.E.B. Price",
-                      "C.Wo.E.B. Price",
-                    ]}
-                  >
-                    <tbody>
-                      {values.prices.map((price, index) => (
-                        <tr key={index}>
-                          <td>
+                  <ol className="list">
+                    {values.prices.map((price, index) => (
+                      <li key={index}>
+                        <Grid>
+                          <Col>
                             <InputField
+                              label="Start Date"
                               name={`${name}.${index}.start_date`}
                               type="date"
                             />
-                          </td>
-                          <td>
+                          </Col>
+                          <Col>
                             <InputField
+                              label="End Date"
                               name={`${name}.${index}.end_date`}
                               type="date"
                             />
-                          </td>
-                          <td>
+                          </Col>
+                          <Col>
                             <FormikFormGroup
                               name={`prices.${index}.meal_plan`}
                               render={({ field }) => (
                                 <SelectMealPlans
+                                  label="Meal Plan"
                                   {...field}
                                   searchable={false}
                                   multiple={false}
@@ -198,13 +189,14 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                                 />
                               )}
                             />
-                          </td>
-                          <td>
+                          </Col>
+                          <Col>
                             <FormikFormGroup
                               name={`prices.${index}.room_type`}
                               render={({ field }) => (
                                 <SelectRoomTypes
                                   {...field}
+                                  label="Room Type"
                                   searchable={false}
                                   multiple={false}
                                   options={hotel.room_types}
@@ -224,87 +216,107 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                                 />
                               )}
                             />
-                          </td>
-                          <td>
-                            <InputField
-                              name={`${name}.${index}.base_price`}
-                              type="number"
-                            />
-                          </td>
-                          <td>
-                            <InputField
-                              name={`${name}.${index}.persons`}
-                              type="number"
-                            />
-                          </td>
-                          <td>
-                            <InputField
-                              name={`${name}.${index}.adult_with_extra_bed_price`}
-                              type="number"
-                              title={
-                                !price.room_type
-                                  ? "Please select a room type"
-                                  : !price.room_type.allowed_extra_beds
-                                  ? "No extra bed allowed"
-                                  : undefined
-                              }
-                              disabled={
-                                !price.room_type ||
-                                !price.room_type.allowed_extra_beds
-                              }
-                            />
-                          </td>
-                          <td>
-                            <InputField
-                              name={`${name}.${index}.child_with_extra_bed_price`}
-                              type="number"
-                              title={
-                                !price.room_type
-                                  ? "Please select a room type"
-                                  : !price.room_type.allowed_extra_beds
-                                  ? "No extra bed allowed"
-                                  : undefined
-                              }
-                              disabled={
-                                !price.room_type ||
-                                !price.room_type.allowed_extra_beds
-                              }
-                            />
-                          </td>
-                          <td>
-                            <InputField
-                              name={`${name}.${index}.child_without_extra_bed_price`}
-                              type="number"
-                            />
-                          </td>
-                          <td>
-                            {values.prices.length > 1 ? (
-                              <Button onClick={_ => remove(index)}>
-                                Remove
-                              </Button>
-                            ) : null}
-                            <Button onClick={_ => push(price)}>
-                              Duplicate
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                      <tr>
-                        <td>
-                          <Button onClick={_ => push(initialValues.prices[0])}>
-                            Add More
+                          </Col>
+                        </Grid>
+                        <fieldset>
+                          <legend>Prices</legend>
+                          <Grid>
+                            <Col>
+                              <InputField
+                                label="Number of persons"
+                                name={`${name}.${index}.persons`}
+                                type="number"
+                              />
+                            </Col>
+                            <Col>
+                              <InputField
+                                label="Base Price"
+                                name={`${name}.${index}.base_price`}
+                                type="number"
+                              />
+                            </Col>
+                            <Col>
+                              <InputField
+                                label="Adult with extra bed price"
+                                name={`${name}.${index}.adult_with_extra_bed_price`}
+                                type="number"
+                                title={
+                                  !price.room_type
+                                    ? "Please select a room type"
+                                    : !price.room_type.allowed_extra_beds
+                                    ? "No extra bed allowed"
+                                    : undefined
+                                }
+                                disabled={
+                                  !price.room_type ||
+                                  !price.room_type.allowed_extra_beds
+                                }
+                              />
+                            </Col>
+                            <Col>
+                              <InputField
+                                label="Child with extra bed price"
+                                name={`${name}.${index}.child_with_extra_bed_price`}
+                                type="number"
+                                title={
+                                  !price.room_type
+                                    ? "Please select a room type"
+                                    : !price.room_type.allowed_extra_beds
+                                    ? "No extra bed allowed"
+                                    : undefined
+                                }
+                                disabled={
+                                  !price.room_type ||
+                                  !price.room_type.allowed_extra_beds
+                                }
+                              />
+                            </Col>
+                            <Col>
+                              <InputField
+                                label="Child without extra bed price"
+                                name={`${name}.${index}.child_without_extra_bed_price`}
+                                type="number"
+                              />
+                            </Col>
+                          </Grid>
+                        </fieldset>
+                        <hr />
+                        <div className="button-group form-group">
+                          <Button
+                            className="btn--secondary"
+                            onClick={_ => push(price)}
+                          >
+                            + Duplicate
                           </Button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </Table>
+                          {values.prices.length > 1 ? (
+                            <Button
+                              className="btn--secondary"
+                              onClick={_ => remove(index)}
+                            >
+                              &times; Remove
+                            </Button>
+                          ) : null}
+                        </div>
+                      </li>
+                    ))}
+                    <div className="form-group">
+                      <hr />
+                      <Button onClick={_ => push(initialValues.prices[0])}>
+                        + Add More
+                      </Button>
+                    </div>
+                  </ol>
                 )}
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save
+                </Button>
+                <Link to=".." className="btn btn--secondary">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

@@ -8,6 +8,8 @@ import {
 } from "formik"
 import { Omit } from "utility-types"
 
+import "./input-field.css"
+
 export function ErrorMessage({ className = "", ...props }: ErrorMessageProps) {
   return (
     <FormikErrorMessage
@@ -25,9 +27,11 @@ interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, "as"> {
 export function Input({
   type = "text",
   as: Component = "input",
+  id,
+  name,
   ...otherProps
 }: InputProps) {
-  return <Component {...otherProps} type={type} />
+  return <Component name={name} id={id || name} {...otherProps} type={type} />
 }
 
 export function FormGroup({
@@ -79,6 +83,7 @@ export function InputField({
   name,
   type = "text",
   className,
+  labelPlacement,
   ...otherProps
 }: InputProps & {
   name: string
@@ -86,15 +91,22 @@ export function InputField({
   label?: React.ReactNode
   className?: string
   as?: React.ReactType
+  labelPlacement?: "before" | "after"
 }) {
+  // for radio or checkbox, default to after
+  labelPlacement =
+    labelPlacement ||
+    (type === "checkbox" || type === "radio" ? "after" : "before")
+  const renderLabel = label ? <label htmlFor={name}>{label}</label> : null
   return (
     <FormikFormGroup
       name={name}
       className={className}
       render={({ field }) => (
         <Fragment>
-          {label ? <label htmlFor={name}>{label}</label> : null}
+          {labelPlacement === "before" ? renderLabel : null}
           <Input {...otherProps} type={type} {...field} />
+          {labelPlacement === "after" ? renderLabel : null}
         </Fragment>
       )}
     />

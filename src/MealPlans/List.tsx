@@ -12,6 +12,7 @@ import { Async, AsyncProps } from "./../Shared/Select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -93,14 +94,13 @@ function List({ getMealPlans, mealPlans, ...otherProps }: ListProps) {
         />
       </div>
       <Listable total={total} isFetching={isFetching}>
-        <dl>
-          {mealPlans.map(mealPlan => (
-            <Fragment key={mealPlan.id}>
-              <dt>{mealPlan.name}</dt>
-              <dd>{mealPlan.description}</dd>
-            </Fragment>
-          ))}
-        </dl>
+        <Table
+          headers={["Name", "Description"]}
+          rows={mealPlans.map(mealPlan => [
+            mealPlan.name,
+            mealPlan.description,
+          ])}
+        />
       </Listable>
     </Fragment>
   )

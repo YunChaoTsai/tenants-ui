@@ -80,7 +80,15 @@ function Login({ login, navigate, location }: LoginProps) {
       <Helmet>
         <title>Login</title>
       </Helmet>
-      <h1 className="text--center">Tourepedia Admin Dashboard</h1>
+      <div className="text--center">
+        <img
+          src={process.env.PUBLIC_URL + "/favicon.png"}
+          style={{
+            marginTop: "50px",
+          }}
+        />
+      </div>
+      <h1 className="text--center">Sign in to TAD</h1>
       <div className="w--sm">
         <Formik
           initialValues={initialValues}
@@ -103,8 +111,8 @@ function Login({ login, navigate, location }: LoginProps) {
             status,
           }: FormikProps<ILoginCredentials>) => (
             <Form noValidate>
-              {status ? <div>{status}</div> : null}
               <fieldset>
+                {status ? <p className="error">{status}</p> : null}
                 <InputField
                   label="Email"
                   name="email"
@@ -115,6 +123,9 @@ function Login({ login, navigate, location }: LoginProps) {
                   autoComplete="username email"
                   required
                 />
+                <Link to="/forgot-password" className="float--right">
+                  Forgot Password ?
+                </Link>
                 <InputField
                   label="Password"
                   name="password"
@@ -123,14 +134,15 @@ function Login({ login, navigate, location }: LoginProps) {
                   required
                   autoComplete="current-password"
                 />
-                <Button type="submit" disabled={isSubmitting}>
-                  Login
-                </Button>
+                <footer>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Sign in
+                  </Button>
+                </footer>
               </fieldset>
             </Form>
           )}
         />
-        <Link to="/forgot-password">Forgot Password ?</Link>
       </div>
     </RedirectIfAuthenticated>
   )

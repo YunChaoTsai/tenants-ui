@@ -66,7 +66,8 @@ function ForgotPassword({
         <h1>Forgot Your Password?</h1>
         <p>
           No problem? Just enter your email address and we will send
-          instructions to reset your password.
+          instructions to reset your password. <br />
+          or <Link to="/login">Login</Link> if you remember your password!
         </p>
       </div>
       <div className="w--sm">
@@ -119,14 +120,15 @@ function ForgotPassword({
                   hidden
                   value={values.reset_password_link}
                 />
-                <Button type="submit" disabled={isSubmitting}>
-                  Get Instructions
-                </Button>
+                <footer>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Get Instructions
+                  </Button>
+                </footer>
               </fieldset>
             </Form>
           )}
         />
-        or <Link to="/login">Login</Link> if you remember your password!
       </div>
     </RedirectIfAuthenticated>
   )
