@@ -33,35 +33,17 @@ function XHR(xhr: AxiosInstance) {
   }
 }
 
-interface DashboardProps extends RouteComponentProps, XHRProps {}
-
-function Dashboard({ xhr }: DashboardProps) {
+function ConvertedTrips({ xhr }: XHRProps) {
   const [convertedTripAnalytics, setConvertedTripAnalytics] = useState<
     IConvertedTripAnalytics
   >([])
-  const [duePayments, setDuePayments] = useState<IDuePayments>([])
-  const [transactions, setTransactions] = useState<{
-    data: ITransactions
-    debited: number
-    credited: number
-  }>({ data: [], debited: 0, credited: 0 })
   useEffect(() => {
     XHR(xhr)
       .getConvertedTripAnalytics()
       .then(setConvertedTripAnalytics)
-    XHR(xhr)
-      .getDuePayments()
-      .then(setDuePayments)
-    XHR(xhr)
-      .getTransactions()
-      .then(({ data, meta }) => setTransactions({ data, ...meta }))
   }, [])
   return (
-    <RedirectUnlessAuthenticated>
-      <Helmet>
-        <title>Dashboard</title>
-      </Helmet>
-      <h2>Dashboard</h2>
+    <section>
       <h3>Converted trips over time</h3>
       {convertedTripAnalytics
         .map(a =>
@@ -71,6 +53,19 @@ function Dashboard({ xhr }: DashboardProps) {
             .format("DD/MM/YYYY")
         )
         .join(" • ")}
+    </section>
+  )
+}
+
+function DuePayments({ xhr }: XHRProps) {
+  const [duePayments, setDuePayments] = useState<IDuePayments>([])
+  useEffect(() => {
+    XHR(xhr)
+      .getDuePayments()
+      .then(setDuePayments)
+  }, [])
+  return (
+    <section>
       <h3>Due payments</h3>
       <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
         <table>
@@ -100,6 +95,23 @@ function Dashboard({ xhr }: DashboardProps) {
           </tbody>
         </table>
       </div>
+    </section>
+  )
+}
+
+function Transactions({ xhr }: XHRProps) {
+  const [transactions, setTransactions] = useState<{
+    data: ITransactions
+    debited: number
+    credited: number
+  }>({ data: [], debited: 0, credited: 0 })
+  useEffect(() => {
+    XHR(xhr)
+      .getTransactions()
+      .then(({ data, meta }) => setTransactions({ data, ...meta }))
+  }, [])
+  return (
+    <section>
       <h3>Transactions</h3>
       <div>
         Credited: {transactions.credited} • Debited: {transactions.debited}
@@ -132,6 +144,22 @@ function Dashboard({ xhr }: DashboardProps) {
           </tbody>
         </table>
       </div>
+    </section>
+  )
+}
+
+interface DashboardProps extends RouteComponentProps, XHRProps {}
+
+function Dashboard({ xhr }: DashboardProps) {
+  return (
+    <RedirectUnlessAuthenticated>
+      <Helmet>
+        <title>Dashboard</title>
+      </Helmet>
+      <h2>Dashboard</h2>
+      <ConvertedTrips xhr={xhr} />
+      <DuePayments xhr={xhr} />
+      <Transactions xhr={xhr} />
     </RedirectUnlessAuthenticated>
   )
 }
