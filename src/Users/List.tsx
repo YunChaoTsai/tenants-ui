@@ -11,6 +11,7 @@ import { List } from "./../Shared/List"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -57,18 +58,22 @@ export function Users({ getUsers, users, ...otherProps }: UsersProps) {
       <Helmet>
         <title>Users</title>
       </Helmet>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getUsers({ ...params, page: 1 })
-          }}
-        />
-        <Paginate
-          {...otherProps}
-          onChange={page => getUsers({ ...params, page })}
-        />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getUsers({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getUsers({ ...params, page })}
+          />
+        </Col>
+      </Grid>
       <List isFetching={isFetching} total={total}>
         <Table
           responsive

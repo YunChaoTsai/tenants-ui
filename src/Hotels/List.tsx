@@ -18,6 +18,7 @@ import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import Helmet from "react-helmet-async"
 import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -90,20 +91,25 @@ function List({ getHotels, hotels, ...otherProps }: ListProps) {
       <Helmet>
         <title>Hotels List</title>
       </Helmet>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getHotels({ ...params, page: 1 })
-          }}
-        />
-        <Paginate
-          {...otherProps}
-          onChange={page => getHotels({ ...params, page })}
-        />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getHotels({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getHotels({ ...params, page })}
+          />
+        </Col>
+      </Grid>
       <Listable isFetching={isFetching} total={total}>
         <Table
+          responsive
           headers={["Name", "Meal Plans", "Room Type", "Child extra bed age"]}
           rows={hotels.map(hotel => [
             <Fragment>

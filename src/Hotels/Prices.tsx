@@ -15,6 +15,8 @@ import {
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import List from "../Shared/List"
 import Search, { useSearch } from "../Shared/Search"
+import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -76,71 +78,73 @@ function Prices({
   }, [])
   return (
     <Fragment>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getPrices({ ...params, page: 1 })
-          }}
-        />
-        <Paginate {...otherProps} onChange={page => getPrices(id, { page })} />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getPrices({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getPrices(id, { page })}
+          />
+        </Col>
+      </Grid>
       <List isFetching={isFetching} total={total}>
-        <table className="table--fixed">
-          <thead>
-            <tr>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th>Meal Plan</th>
-              <th>Room Type</th>
-              <th className="text--right">Base Price</th>
-              <th className="text--right">Persons</th>
-              <th className="text--right">A.W.E.B.</th>
-              <th className="text--right">C.W.E.B.</th>
-              <th className="text--right">C.Wo.E.B</th>
-            </tr>
-          </thead>
-          <tbody>
-            {prices.map(
-              ({
-                id,
-                base_price,
-                persons,
-                start_date,
-                end_date,
-                adult_with_extra_bed_price,
-                child_with_extra_bed_price,
-                child_without_extra_bed_price,
-                meal_plan,
-                room_type,
-              }) => (
-                <tr key={id}>
-                  <td>
-                    {moment
-                      .utc(start_date)
-                      .local()
-                      .format("DD/MM/YYYY")}
-                  </td>
-                  <td>
-                    {moment
-                      .utc(end_date)
-                      .local()
-                      .format("DD/MM/YYYY")}
-                  </td>
-                  <td>{meal_plan.name}</td>
-                  <td>{room_type.name}</td>
-                  <td className="text--right">{base_price}</td>
-                  <td className="text--right">{persons}</td>
-                  <td className="text--right">{adult_with_extra_bed_price}</td>
-                  <td className="text--right">{child_with_extra_bed_price}</td>
-                  <td className="text--right">
-                    {child_without_extra_bed_price}
-                  </td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </table>
+        <Table
+          responsive
+          headers={[
+            "Start Date",
+            "End Date",
+            "Meal Plan",
+            "Room Type",
+            "Base Price",
+            "Persons",
+            "A.W.E.B.",
+            "C.W.E.B.",
+            "C.Wo.E.B",
+          ]}
+          alignCols={{
+            4: "right",
+            5: "right",
+            6: "right",
+            7: "right",
+            8: "right",
+          }}
+          rows={prices.map(
+            ({
+              base_price,
+              persons,
+              start_date,
+              end_date,
+              adult_with_extra_bed_price,
+              child_with_extra_bed_price,
+              child_without_extra_bed_price,
+              meal_plan,
+              room_type,
+            }) => [
+              moment
+                .utc(start_date)
+                .local()
+                .format("DD/MM/YYYY"),
+              moment
+                .utc(end_date)
+                .local()
+                .format("DD/MM/YYYY"),
+              meal_plan.name,
+              room_type.name,
+              base_price,
+              persons,
+              adult_with_extra_bed_price,
+              child_with_extra_bed_price,
+              child_without_extra_bed_price,
+            ]
+          )}
+        />
       </List>
     </Fragment>
   )

@@ -12,6 +12,8 @@ import { Async, AsyncProps } from "./../Shared/Select"
 import { PaginateProps, Paginate } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
+import { Grid, Col } from "../Shared/Layout"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -82,35 +84,29 @@ function List({ getCabTypes, cabTypes, ...otherProps }: ListProps) {
       <Helmet>
         <title>Cab Types</title>
       </Helmet>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getCabTypes({ ...params, page: 1 })
-          }}
-        />
-        <Paginate
-          {...otherProps}
-          onChange={page => getCabTypes({ ...params, page })}
-        />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getCabTypes({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getCabTypes({ ...params, page })}
+          />
+        </Col>
+      </Grid>
       <Listable isFetching={isFetching} total={total}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Capacity</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cabTypes.map(cabType => (
-              <tr key={cabType.id}>
-                <td>{cabType.name}</td>
-                <td className="text--right">{cabType.capacity}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Name", "Capacity"]}
+          alignCols={{ 1: "right" }}
+          autoWidth
+          rows={cabTypes.map(cabType => [cabType.name, cabType.capacity])}
+        />
       </Listable>
     </Fragment>
   )

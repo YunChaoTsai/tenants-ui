@@ -13,6 +13,7 @@ import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -92,21 +93,26 @@ function List({
       <Helmet>
         <title>Transport Services List</title>
       </Helmet>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getTransportServices({ ...params, page: 1 })
-          }}
-        />
-        <Paginate
-          {...otherProps}
-          onChange={page => getTransportServices({ ...params, page })}
-        />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getTransportServices({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getTransportServices({ ...params, page })}
+          />
+        </Col>
+      </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
-          headers={["Destinations", "Total Distance (in kms)"]}
+          responsive
+          headers={["Destinations", "Distance (kms)"]}
           alignCols={{ 1: "right" }}
           rows={transportServices.map(transportService => [
             transportService.name,

@@ -12,6 +12,7 @@ import { Async, AsyncProps } from "./../Shared/Select"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import { List } from "./../Shared/List"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -58,18 +59,22 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
       <Helmet>
         <title>Cabs</title>
       </Helmet>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getCabs({ ...params, page: 1 })
-          }}
-        />
-        <Paginate
-          {...otherProps}
-          onChange={page => getCabs({ ...params, page })}
-        />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getCabs({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getCabs({ ...params, page })}
+          />
+        </Col>
+      </Grid>
       <List isFetching={isFetching} total={total}>
         <table>
           <thead>
