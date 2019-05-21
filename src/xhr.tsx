@@ -118,9 +118,38 @@ function errorTransformInterceptor(error: AxiosError): any {
  * Handle the maintaince error response
  */
 function maintainceErrorInterceptor(error: AxiosError): any {
-  const e = error.response && error.response.data && error.response.data.error
-  if (e.status_code === 503) {
-    alert(e.message)
+  const response = error.response
+  if (response) {
+    const e = response.data && response.data.error
+    if (e.status_code === 503) {
+      if (response.headers && response.headers["retry-after"]) {
+        const retryAfter = response.headers["retry-after"]
+        setTimeout(() => {
+          window.location = window.location
+        }, parseInt(retryAfter) * 1000)
+      }
+      alert(e.message)
+    }
+  }
+  return error
+}
+
+/**
+ * Handle the maintaince error response
+ */
+function rateLimitErrorInterceptor(error: AxiosError): any {
+  const response = error.response
+  if (response) {
+    const e = response.data && response.data.error
+    if (e.status_code === 429) {
+      if (response.headers && response.headers["retry-after"]) {
+        const retryAfter = response.headers["retry-after"]
+        setTimeout(() => {
+          window.location = window.location
+        }, parseInt(retryAfter) * 1000)
+      }
+      alert(e.message)
+    }
   }
   return error
 }
@@ -146,7 +175,8 @@ axios.interceptors.response.use(
   compose(accessTokenInterceptor),
   compose(
     errorTransformInterceptor,
-    maintainceErrorInterceptor
+    maintainceErrorInterceptor,
+    rateLimitErrorInterceptor
   )
 )
 
