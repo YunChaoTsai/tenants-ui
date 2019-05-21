@@ -4,11 +4,7 @@ import { Formik, FormikProps, FormikActions, Form, FieldArray } from "formik"
 import Button from "@tourepedia/button"
 import * as Validator from "yup"
 
-import {
-  InputField,
-  ErrorMessage,
-  FormikFormGroup,
-} from "./../Shared/InputField"
+import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectLocations, store as locationStore } from "./../Locations"
 import { withXHR, XHRProps } from "./../xhr"
 import Helmet from "react-helmet-async"
@@ -17,8 +13,9 @@ import { Grid, Col } from "../Shared/Layout"
 const validationSchema = Validator.object().shape({
   via: Validator.array()
     .of(Validator.object().required("Destination is required"))
-    .min(2, "Atleast two locations required")
+    .min(1, "Atleast one locations required")
     .required("Via field is required"),
+  is_sightseeing: Validator.boolean(),
   distance: Validator.number()
     .positive("Distance should be a positive number")
     .integer("Distance should be an integer")
@@ -27,11 +24,13 @@ const validationSchema = Validator.object().shape({
 
 interface NewServiceCredentials {
   via: locationStore.ILocation[]
+  is_sightseeing?: boolean
   distance: number
 }
 
 const initialValues: NewServiceCredentials = {
-  via: [undefined as any, undefined as any],
+  via: [undefined as any],
+  is_sightseeing: false,
   distance: 0,
 }
 
@@ -50,14 +49,14 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
           actions: FormikActions<NewServiceCredentials>
         ) => {
           actions.setStatus()
-          const { distance, via } = values
+          const { distance, via, is_sightseeing } = values
           return xhr
             .post("/transport-services", {
               distance,
               via: via.map(location => location.id),
+              is_sightseeing: +!!is_sightseeing,
             })
-            .then(({ data }) => {
-              const { service } = data
+            .then(() => {
               navigate && navigate("..")
               actions.setSubmitting(false)
             })
@@ -105,7 +104,7 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
                               />
                             )}
                           />
-                          {locations.length > 2 ? (
+                          {locations.length > 1 ? (
                             <Button onClick={_ => remove(index)}>
                               &times; Remove
                             </Button>
@@ -126,6 +125,11 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
                 label="Total distance for the transportation (in kms)"
                 placeholder="420"
                 required
+              />
+              <InputField
+                name="is_sightseeing"
+                type="checkbox"
+                label="Includes sightseeing"
               />
               <footer>
                 <Button type="submit" disabled={isSubmitting}>
