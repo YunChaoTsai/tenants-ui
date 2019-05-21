@@ -16,6 +16,7 @@ import { Dialog, useDialog } from "./../Shared/Dialog"
 import Button from "@tourepedia/button"
 import { AddContactForm } from "../Contacts"
 import { withXHR, XHRProps } from "./../xhr"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -132,8 +133,8 @@ export function Item({
         return (
           <div>
             <Link to="..">Back</Link>
-            <div className="row">
-              <div className="col-md-6">
+            <Grid>
+              <Col>
                 <h3>
                   {name} • {location.short_name} • {stars} Star
                 </h3>
@@ -163,9 +164,9 @@ export function Item({
                     {extra_bed_child_age_end} years
                   </dd>
                 </dl>
-              </div>
-              <div className="col-md-6">
-                <fieldset className="float--right">
+              </Col>
+              <Col sm={"auto"} xs={12}>
+                <fieldset>
                   <legend>Contacts</legend>
                   <ul>
                     {(contacts || []).map(contact => (
@@ -211,8 +212,8 @@ export function Item({
                   </Dialog>
                   <Button onClick={showAddContact}>Add Contact</Button>
                 </fieldset>
-              </div>
-            </div>
+              </Col>
+            </Grid>
             <hr />
             <div>
               <h4>Prices</h4>

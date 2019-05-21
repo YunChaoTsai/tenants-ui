@@ -21,6 +21,7 @@ import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Table } from "../Shared/Table"
+import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -105,21 +106,26 @@ function List({ getLocations, locations, ...otherProps }: ListProps) {
       <Helmet>
         <title>Locations</title>
       </Helmet>
-      <div className="display--flex justify-content--space-between">
-        <Search
-          onSearch={params => {
-            setParams(params)
-            getLocations({ ...params, page: 1 })
-          }}
-        />
-        <Paginate
-          {...otherProps}
-          onChange={page => getLocations({ ...params, page })}
-        />
-      </div>
+      <Grid>
+        <Col>
+          <Search
+            onSearch={params => {
+              setParams(params)
+              getLocations({ ...params, page: 1 })
+            }}
+          />
+        </Col>
+        <Col className="text--right">
+          <Paginate
+            {...otherProps}
+            onChange={page => getLocations({ ...params, page })}
+          />
+        </Col>
+      </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
           headers={["Name", "Latitude", "Longitude"]}
+          responsive
           rows={locations.map(location => [
             location.name,
             location.latitude,

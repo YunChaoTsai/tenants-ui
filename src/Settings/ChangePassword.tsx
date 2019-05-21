@@ -74,7 +74,7 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
           changePassword(values)
             .then(() => {
               alert("Password updated successfully")
-              navigate && navigate("/me")
+              navigate && navigate("/")
             })
             .catch(error => {
               if (error.formikErrors) {

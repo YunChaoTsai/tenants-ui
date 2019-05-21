@@ -22,7 +22,7 @@ export function Paginate({
   onChange: (page: number) => any
 }) {
   return (
-    <span>
+    <span style={{ marginBottom: "1em", display: "inline-block" }}>
       {from}-{to} of {total}{" "}
       <span className="button-group">
         <Button

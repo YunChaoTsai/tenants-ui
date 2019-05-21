@@ -24,6 +24,9 @@ table caption {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+.table-responsive th {
+  white-space: pre;
+}
 .table {
   width: 100%;
 }
