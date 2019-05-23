@@ -30,6 +30,7 @@ import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
 import "./main.css"
 import "./typography.css"
+import { CogAltIcon, OffIcon } from "./Shared/Icons"
 
 interface HeaderProps extends AuthProps {}
 
@@ -91,11 +92,13 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
               Hi {name}
             </a>
             <ul className="menu">
-              <NavLink to="/settings">Settings</NavLink>
+              <NavLink to="/settings">
+                <CogAltIcon /> Settings
+              </NavLink>
               <Location>
                 {({ location }) => (
                   <NavLink to={`/logout?from=${location.pathname}`}>
-                    Logout
+                    <OffIcon /> Logout
                   </NavLink>
                 )}
               </Location>
