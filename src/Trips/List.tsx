@@ -130,14 +130,14 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
                 <div>
                   {contact.name}
                   <br />
-                  <a href={`tel:${contact.phone_number}`}>
+                  <a href={`tel:${contact.phone_number}`} className="btn--icon">
                     <PhoneIcon
                       title={`Call to ${contact.name} on ${
                         contact.phone_number
                       }`}
                     />
                   </a>
-                  <a href={`mailto:${contact.email}`}>
+                  <a href={`mailto:${contact.email}`} className="btn--icon">
                     <MailIcon
                       title={`Send Email to ${contact.name} at ${
                         contact.email

@@ -22,7 +22,7 @@ export default function icon(
    *
    * @example 'chevron-down'
    */
-  baseClassName?: string
+  baseClassName: string
 ) {
   function Icon({
     className,

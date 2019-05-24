@@ -219,6 +219,10 @@ mark {
   background-color: #fff1a8;
 }
 
+svg:not(:root) {
+  overflow: hidden;
+}
+
 /**
  * Utility classes
  */
@@ -318,4 +322,21 @@ mark {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   margin-right: 0 !important;
+}
+
+.btn--icon {
+  display: inline-block;
+  width: 1.8em;
+  height: 1.8em;
+  vertical-align: middle;
+  text-align: center;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+.btn--icon svg {
+  vertical-align: middle;
+}
+.btn--icon + .btn--icon {
+  margin-left: 10px;
 }

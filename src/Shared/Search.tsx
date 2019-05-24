@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Formik, Form } from "formik"
 import { InputField } from "./InputField"
 import Button from "@tourepedia/button"
+import { SearchIcon } from "./Icons"
 
 export interface SearchProps {
   initialParams?: {
@@ -36,7 +37,9 @@ export function Search({
               type="search"
               style={{ minWidth: "200px" }}
             />
-            <Button type="submit">&#128269;</Button>
+            <Button type="submit">
+              <SearchIcon />
+            </Button>
           </div>
         </Form>
       )}

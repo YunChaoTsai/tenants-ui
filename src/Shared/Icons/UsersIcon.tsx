@@ -1,4 +1,4 @@
 import { ReactComponent as Users } from "./svgs/users.svg"
 import icon from "./Icon"
 
-export default icon(Users)
+export default icon(Users, "users")

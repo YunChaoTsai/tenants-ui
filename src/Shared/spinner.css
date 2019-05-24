@@ -9,4 +9,6 @@
 .spin {
   animation: fa-spin 0.6s infinite linear;
   display: inline-block;
+  transform-origin: center center;
+  line-height: 0;
 }

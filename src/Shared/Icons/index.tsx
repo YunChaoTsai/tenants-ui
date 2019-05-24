@@ -15,6 +15,7 @@ import OffIcon from "./OffIcon"
 import OkIcon from "./OkIcon"
 import PlusIcon from "./PlusIcon"
 import PhoneIcon from "./PhoneIcon"
+import RefreshIcon from "./RefreshIcon"
 import RupeeIcon from "./RupeeIcon"
 import SearchIcon from "./SearchIcon"
 import SpinnerIcon from "./SpinnerIcon"
@@ -42,6 +43,7 @@ export {
   OkIcon,
   PlusIcon,
   PhoneIcon,
+  RefreshIcon,
   RupeeIcon,
   SearchIcon,
   SpinnerIcon,

@@ -1,4 +1,4 @@
 import { ReactComponent as Plus } from "./svgs/plus.svg"
 import icon from "./Icon"
 
-export default icon(Plus)
+export default icon(Plus, "plus")

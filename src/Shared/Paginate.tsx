@@ -1,5 +1,6 @@
 import React from "react"
 import Button from "@tourepedia/button"
+import { RefreshIcon } from "./Icons"
 
 export interface PaginateProps {
   total: number
@@ -32,7 +33,7 @@ export function Paginate({
           &lt;
         </Button>
         <Button disabled={isFetching} onClick={() => onChange(currentPage)}>
-          &#8635;
+          <RefreshIcon />
         </Button>
         <Button
           disabled={isFetching || lastPage <= currentPage}

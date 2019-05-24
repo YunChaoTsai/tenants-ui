@@ -32,7 +32,7 @@ function MyComponent() {
 ```typescript
 import { ReactComponent as Phone } from "./svgs/phone.svg"
 import icon from "./Icon"
-export default icon(Phone)
+export default icon(Phone, "phone")
 ```
 
 3. Add an export entry inside `./index.tsx` for each import
