@@ -3,6 +3,7 @@ export interface IInstalment {
   amount: number
   due_date: string
   paid_amount: number
+  due_amount: number
   payment_id: number
   transactions: ITransaction[]
 }

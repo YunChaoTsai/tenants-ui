@@ -11,29 +11,31 @@ import "./icon.css"
  *   - const Icon = icon(Test)
  */
 export default function icon(
-  Icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>,
+  /**
+   * Icon to be rendered
+   */
+  SvgIcon: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & { title?: string }
+  >,
+  /**
+   * base class name for the icon (without prefixing with 'tp-icon-')
+   *
+   * @example 'chevron-down'
+   */
   baseClassName?: string
 ) {
-  const name = `${Icon.displayName || Icon.name}Icon`
-  baseClassName =
-    baseClassName ||
-    name
-      .replace(/^svg/i, "") // remove the svg prefix, addes by @svgr based on import name
-      .replace(/icon$/i, "") // remove the icon suffix, added by @svgr based on file name
-      .replace(/\B([A-Z])/g, "-$1")
-      .toLowerCase()
-  function ComponentWithIcon({
+  function Icon({
     className,
     title,
     ...props
-  }: React.ComponentProps<typeof Icon> & {
+  }: React.ComponentProps<typeof SvgIcon> & {
     /**
      * A title for a11y. If not passed, aria-hidden will be set to true to hide the icon from screen readers
      */
     title?: string
   }) {
     return (
-      <Icon
+      <SvgIcon
         aria-label={title}
         aria-hidden={!title ? "true" : "false"}
         className={classNames("tp-icon", `tp-icon-${baseClassName}`, className)}
@@ -41,6 +43,5 @@ export default function icon(
       />
     )
   }
-  ComponentWithIcon.displayName = name
-  return ComponentWithIcon
+  return Icon
 }

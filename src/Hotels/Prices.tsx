@@ -70,17 +70,21 @@ function Prices({
 }: PricesProps) {
   const { isFetching, total, currentPage } = otherProps
   const [params, setParams] = useSearch()
-  if (!hotelId) return null
-  const id = parseInt(hotelId, 10)
-  if (isNaN(id)) return null
+  let id: number = parseInt(hotelId || "", 10)
   useEffect(() => {
-    getPrices(id, { page: currentPage })
+    if (id) {
+      getPrices(id, { page: currentPage })
+    }
   }, [])
+  if (isNaN(id)) {
+    return null
+  }
   return (
     <Fragment>
       <Grid>
         <Col>
           <Search
+            initialParams={params}
             onSearch={params => {
               setParams(params)
               getPrices({ ...params, page: 1 })

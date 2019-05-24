@@ -11,6 +11,7 @@ import { Table } from "../Shared/Table"
 import { useFetch } from "../hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
+import { RupeeIcon } from "../Shared/Icons"
 
 export interface IInstalment {
   amount: number
@@ -65,7 +66,10 @@ export const GivenQuote = withXHR(function GivenQuote({
   return (
     <div>
       <h5>
-        Given Price: <mark>INR {numberToLocalString(given_price)} /-</mark>
+        Given Price:{" "}
+        <mark>
+          <RupeeIcon /> {numberToLocalString(given_price)} /-
+        </mark>
       </h5>
       {comments ? <blockquote>{comments}</blockquote> : null}
       <p>

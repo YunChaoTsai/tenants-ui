@@ -16,6 +16,7 @@ import { useFetch } from "../hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
+import { BedIcon, BusIcon } from "../Shared/Icons"
 
 interface IInstalment {
   amount: number
@@ -186,7 +187,9 @@ export const Quote = withXHR(function Quote({
         </p>
       </header>
       <section>
-        <h6>Hotels</h6>
+        <h6>
+          <BedIcon /> Accommodation
+        </h6>
         <Table
           caption={
             "Bellow are the details of daywise hotel accomodation and their prices"
@@ -237,7 +240,9 @@ export const Quote = withXHR(function Quote({
         />
       </section>
       <section>
-        <h6>Transport</h6>
+        <h6>
+          <BusIcon /> Transportation
+        </h6>
         <Table
           caption={
             "Bellow are the details for the daywise transportation and their prices"
@@ -294,7 +299,7 @@ export const Quote = withXHR(function Quote({
                   validationSchema={giveQuoteSchema}
                   onSubmit={(values, actions) => {
                     if (
-                      confirm(
+                      window.confirm(
                         "Are you sure you want to give this quote to the customer?"
                       )
                     ) {

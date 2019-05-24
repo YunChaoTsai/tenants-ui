@@ -1,5 +1,6 @@
 import { createAsyncAction, ActionType } from "typesafe-actions"
 
+import { store as cabTypeStore } from "./../CabTypes"
 import {
   IBaseItem,
   IBaseState,
@@ -11,8 +12,6 @@ import {
 } from "./../model"
 
 export const key = "CAB_LIST_STATE"
-
-import { store as cabTypeStore } from "./../CabTypes"
 
 export interface ICab extends IBaseItem {
   id: number

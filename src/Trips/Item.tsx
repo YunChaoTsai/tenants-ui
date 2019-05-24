@@ -1,10 +1,11 @@
-import React, { useEffect, useState, Fragment } from "react"
-import { RouteComponentProps, Link, Router, Redirect } from "@reach/router"
+import React, { useEffect, Fragment } from "react"
+import { RouteComponentProps, Link, Router } from "@reach/router"
 import Button from "@tourepedia/button"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 import moment from "moment"
 import Helmet from "react-helmet-async"
+import { $PropertyType } from "utility-types"
 import {
   Formik,
   Form,
@@ -34,6 +35,7 @@ import Spinner from "../Shared/Spinner"
 import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
+import { UsersIcon, ChildIcon } from "../Shared/Icons"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -64,19 +66,19 @@ export const getTrip = (tripId: string): ThunkAction<Promise<ITrip>> => (
     })
 }
 
-function TripPayments<T>({
+function CustomerPayments({
   payments,
-  caption,
 }: {
-  caption: string
-  payments?: Array<paymentStore.IPayment<T>>
+  payments: $PropertyType<ITrip, "customer_payments">
 }) {
   return payments && payments.length ? (
     <Table
       autoWidth
-      caption={caption}
-      headers={["Due Amount", "Due Date"]}
-      alignCols={{ 0: "right" }}
+      caption={"Payments towards customer"}
+      headers={["Due Date", "Due", "Total", "Paid"]}
+      alignCols={{ 0: "right", 2: "right", 3: "right" }}
+      bordered
+      striped={false}
       rows={payments
         .reduce(
           (
@@ -87,15 +89,238 @@ function TripPayments<T>({
           []
         )
         .map(instalment => [
-          numberToLocalString(instalment.amount - instalment.paid_amount),
           moment
             .utc(instalment.due_date)
             .local()
             .format("DD MMM, YYYY"),
+          numberToLocalString(instalment.due_amount),
+          numberToLocalString(instalment.amount),
+          numberToLocalString(instalment.paid_amount),
         ])}
     />
   ) : null
 }
+function HotelPayments({
+  payments,
+}: {
+  payments: $PropertyType<ITrip, "hotel_payments">
+}) {
+  return payments && payments.length ? (
+    <Table
+      caption="Payments for accomodation"
+      headers={[
+        "Hotel",
+        "Due Date",
+        "Due Amount",
+        "Total Amount",
+        "Paid Amount",
+      ]}
+      striped={false}
+      bordered
+      autoWidth
+    >
+      <tbody>
+        {payments.map(payment => {
+          const hotel = payment.paymentable.hotel
+          return (
+            <Fragment key={payment.id}>
+              {payment.instalments.map((instalment, i, instalments) => (
+                <tr key={instalment.id}>
+                  {i == 0 ? (
+                    <td
+                      rowSpan={instalments.length}
+                      className="vertical-align--middle"
+                    >
+                      <b>{hotel.name}</b>
+                      <br />
+                      <small>
+                        {hotel.location.short_name}, {hotel.stars} Star
+                      </small>
+                    </td>
+                  ) : null}
+                  <td>
+                    {moment
+                      .utc(instalment.due_date)
+                      .local()
+                      .format("Do MMM, YYYY")}
+                  </td>
+                  <td>{numberToLocalString(instalment.due_amount)}</td>
+                  <td>{numberToLocalString(instalment.amount)}</td>
+                  <td>{numberToLocalString(instalment.paid_amount)}</td>
+                </tr>
+              ))}
+            </Fragment>
+          )
+        })}
+      </tbody>
+    </Table>
+  ) : null
+}
+
+function CabPayments({
+  payments,
+}: {
+  payments: $PropertyType<ITrip, "cab_payments">
+}) {
+  return payments && payments.length ? (
+    <Table
+      caption="Payments for Transportation"
+      headers={["Transportation", "Due Date", "Due", "Total", "Paid"]}
+      striped={false}
+      bordered
+      autoWidth
+    >
+      <tbody>
+        {payments.map(payment => {
+          const cabType = payment.paymentable.cab_type
+          const transportService = payment.paymentable.transport_service
+          return (
+            <Fragment key={payment.id}>
+              {payment.instalments.map((instalment, i, instalments) => (
+                <tr key={instalment.id}>
+                  {i == 0 ? (
+                    <td
+                      rowSpan={instalments.length}
+                      className="vertical-align--middle"
+                    >
+                      <b>{transportService.name}</b>
+                      <br />
+                      <small>{cabType.name}</small>
+                    </td>
+                  ) : null}
+                  <td>
+                    {moment
+                      .utc(instalment.due_date)
+                      .local()
+                      .format("Do MMM, YYYY")}
+                  </td>
+                  <td>{numberToLocalString(instalment.due_amount)}</td>
+                  <td>{numberToLocalString(instalment.amount)}</td>
+                  <td>{numberToLocalString(instalment.paid_amount)}</td>
+                </tr>
+              ))}
+            </Fragment>
+          )
+        })}
+      </tbody>
+    </Table>
+  ) : null
+}
+
+function BasicDetails({ trip }: { trip: ITrip }) {
+  const {
+    id,
+    start_date,
+    end_date,
+    locations,
+    no_of_adults,
+    children,
+    trip_source,
+    trip_id,
+    contacts,
+  } = trip
+  return (
+    <div>
+      <h3>
+        {locations.map(l => l.short_name).join(" • ")} ({trip_source.short_name}
+        -{trip_id || id})
+      </h3>
+      <dl>
+        <Grid>
+          <Col>
+            <dt>Dates</dt>
+            <dd className="white-space--pre">
+              {moment
+                .utc(start_date)
+                .local()
+                .format("DD MMM, YYYY")}{" "}
+              to{" "}
+              {moment
+                .utc(end_date)
+                .local()
+                .format("DD MMM, YYYY")}
+            </dd>
+          </Col>
+          <Col>
+            <dt>Pax</dt>
+            <dd>
+              <UsersIcon /> {no_of_adults} Adults
+              <br />
+              {children ? (
+                <span>
+                  <ChildIcon />
+                  {children} Children
+                </span>
+              ) : (
+                ""
+              )}
+            </dd>
+          </Col>
+          <Col>
+            <dt>Travelers</dt>
+            <dd>
+              <ul className="list">
+                {contacts.map(contact => (
+                  <li key={contact.id}>
+                    <b>{contact.name}</b>
+                    <br />
+                    <span>
+                      <a href={`tel:${contact.phone_number}`}>
+                        {contact.phone_number}
+                      </a>
+                      {contact.email ? (
+                        <span>
+                          {" "}
+                          • 
+                          <a href={`mailto:${contact.email}`}>
+                            {contact.email}
+                          </a>
+                        </span>
+                      ) : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </Col>
+        </Grid>
+      </dl>
+    </div>
+  )
+}
+
+const LatestGivenQuote = withXHR(function LatestGivenQuote({
+  trip,
+  xhr,
+}: XHRProps & { trip: ITrip }) {
+  const [isConvertVisible, showConvert, hideConvert] = useDialog()
+  const { latest_given_quote, converted_at } = trip
+  return latest_given_quote ? (
+    <fieldset>
+      <legend>
+        <h4>
+          {converted_at ? "Quote used for conversion" : "Latest Given Quote"}
+        </h4>
+      </legend>
+      <GivenQuote
+        givenQuote={latest_given_quote}
+        readOnly={!!converted_at}
+        showHotelBookingStatus={!!converted_at}
+      />
+      <ConvertTrip
+        trip={trip}
+        isConvertVisible={isConvertVisible}
+        hideConvert={hideConvert}
+        onConvert={(data: any) => XHR(xhr).convertTrip(data)}
+      />
+      {converted_at ? null : (
+        <footer>
+          <Button onClick={showConvert}>Mark as converted</Button>
+        </footer>
+      )}
+    </fieldset>
+  ) : null
+})
 
 interface StateProps {
   isFetching: boolean
@@ -127,7 +352,6 @@ const connectWithItem = connect<
 )
 
 function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
-  const [isConvertVisible, showConvert, hideConvert] = useDialog()
   useEffect(() => {
     tripId && getTrip(tripId)
   }, [])
@@ -142,17 +366,10 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
   }
   const {
     id,
-    start_date,
-    end_date,
     locations,
-    no_of_adults,
-    children,
     trip_source,
     trip_id,
-    latest_given_quote,
-    contacts,
-    converted_at,
-    customer_payments: payments,
+    customer_payments,
     cab_payments,
     hotel_payments,
   } = trip
@@ -165,214 +382,13 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
         </title>
       </Helmet>
       <Link to="..">Back to Listing</Link>
-      <div>
-        <h3>
-          {locations.map(l => l.short_name).join(" • ")} (
-          {trip_source.short_name}-{trip_id || id})
-        </h3>
-        <dl>
-          <Grid>
-            <Col>
-              <dt>Dates</dt>
-              <dd className="white-space--pre">
-                {moment
-                  .utc(start_date)
-                  .local()
-                  .format("DD MMM, YYYY")}{" "}
-                to{" "}
-                {moment
-                  .utc(end_date)
-                  .local()
-                  .format("DD MMM, YYYY")}
-              </dd>
-            </Col>
-            <Col>
-              <dt>Pax</dt>
-              <dd>
-                {no_of_adults} Adults
-                <br />
-                {children ? `${children} Children` : ""}
-              </dd>
-            </Col>
-            <Col>
-              <dt>Travelers</dt>
-              <dd>
-                <ul className="list">
-                  {contacts.map(contact => (
-                    <li key={contact.id}>
-                      <b>{contact.name}</b>
-                      <br />
-                      <span>
-                        <a href={`tel:${contact.phone_number}`}>
-                          {contact.phone_number}
-                        </a>
-                        {contact.email ? (
-                          <span>
-                            {" "}
-                            • 
-                            <a href={`mailto:${contact.email}`}>
-                              {contact.email}
-                            </a>
-                          </span>
-                        ) : null}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </dd>
-            </Col>
-          </Grid>
-        </dl>
-        <h4>{converted_at ? "Converted" : null}</h4>
-        <Grid>
-          {payments && payments.length ? (
-            <Col sm="auto">
-              <Table
-                autoWidth
-                caption={"Payments towards customer"}
-                headers={["Due Amount", "Due Date"]}
-                alignCols={{ 0: "right" }}
-                rows={payments
-                  .reduce(
-                    (
-                      instalments: Array<paymentStore.IInstalment>,
-                      payment
-                    ): Array<paymentStore.IInstalment> =>
-                      instalments.concat(payment.instalments),
-                    []
-                  )
-                  .map(instalment => [
-                    numberToLocalString(
-                      instalment.amount - instalment.paid_amount
-                    ),
-                    moment
-                      .utc(instalment.due_date)
-                      .local()
-                      .format("DD MMM, YYYY"),
-                  ])}
-              />
-            </Col>
-          ) : null}
-          {cab_payments ? (
-            <Col sm="auto">
-              <Table
-                caption="Payments for Transportation"
-                headers={["Transportation", "Amount", "Due Date"]}
-                striped={false}
-                bordered
-              >
-                <tbody>
-                  {cab_payments.map(payment => {
-                    const cabType = payment.paymentable.cab_type
-                    const transportService =
-                      payment.paymentable.transport_service
-                    return (
-                      <Fragment key={payment.id}>
-                        {payment.instalments.map(
-                          (instalment, i, instalments) => (
-                            <tr key={instalment.id}>
-                              {i == 0 ? (
-                                <td
-                                  rowSpan={instalments.length}
-                                  className="vertical-align--middle"
-                                >
-                                  <b>{transportService.name}</b>
-                                  <br />
-                                  <small>{cabType.name}</small>
-                                </td>
-                              ) : null}
-                              <td>{numberToLocalString(instalment.amount)}</td>
-                              <td>
-                                {moment
-                                  .utc(instalment.due_date)
-                                  .local()
-                                  .format("Do MMM, YYYY")}
-                              </td>
-                            </tr>
-                          )
-                        )}
-                      </Fragment>
-                    )
-                  })}
-                </tbody>
-              </Table>
-            </Col>
-          ) : null}
-          {hotel_payments ? (
-            <Col sm="auto">
-              <Table
-                caption="Payments for accomodation"
-                headers={["Hotel", "Amount", "Due Date"]}
-                striped={false}
-                bordered
-              >
-                <tbody>
-                  {hotel_payments.map(payment => {
-                    const hotel = payment.paymentable.hotel
-                    return (
-                      <Fragment key={payment.id}>
-                        {payment.instalments.map(
-                          (instalment, i, instalments) => (
-                            <tr key={instalment.id}>
-                              {i == 0 ? (
-                                <td
-                                  rowSpan={instalments.length}
-                                  className="vertical-align--middle"
-                                >
-                                  <b>{hotel.name}</b>
-                                  <br />
-                                  <small>
-                                    {hotel.location.short_name}, {hotel.stars}{" "}
-                                    Star
-                                  </small>
-                                </td>
-                              ) : null}
-                              <td>{numberToLocalString(instalment.amount)}</td>
-                              <td>
-                                {moment
-                                  .utc(instalment.due_date)
-                                  .local()
-                                  .format("Do MMM, YYYY")}
-                              </td>
-                            </tr>
-                          )
-                        )}
-                      </Fragment>
-                    )
-                  })}
-                </tbody>
-              </Table>
-            </Col>
-          ) : null}
-        </Grid>
-        {latest_given_quote ? (
-          <fieldset>
-            <legend>
-              <h4>
-                {converted_at
-                  ? "Quote used for conversion"
-                  : "Latest Given Quote"}
-              </h4>
-            </legend>
-            <GivenQuote
-              givenQuote={latest_given_quote}
-              readOnly={!!converted_at}
-              showHotelBookingStatus={!!converted_at}
-            />
-            <ConvertTrip
-              trip={trip}
-              isConvertVisible={isConvertVisible}
-              hideConvert={hideConvert}
-              onConvert={(data: any) => XHR(xhr).convertTrip(data)}
-            />
-            {converted_at ? null : (
-              <footer>
-                <Button onClick={showConvert}>Mark as converted</Button>
-              </footer>
-            )}
-          </fieldset>
-        ) : null}
-      </div>
+      <BasicDetails trip={trip} />
+      {customer_payments ? (
+        <CustomerPayments payments={customer_payments} />
+      ) : null}
+      {hotel_payments ? <HotelPayments payments={hotel_payments} /> : null}
+      {cab_payments ? <CabPayments payments={cab_payments} /> : null}
+      <LatestGivenQuote trip={trip} />
       <Link to="given-quotes">Given Quotes</Link> •{" "}
       <Link to="quotes">Quotes</Link> • <Link to="new-quote">New Quote</Link>
       <Router>
@@ -436,16 +452,19 @@ export const ConvertTrip = withXHR(function ConvertTrip({
     no_of_adults,
     children,
   } = trip
-  if (!latest_given_quote) return null
   const [
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
   ] = useFetch<IInstalment[]>(
-    () =>
-      GiveQuotesXHR(xhr)
+    () => {
+      if (!latest_given_quote) {
+        return Promise.reject("No given quote for the trip")
+      }
+      return GiveQuotesXHR(xhr)
         .getInstalments(latest_given_quote.id)
-        .then(resp => resp.data),
+        .then(resp => resp.data)
+    },
     {
       isFetching: true,
     }
@@ -455,6 +474,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
       fetchInstalments()
     }
   }, [isConvertVisible])
+  if (!latest_given_quote) return null
   return (
     <Dialog open={isConvertVisible} onClose={hideConvert}>
       <Dialog.Header>
@@ -509,7 +529,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                 return
               }
               if (
-                confirm(
+                window.confirm(
                   `${
                     totalInstalmentAmount > given_price
                       ? "Total instalment is greater then given quote's amount. "

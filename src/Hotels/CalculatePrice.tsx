@@ -185,7 +185,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           } = values
           if (
             hotel &&
-            location &&
             start_date &&
             no_of_nights &&
             meal_plan &&

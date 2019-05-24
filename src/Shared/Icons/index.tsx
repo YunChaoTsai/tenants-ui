@@ -14,7 +14,9 @@ import MinusIcon from "./MinusIcon"
 import OffIcon from "./OffIcon"
 import OkIcon from "./OkIcon"
 import PlusIcon from "./PlusIcon"
+import PhoneIcon from "./PhoneIcon"
 import RupeeIcon from "./RupeeIcon"
+import SearchIcon from "./SearchIcon"
 import SpinnerIcon from "./SpinnerIcon"
 import StarEmptyIcon from "./StarEmptyIcon"
 import StarIcon from "./StarIcon"
@@ -39,7 +41,9 @@ export {
   OffIcon,
   OkIcon,
   PlusIcon,
+  PhoneIcon,
   RupeeIcon,
+  SearchIcon,
   SpinnerIcon,
   StarEmptyIcon,
   StarIcon,

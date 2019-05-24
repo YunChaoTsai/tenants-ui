@@ -104,11 +104,11 @@ export function Item({
   navigate,
   xhr,
 }: XHRProps & RouteComponentProps<{ hotelId: string }>) {
+  const [isVisibleAddContact, showAddContact, hideAddContact] = useDialog()
   if (!hotelId) {
     navigate && navigate("/hotels")
     return null
   }
-  const [isVisibleAddContact, showAddContact, hideAddContact] = useDialog()
   return (
     <HotelDataProvider
       hotelId={hotelId}

@@ -12,6 +12,8 @@ import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { MailIcon } from "../Shared/Icons"
+import PhoneIcon from "../Shared/Icons/PhoneIcon"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -128,8 +130,20 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
                 <div>
                   {contact.name}
                   <br />
-                  <a href={`tel:${contact.phone_number}`}>&#128222;</a>
-                  <a href={`mailto:${contact.email}`}>&#9993;</a>
+                  <a href={`tel:${contact.phone_number}`}>
+                    <PhoneIcon
+                      title={`Call to ${contact.name} on ${
+                        contact.phone_number
+                      }`}
+                    />
+                  </a>
+                  <a href={`mailto:${contact.email}`}>
+                    <MailIcon
+                      title={`Send Email to ${contact.name} at ${
+                        contact.email
+                      }`}
+                    />
+                  </a>
                 </div>
               ) : null,
               `${no_of_adults} Adults${children ? " with " + children : ""}`,
