@@ -29,6 +29,7 @@
 - `yup`: data validation
 - `axios`: helper for xhr
 - `@tourepedia/ui`: ui component library for tourepedia
+- `commitizen`: craft your commit message with proper attributes
 
 2. Clone the repository and install the dependencies
 
@@ -58,5 +59,8 @@ contain all the exports from Roles management module.
 
 ```bash
 npm start # to start the development server
-npm run test # to run the tests
+npm run test # to run the unit tests
+npm run cypress # to run any E2E tests
+npm run cypress:all # to run all E2E tests
+npm run commit # to commit the changes
 ```
