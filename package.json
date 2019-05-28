@@ -24,6 +24,7 @@
     "@types/yup": "0.26.9",
     "axios": "0.18.0",
     "classnames": "2.2.6",
+    "env-cmd": "9.0.1",
     "formik": "1.5.1",
     "moment": "2.24.0",
     "qs": "6.6.0",
@@ -47,7 +48,7 @@
     "cypress": "cypress open",
     "cypress:all": "cypress run",
     "commit": "git-cz",
-    "release": "semantic-release"
+    "release": "env-cmd semantic-release"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -67,7 +68,7 @@
   "devDependencies": {
     "@cypress/webpack-preprocessor": "4.0.3",
     "@semantic-release/commit-analyzer": "6.1.0",
-    "@semantic-release/github": "5.2.10",
+    "@semantic-release/github": "5.3.3",
     "@semantic-release/release-notes-generator": "7.1.4",
     "commitizen": "3.1.1",
     "cross-env": "5.2.0",
