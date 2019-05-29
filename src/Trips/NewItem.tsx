@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import {
   Formik,
@@ -6,8 +6,6 @@ import {
   FormikProps,
   Form,
   FieldArray,
-  ErrorMessage,
-  Field,
   FieldProps,
 } from "formik"
 import Button from "@tourepedia/button"
@@ -21,6 +19,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { ICountryDialCode } from "../CountryDialCodes/store"
 import { SelectCountryDialCodes } from "../CountryDialCodes"
 import { Grid, Col } from "../Shared/Layout"
+import DatePicker from "../Shared/DatePicker"
 
 const validationSchema = Validator.object().shape({
   trip_id: Validator.string(),
@@ -195,12 +194,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 />
               </Col>
               <Col>
-                <InputField
-                  name="start_date"
-                  label="Start Date"
-                  type="date"
-                  required
-                />
+                <DatePicker name="start_date" label="Start Date" required />
               </Col>
               <Col>
                 <InputField

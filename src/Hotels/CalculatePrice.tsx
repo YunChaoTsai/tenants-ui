@@ -26,6 +26,7 @@ import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import DatePicker from "../Shared/DatePicker"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -269,10 +270,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       <fieldset key={index}>
                         <Grid>
                           <Col md={3} sm={6}>
-                            <InputField
+                            <DatePicker
                               label="Checkin Date"
                               name={`${name}.${index}.start_date`}
-                              type="date"
                             />
                           </Col>
                           <Col md={3} sm={6}>
