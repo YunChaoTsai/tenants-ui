@@ -15,7 +15,8 @@ export interface ITransaction {
   is_credited: boolean
   payment_mode: string
   comments: string
-  instalment: IInstalment
+  instalment?: IInstalment
+  date: string
 }
 
 export interface IPayment<TPaymentable> {
