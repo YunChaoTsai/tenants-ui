@@ -45,6 +45,11 @@ export function XHR(xhr: AxiosInstance) {
     convertTrip(data: any): Promise<ITrip> {
       return xhr.post("/converted-trips", data).then(resp => resp.data.data)
     },
+    logTransaction(data: any): Promise<paymentStore.IPayment<any>> {
+      return xhr
+        .post("/payment-transactions", data)
+        .then(resp => resp.data.data)
+    },
   }
 }
 
@@ -66,6 +71,171 @@ export const getTrip = (tripId: string): ThunkAction<Promise<ITrip>> => (
     })
 }
 
+const LogTransaction = withXHR(function LogTransaction({
+  instalment,
+  xhr,
+}: XHRProps & { instalment: paymentStore.IInstalment }) {
+  const [dialogOpen, open, close] = useDialog()
+  return (
+    <>
+      <Button onClick={open}>Add</Button>
+      <Dialog open={dialogOpen} onClose={close} closeButton>
+        <Dialog.Header>
+          <Dialog.Title>Log Transaction</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Body>
+          <p>
+            <mark>INR {numberToLocalString(instalment.due_amount)}</mark> is due
+            by
+            <mark>
+              {moment
+                .utc(instalment.due_date)
+                .local()
+                .format("DD MMM, YYYY")}
+            </mark>
+          </p>
+          <Formik
+            initialValues={{
+              amount: instalment.due_amount,
+              payment_mode: "netbanking",
+              comments: "",
+            }}
+            onSubmit={({ amount, comments, payment_mode }, actions) => {
+              actions.setStatus()
+              XHR(xhr)
+                .logTransaction({
+                  instalment_id: instalment.id,
+                  amount,
+                  payment_mode,
+                  comments,
+                })
+                .then(() => {
+                  actions.setSubmitting(false)
+                  window.location = window.location
+                })
+                .catch(e => {
+                  actions.setStatus(e.message)
+                  if (e.formikErrors) {
+                    actions.setErrors(e.formikErrors)
+                  }
+                  actions.setStatus(false)
+                })
+            }}
+            render={({ isSubmitting, status }) => (
+              <Form noValidate>
+                {status ? <p className="error">{status}</p> : null}
+                <InputField name="amount" label="Paid Amount (INR)" required />
+                <InputField
+                  as="select"
+                  name="payment_mode"
+                  label="Payment Mode"
+                  required
+                >
+                  <option value="cash">Cash</option>
+                  <option value="netbanking">Netbanking</option>
+                  <option value="upi">UPI</option>
+                  <option value="others">Others</option>
+                </InputField>
+                <InputField
+                  name="comments"
+                  as="textarea"
+                  label="Comments"
+                  placeholder="Any comments consisting reference id or payment details"
+                />
+
+                <Dialog.Footer>
+                  <Button disabled={isSubmitting} type="submit">
+                    Update
+                  </Button>
+                  <Button className="btn--secondary" onClick={close}>
+                    Cancel
+                  </Button>
+                </Dialog.Footer>
+              </Form>
+            )}
+          />
+        </Dialog.Body>
+      </Dialog>
+    </>
+  )
+})
+
+function Transactions({
+  instalment,
+}: {
+  instalment: paymentStore.IInstalment
+}) {
+  return (
+    <div>
+      {instalment.transactions && instalment.transactions.length ? (
+        <div>
+          {instalment.transactions.map(transaction => (
+            <div key={transaction.id}>
+              {moment
+                .utc(transaction.date)
+                .local()
+                .format("DD MMM, YYYY [at] hh:mm A")}
+              {" - "}
+              {numberToLocalString(transaction.amount)} /-
+              {transaction.comments ? (
+                <blockquote>{transaction.comments}</blockquote>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>Nothing yet</p>
+      )}
+      {instalment.due_amount > 0 ? (
+        <LogTransaction instalment={instalment} />
+      ) : null}
+    </div>
+  )
+}
+
+function InstalmentStatus({
+  dueAmount,
+  dueDate,
+}: {
+  dueAmount: number
+  dueDate: string
+}) {
+  if (dueAmount <= 0) {
+    return <b>&lt;PAID&gt;</b>
+  }
+  const due_date = moment.utc(dueDate).local()
+  const today = moment()
+  if (due_date.isBefore(today)) {
+    return <b>&lt;OVERDUE&gt;</b>
+  }
+  return <b>&lt;PENDING&gt;</b>
+}
+
+function DateString({ date }: { date: string }) {
+  return (
+    <span>
+      {moment
+        .utc(date)
+        .local()
+        .format("DD MMM, YYYY")}
+    </span>
+  )
+}
+
+function Amount({ amount }: { amount: number }) {
+  return <span>{numberToLocalString(amount)}</span>
+}
+
+function Due({ date, amount }: { date: string; amount: number }) {
+  return (
+    <div>
+      <Amount amount={amount} />
+      <br />
+      <InstalmentStatus dueAmount={amount} dueDate={date} />
+    </div>
+  )
+}
+
 function CustomerPayments({
   payments,
 }: {
@@ -75,7 +245,7 @@ function CustomerPayments({
     <Table
       autoWidth
       caption={"Payments towards customer"}
-      headers={["Due Date", "Due", "Total", "Paid"]}
+      headers={["Due Date", "Due", "Total", "Paid", "Transactions"]}
       alignCols={{ 0: "right", 2: "right", 3: "right" }}
       bordered
       striped={false}
@@ -89,13 +259,11 @@ function CustomerPayments({
           []
         )
         .map(instalment => [
-          moment
-            .utc(instalment.due_date)
-            .local()
-            .format("DD MMM, YYYY"),
-          numberToLocalString(instalment.due_amount),
-          numberToLocalString(instalment.amount),
-          numberToLocalString(instalment.paid_amount),
+          <DateString date={instalment.due_date} />,
+          <Due date={instalment.due_date} amount={instalment.due_amount} />,
+          <Amount amount={instalment.amount} />,
+          <Amount amount={instalment.paid_amount} />,
+          <Transactions instalment={instalment} />,
         ])}
     />
   ) : null
@@ -114,6 +282,7 @@ function HotelPayments({
         "Due Amount",
         "Total Amount",
         "Paid Amount",
+        "Transactions",
       ]}
       striped={false}
       bordered
@@ -139,14 +308,23 @@ function HotelPayments({
                     </td>
                   ) : null}
                   <td>
-                    {moment
-                      .utc(instalment.due_date)
-                      .local()
-                      .format("Do MMM, YYYY")}
+                    <DateString date={instalment.due_date} />
                   </td>
-                  <td>{numberToLocalString(instalment.due_amount)}</td>
-                  <td>{numberToLocalString(instalment.amount)}</td>
-                  <td>{numberToLocalString(instalment.paid_amount)}</td>
+                  <td>
+                    <Due
+                      date={instalment.due_date}
+                      amount={instalment.due_amount}
+                    />
+                  </td>
+                  <td>
+                    <Amount amount={instalment.amount} />
+                  </td>
+                  <td>
+                    <Amount amount={instalment.amount} />
+                  </td>
+                  <td>
+                    <Transactions instalment={instalment} />
+                  </td>
                 </tr>
               ))}
             </Fragment>
@@ -165,7 +343,14 @@ function CabPayments({
   return payments && payments.length ? (
     <Table
       caption="Payments for Transportation"
-      headers={["Transportation", "Due Date", "Due", "Total", "Paid"]}
+      headers={[
+        "Transportation",
+        "Due Date",
+        "Due",
+        "Total",
+        "Paid",
+        "Transactions",
+      ]}
       striped={false}
       bordered
       autoWidth
@@ -189,14 +374,23 @@ function CabPayments({
                     </td>
                   ) : null}
                   <td>
-                    {moment
-                      .utc(instalment.due_date)
-                      .local()
-                      .format("Do MMM, YYYY")}
+                    <Due
+                      date={instalment.due_date}
+                      amount={instalment.due_amount}
+                    />
                   </td>
-                  <td>{numberToLocalString(instalment.due_amount)}</td>
-                  <td>{numberToLocalString(instalment.amount)}</td>
-                  <td>{numberToLocalString(instalment.paid_amount)}</td>
+                  <td>
+                    <Amount amount={instalment.due_amount} />
+                  </td>
+                  <td>
+                    <Amount amount={instalment.amount} />
+                  </td>
+                  <td>
+                    <Amount amount={instalment.paid_amount} />
+                  </td>
+                  <td>
+                    <Transactions instalment={instalment} />
+                  </td>
                 </tr>
               ))}
             </Fragment>
