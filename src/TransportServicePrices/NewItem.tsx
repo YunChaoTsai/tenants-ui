@@ -6,10 +6,8 @@ import {
   FormikActions,
   FormikProps,
   Form,
-  Field,
   FieldProps,
   FieldArray,
-  ErrorMessage,
 } from "formik"
 import Button from "@tourepedia/button"
 import * as Validator from "yup"
@@ -23,8 +21,8 @@ import {
 } from "./../TransportServices"
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import DatePicker from "../Shared/DatePicker"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -126,9 +124,9 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
             })
           }
         })
-        return XHR(xhr)
+        XHR(xhr)
           .storePrice({ prices })
-          .then(resp => {
+          .then(() => {
             actions.setSubmitting(false)
             navigate && navigate("..")
           })
@@ -157,18 +155,16 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                     <li key={index}>
                       <Grid>
                         <Col>
-                          <InputField
+                          <DatePicker
                             label="Start Date"
                             name={`${name}.${index}.start_date`}
-                            type="date"
                             required
                           />
                         </Col>
                         <Col>
-                          <InputField
+                          <DatePicker
                             label="End Date"
                             name={`${name}.${index}.end_date`}
-                            type="date"
                             required
                           />
                         </Col>

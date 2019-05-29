@@ -25,8 +25,8 @@ import {
   FormGroup,
 } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import DatePicker from "../Shared/DatePicker"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -210,10 +210,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                     <fieldset key={index}>
                       <Grid>
                         <Col>
-                          <InputField
+                          <DatePicker
                             label="Start Date"
                             name={`${name}.${index}.start_date`}
-                            type="date"
                             required
                           />
                         </Col>

@@ -21,6 +21,7 @@ import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import DatePicker from "../Shared/DatePicker"
 
 type NewPriceCredentials = {
   prices: {
@@ -160,17 +161,15 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                       <li key={index}>
                         <Grid>
                           <Col>
-                            <InputField
+                            <DatePicker
                               label="Start Date"
                               name={`${name}.${index}.start_date`}
-                              type="date"
                             />
                           </Col>
                           <Col>
-                            <InputField
+                            <DatePicker
                               label="End Date"
                               name={`${name}.${index}.end_date`}
-                              type="date"
                             />
                           </Col>
                           <Col>

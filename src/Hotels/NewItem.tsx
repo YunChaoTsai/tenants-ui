@@ -6,9 +6,7 @@ import {
   FormikProps,
   Form,
   FieldArray,
-  Field,
   FieldProps,
-  ErrorMessage,
 } from "formik"
 import * as Validator from "yup"
 import Helmet from "react-helmet-async"
@@ -94,7 +92,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           actions: FormikActions<NewItemCredentials>
         ) => {
           actions.setStatus()
-          return xhr
+          xhr
             .post("/hotels", {
               ...values,
               meal_plans: values.meal_plans.map(mealPlan => mealPlan.id),

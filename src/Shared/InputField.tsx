@@ -20,7 +20,8 @@ export function ErrorMessage({ className = "", ...props }: ErrorMessageProps) {
   )
 }
 
-interface InputProps extends Omit<React.HTMLProps<HTMLInputElement>, "as"> {
+interface InputProps
+  extends Omit<React.HTMLProps<HTMLInputElement>, "as" | "label"> {
   as?: React.ReactType
 }
 
@@ -78,6 +79,14 @@ export function FormikFormGroup({
   )
 }
 
+export interface InputFieldProps extends InputProps {
+  name: string
+  type?: string
+  label?: React.ReactNode
+  className?: string
+  labelPlacement?: "before" | "after"
+}
+
 export function InputField({
   label,
   name,
@@ -85,14 +94,7 @@ export function InputField({
   className,
   labelPlacement,
   ...otherProps
-}: InputProps & {
-  name: string
-  type?: string
-  label?: React.ReactNode
-  className?: string
-  as?: React.ReactType
-  labelPlacement?: "before" | "after"
-}) {
+}: InputFieldProps) {
   // for radio or checkbox, default to after
   labelPlacement =
     labelPlacement ||
