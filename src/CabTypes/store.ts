@@ -52,7 +52,7 @@ export const actions = {
     "@CAB_TYPES/LIST_FETCH_REQUEST",
     "@CAB_TYPES/LIST_FETCH_SUCCESS",
     "@CAB_TYPES/LIST_FETCH_FAILED"
-  )<any, { data: ICabType[]; meta: IMeta }, Error>(),
+  )<undefined, { data: ICabType[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

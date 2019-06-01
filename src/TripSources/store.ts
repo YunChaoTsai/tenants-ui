@@ -35,7 +35,7 @@ export const actions = {
     "@TRIP_SOURCES/LIST_FETCH_REQUEST",
     "@TRIP_SOURCES/LIST_FETCH_SUCCESS",
     "@TRIP_SOURCES/LIST_FETCH_FAILED"
-  )<any, { data: ITripSource[]; meta: IMeta }, Error>(),
+  )<undefined, { data: ITripSource[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

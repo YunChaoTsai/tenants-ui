@@ -35,7 +35,7 @@ export const actions = {
     "@HOTEL_BOOKING_STAGES/LIST_FETCH_REQUEST",
     "@HOTEL_BOOKING_STAGES/LIST_FETCH_SUCCESS",
     "@HOTEL_BOOKING_STAGES/LIST_FETCH_FAILED"
-  )<any, { data: IHotelBookingStage[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IHotelBookingStage[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

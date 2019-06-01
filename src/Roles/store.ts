@@ -43,12 +43,12 @@ export const actions = {
     "@ROLES/LIST_FETCH_REQUEST",
     "@ROLES/LIST_FETCH_SUCCESS",
     "@ROLES/LIST_FETCH_FAILED"
-  )<any, { data: IRole[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IRole[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@ROLES/ITEM_FETCH_REQUEST",
     "@ROLES/ITEM_FETCH_SUCCESS",
     "@ROLES/ITEM_FETCH_FAILED"
-  )<any, IRole, Error>(),
+  )<undefined, IRole, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

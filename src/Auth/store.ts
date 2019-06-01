@@ -46,17 +46,17 @@ export const actions = {
     "@AUTH/CHECK_AUTH_REQUEST",
     "@AUTH/CHECK_AUTH_SUCCESS",
     "@AUTH/CHECK_AUTH_FAILED"
-  )<any, IUser, Error>(),
+  )<undefined, IUser, Error>(),
   login: createAsyncAction(
     "@AUTH/LOGIN_REQUEST",
     "@AUTH/LOGIN_SUCCESS",
     "@AUTH/LOGIN_FAILED"
-  )<any, IUser, Error>(),
+  )<undefined, IUser, Error>(),
   logout: createAsyncAction(
     "@AUTH/LOGOUT_REQUEST",
     "@AUTH/LOGOUT_SUCCESS",
     "@AUTH/LOGOUT_FAILED"
-  )<any, any, Error>(),
+  )<undefined, undefined, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

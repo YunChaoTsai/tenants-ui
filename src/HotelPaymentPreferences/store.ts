@@ -44,7 +44,7 @@ export const actions = {
     "@HOTEL_PAYMENT_PREFERENCES/LIST_FETCH_REQUEST",
     "@HOTEL_PAYMENT_PREFERENCES/LIST_FETCH_SUCCESS",
     "@HOTEL_PAYMENT_PREFERENCES/LIST_FETCH_FAILED"
-  )<any, { data: IHotelPaymentPreference[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IHotelPaymentPreference[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

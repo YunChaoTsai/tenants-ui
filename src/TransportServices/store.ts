@@ -37,7 +37,7 @@ export const actions = {
     "@TRANSPORT_SERVICES/LIST_FETCH_REQUEST",
     "@TRANSPORT_SERVICES/LIST_FETCH_SUCCESS",
     "@TRANSPORT_SERVICES/LIST_FETCH_FAILED"
-  )<any, { data: ITransportService[]; meta: IMeta }, Error>(),
+  )<undefined, { data: ITransportService[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>
