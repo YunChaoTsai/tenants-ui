@@ -35,7 +35,7 @@ import Spinner from "../Shared/Spinner"
 import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
-import { UsersIcon, ChildIcon } from "../Shared/Icons"
+import { UsersIcon, ChildIcon } from "@tourepedia/icons"
 
 export function XHR(xhr: AxiosInstance) {
   return {

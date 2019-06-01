@@ -12,8 +12,7 @@ import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
-import { MailIcon } from "../Shared/Icons"
-import PhoneIcon from "../Shared/Icons/PhoneIcon"
+import { MailIcon, PhoneIcon } from "@tourepedia/icons"
 
 export function XHR(xhr: AxiosInstance) {
   return {

@@ -1,7 +1,7 @@
 import React from "react"
 
 import "./spinner.css"
-import { SpinnerIcon } from "./Icons"
+import { SpinnerIcon } from "@tourepedia/icons"
 
 export function Spinner() {
   return (

@@ -16,7 +16,7 @@ import { useFetch } from "../hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
-import { BedIcon, BusIcon } from "../Shared/Icons"
+import { BedIcon, BusIcon } from "@tourepedia/icons"
 
 interface IInstalment {
   amount: number

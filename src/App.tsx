@@ -28,9 +28,10 @@ import { HotelBookingStages } from "./HotelBookingStages"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
+import "@tourepedia/icons/styles/icon.css"
 import "./main.css"
 import "./typography.css"
-import { CogAltIcon, OffIcon } from "./Shared/Icons"
+import { CogAltIcon, OffIcon } from "@tourepedia/icons"
 
 interface HeaderProps extends AuthProps {}
 

@@ -11,7 +11,7 @@ import { Table } from "../Shared/Table"
 import { useFetch } from "../hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
-import { RupeeIcon } from "../Shared/Icons"
+import { RupeeIcon } from "@tourepedia/icons"
 
 export interface IInstalment {
   amount: number
