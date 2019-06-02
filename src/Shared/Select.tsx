@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Omit } from "utility-types"
 
-import { contains } from "../dom-helpers"
+import { contains } from "@tourepedia/dom-helpers"
 import "./select.css"
 
 export interface SelectProps {

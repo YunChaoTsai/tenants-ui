@@ -12,7 +12,7 @@ import {
 import { ThunkDispatch, ThunkAction } from "./../types"
 import Prices from "./Prices"
 import AddPrices from "./AddPrices"
-import { Dialog, useDialog } from "./../Shared/Dialog"
+import { Dialog, useDialog } from "@tourepedia/dialog"
 import Button from "@tourepedia/button"
 import { AddContactForm } from "../Contacts"
 import { withXHR, XHRProps } from "./../xhr"

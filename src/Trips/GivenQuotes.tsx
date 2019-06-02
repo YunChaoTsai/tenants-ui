@@ -8,7 +8,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Quote } from "./Quotes"
 import Button from "@tourepedia/button"
 import { Table } from "../Shared/Table"
-import { useFetch } from "../hooks"
+import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { RupeeIcon } from "@tourepedia/icons"
@@ -58,7 +58,7 @@ export const GivenQuote = withXHR(function GivenQuote({
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
-  ] = useFetch<IInstalment[]>(() =>
+  ] = useFetchState<IInstalment[]>(() =>
     XHR(xhr)
       .getInstalments(id)
       .then(resp => resp.data)

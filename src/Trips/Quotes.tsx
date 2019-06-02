@@ -8,11 +8,11 @@ import moment from "moment"
 
 import { ITrip, IQuote, IGivenQuote, IQuoteHotel } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
-import { Dialog, useDialog } from "./../Shared/Dialog"
+import Dialog, { useDialog } from "@tourepedia/dialog"
 import { InputField, FormGroup, FormikFormGroup } from "./../Shared/InputField"
 import { Table } from "../Shared/Table"
 import { $PropertyType } from "utility-types"
-import { useFetch } from "../hooks"
+import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
@@ -156,7 +156,7 @@ export const Quote = withXHR(function Quote({
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
-  ] = useFetch<IInstalment[]>(() =>
+  ] = useFetchState<IInstalment[]>(() =>
     XHR(xhr)
       .getInstalments(id)
       .then(resp => resp.data)

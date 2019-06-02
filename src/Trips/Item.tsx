@@ -27,10 +27,10 @@ import GivenQuotes, {
   IInstalment,
 } from "./GivenQuotes"
 import NewQuote from "./NewQuote"
-import { Dialog, useDialog } from "./../Shared/Dialog"
+import Dialog, { useDialog } from "@tourepedia/dialog"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
-import { useFetch } from "../hooks"
+import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "../Shared/Spinner"
 import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
@@ -144,12 +144,10 @@ const LogTransaction = withXHR(function LogTransaction({
                 />
 
                 <Dialog.Footer>
-                  <Button disabled={isSubmitting} type="submit">
+                  <Button primary disabled={isSubmitting} type="submit">
                     Update
                   </Button>
-                  <Button className="btn--secondary" onClick={close}>
-                    Cancel
-                  </Button>
+                  <Button onClick={close}>Cancel</Button>
                 </Dialog.Footer>
               </Form>
             )}
@@ -650,7 +648,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
-  ] = useFetch<IInstalment[]>(
+  ] = useFetchState<IInstalment[]>(
     () => {
       if (!latest_given_quote) {
         return Promise.reject("No given quote for the trip")
@@ -946,12 +944,10 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                 />
                 {status ? <p className="error">{status}</p> : null}
                 <Dialog.Footer>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button primary type="submit" disabled={isSubmitting}>
                     Mark as converted
                   </Button>
-                  <Button onClick={hideConvert} className="btn--secondary">
-                    Cancel
-                  </Button>
+                  <Button onClick={hideConvert}>Cancel</Button>
                 </Dialog.Footer>
               </Form>
             )}
