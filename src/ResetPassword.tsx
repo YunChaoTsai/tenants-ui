@@ -151,7 +151,7 @@ function ResetPassword({
                   required
                 />
                 <footer>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button primary type="submit" disabled={isSubmitting}>
                     Reset Password
                   </Button>
                 </footer>

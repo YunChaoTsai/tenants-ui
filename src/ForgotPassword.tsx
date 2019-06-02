@@ -126,7 +126,12 @@ function ForgotPassword({
                   value={values.reset_password_link}
                 />
                 <footer>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button
+                    primary
+                    tabIndex={2}
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
                     Get Instructions
                   </Button>
                 </footer>

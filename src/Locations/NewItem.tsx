@@ -165,10 +165,10 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                 placeholder="88° 15' 45.6192'' E"
               />
               <footer>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button primary type="submit" disabled={isSubmitting}>
                   Save
                 </Button>
-                <Link to=".." className="btn btn--secondary">
+                <Link to=".." className="btn">
                   Cancel
                 </Link>
               </footer>

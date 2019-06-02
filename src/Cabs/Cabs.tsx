@@ -9,7 +9,7 @@ import NewItem from "./New"
 export default function CabsModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="btn btn-primary float-right">
+      <Link to="new" className="btn float-right">
         Add New Cab
       </Link>
       <h2>Cabs</h2>

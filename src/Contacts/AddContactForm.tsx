@@ -93,12 +93,10 @@ export function AddContactForm({ onCreate, onCancel }: AddContactFormProps) {
           />
           <hr />
           <footer>
-            <Button disabled={isSubmitting} type="submit">
+            <Button disabled={isSubmitting} primary type="submit">
               Save
             </Button>{" "}
-            <Button onClick={onCancel} className="btn--secondary">
-              Cancel
-            </Button>
+            <Button onClick={onCancel}>Cancel</Button>
           </footer>
         </Form>
       )}

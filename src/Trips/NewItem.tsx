@@ -342,10 +342,10 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               </Col>
             </Grid>
             <footer>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button primary type="submit" disabled={isSubmitting}>
                 Save
               </Button>
-              <Link to=".." className="btn btn--secondary">
+              <Link to=".." className="btn">
                 Cancel
               </Link>
             </footer>

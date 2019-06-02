@@ -139,7 +139,12 @@ function Login({ login, navigate, location }: LoginProps) {
                     tabIndex={2}
                   />
                   <footer>
-                    <Button type="submit" disabled={isSubmitting}>
+                    <Button
+                      primary
+                      tabIndex={3}
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
                       Sign in
                     </Button>
                   </footer>

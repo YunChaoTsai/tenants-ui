@@ -119,7 +119,9 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
                 autoComplete="new-password"
               />
               <footer>
-                <Button type="submit">Update</Button>
+                <Button primary type="submit">
+                  Update
+                </Button>
               </footer>
             </fieldset>
           </Form>
