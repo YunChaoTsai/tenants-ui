@@ -210,7 +210,7 @@ export const Quote = withXHR(function Quote({
               given_price,
             } = quoteHotel
             return [
-              <span className="white-space--pre">
+              <span className="white-space-pre">
                 {moment
                   .utc(date)
                   .local()
@@ -259,7 +259,7 @@ export const Quote = withXHR(function Quote({
               comments,
               given_price,
             }) => [
-              <span className="white-space--pre">
+              <span className="white-space-pre">
                 {moment
                   .utc(date)
                   .local()
@@ -402,7 +402,7 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
     <Fragment>
       <h4>Quotes</h4>
       {quotes.length === 0 ? (
-        <p className="text--center">No quote created for this trip</p>
+        <p className="text-center">No quote created for this trip</p>
       ) : (
         <ol className="list list--bordered">
           {quotes.map(quote => (

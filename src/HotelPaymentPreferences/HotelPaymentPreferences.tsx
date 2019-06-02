@@ -11,7 +11,7 @@ export default function TripStagesModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <Grid>
         <Col>
-          <h2 className="white-space--pre">Hotel Payment Preferences</h2>
+          <h2 className="white-space-pre">Hotel Payment Preferences</h2>
         </Col>
         <Col className="d-flex align-items-center justify-content-end">
           <Link to="new" className="btn">

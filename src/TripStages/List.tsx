@@ -91,7 +91,7 @@ function List({ getTripStages, tripStages, ...otherProps }: ListProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getTripStages({ ...params, page })}

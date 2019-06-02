@@ -8,7 +8,7 @@ import NewItem from "./NewItem"
 export default function RoomTypesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="btn float--right">
+      <Link to="new" className="btn float-right">
         New Room Type
       </Link>
       <h2>Room Types</h2>

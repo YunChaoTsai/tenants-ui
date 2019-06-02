@@ -8,7 +8,7 @@ import NewItem from "./NewItem"
 export default function MealPlansModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="float--right btn">
+      <Link to="new" className="float-right btn">
         New Meal Plan
       </Link>
       <h2>Meal Plans</h2>

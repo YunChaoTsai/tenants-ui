@@ -12,9 +12,9 @@ export default function CabTypesModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <Grid>
         <Col>
-          <h2 className="white-space--pre">Transport Service Prices</h2>
+          <h2 className="white-space-pre">Transport Service Prices</h2>
         </Col>
-        <Col className="text--right d-flex align-items-center justify-content-end">
+        <Col className="text-right d-flex align-items-center justify-content-end">
           <div className="button-group">
             <Link to="new" className="btn">
               Add Price

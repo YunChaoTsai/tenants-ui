@@ -128,7 +128,7 @@ function Quotes({ xhr, trip }: QuotesProps) {
     <Fragment>
       <h4>Given Quotes</h4>
       {givenQuotes.length === 0 ? (
-        <p className="text--center">No quote given yet</p>
+        <p className="text-center">No quote given yet</p>
       ) : (
         <ol className="list list--bordered">
           {givenQuotes.map(givenQuote => (

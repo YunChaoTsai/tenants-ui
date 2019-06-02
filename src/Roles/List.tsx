@@ -72,7 +72,7 @@ export function Roles({ getRoles, roles, ...otherProps }: RolesProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getRoles({ ...params, page })}

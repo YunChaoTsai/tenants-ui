@@ -37,9 +37,9 @@ export function Search({
               type="search"
               style={{ minWidth: "200px" }}
             />
-            <Button type="submit">
+            <button type="submit">
               <SearchIcon />
-            </Button>
+            </button>
           </div>
         </Form>
       )}

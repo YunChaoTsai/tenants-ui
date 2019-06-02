@@ -9,7 +9,7 @@ import NewItem from "./NewItem"
 export default function Trips(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="float--right btn">
+      <Link to="new" className="float-right btn">
         Add New Trip
       </Link>
       <h2>Trips</h2>

@@ -20,11 +20,21 @@
   margin-top: 5px;
 }
 .input-group {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  border: 1px solid #eee;
+  border-radius: 0.25em;
+  overflow: hidden;
+  align-items: stretch;
+}
+.input-group input {
+  border: none !important;
 }
 .input-group .form-group {
   margin: 0;
+}
+.input-group button {
+  padding: 0 0.5em;
 }
 .input-group input:not(:first-child),
 .input-group .form-group:not(:first-child) input,

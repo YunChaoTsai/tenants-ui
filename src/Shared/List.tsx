@@ -18,11 +18,11 @@ export function List({
   return (
     <Fragment>
       {isFetching ? (
-        <div className="text--center">
+        <div className="text-center">
           <Spinner />
         </div>
       ) : total === 0 ? (
-        <div className="text--center">No item in the list</div>
+        <div className="text-center">No item in the list</div>
       ) : children ? (
         children
       ) : render ? (

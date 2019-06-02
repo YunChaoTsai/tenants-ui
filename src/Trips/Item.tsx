@@ -298,7 +298,7 @@ function HotelPayments({
                   {i == 0 ? (
                     <td
                       rowSpan={instalments.length}
-                      className="vertical-align--middle"
+                      className="vertical-align-middle"
                     >
                       <b>{hotel.name}</b>
                       <br />
@@ -366,7 +366,7 @@ function CabPayments({
                   {i == 0 ? (
                     <td
                       rowSpan={instalments.length}
-                      className="vertical-align--middle"
+                      className="vertical-align-middle"
                     >
                       <b>{transportService.name}</b>
                       <br />
@@ -423,7 +423,7 @@ function BasicDetails({ trip }: { trip: ITrip }) {
         <Grid>
           <Col>
             <dt>Dates</dt>
-            <dd className="white-space--pre">
+            <dd className="white-space-pre">
               {moment
                 .utc(start_date)
                 .local()

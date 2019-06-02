@@ -67,7 +67,7 @@ export function Users({ getUsers, users, ...otherProps }: UsersProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getUsers({ ...params, page })}

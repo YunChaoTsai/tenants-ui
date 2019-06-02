@@ -91,7 +91,7 @@ function List({ getMealPlans, mealPlans, ...otherProps }: ListProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getMealPlans({ ...params, page })}

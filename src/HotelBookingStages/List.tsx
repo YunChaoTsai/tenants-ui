@@ -104,7 +104,7 @@ function List({
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getHotelBookingStages({ ...params, page })}

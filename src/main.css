@@ -94,8 +94,6 @@ input[type="date"],
 input[type="password"],
 input[type="search"],
 textarea,
-button,
-.btn,
 select,
 legend {
   font-size: 0.9rem;
@@ -159,24 +157,6 @@ footer button + .btn,
 footer .btn + .btn {
   margin-left: 10px;
 }
-.btn,
-button {
-  cursor: pointer;
-  padding-left: 0.8em;
-  padding-right: 0.8em;
-  letter-spacing: 0.1px;
-  box-shadow: none;
-  background: inherit;
-  border-color: silver;
-  color: inherit;
-  text-decoration: none;
-  display: inline-block;
-}
-
-button:hover,
-.btn:hover {
-  background: whitesmoke;
-}
 
 .btn:focus,
 button:focus,
@@ -189,10 +169,6 @@ textarea:focus {
   border-color: transparent;
 }
 
-nav {
-  border-bottom: 1px solid #e3e7ea;
-  background: #f6f8fa;
-}
 nav a {
   padding: 10px 15px;
   display: inline-block;
@@ -227,59 +203,6 @@ mark {
 
 svg:not(:root) {
   overflow: hidden;
-}
-
-/**
- * Utility classes
- */
-.text--right {
-  text-align: right;
-}
-.text--center {
-  text-align: center;
-}
-.text--error,
-.error {
-  color: #b10000;
-}
-.display--inline-block {
-  display: inline-block;
-}
-.display--inline {
-  display: inline;
-}
-.display--flex {
-  display: flex;
-  align-items: center;
-}
-.justify-content--space-between {
-  justify-content: space-between;
-}
-.vertical-align--top {
-  vertical-align: top;
-}
-.vertical-align--middle {
-  vertical-align: middle;
-}
-.width--100 {
-  width: 100%;
-}
-.float--right {
-  float: right;
-}
-.fh {
-  height: 100% !important;
-  overflow: auto;
-}
-.fvh {
-  min-height: 100vh;
-}
-.w--sm {
-  max-width: 500px;
-  margin: 0 auto;
-}
-.white-space--pre {
-  white-space: pre;
 }
 
 /**

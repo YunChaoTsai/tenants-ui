@@ -13,6 +13,7 @@
   "dependencies": {
     "@reach/router": "1.2.1",
     "@tourepedia/button": "0.1.8",
+    "@tourepedia/css": "0.4.3",
     "@tourepedia/icons": "0.2.2",
     "@types/classnames": "2.2.7",
     "@types/jest": "24.0.5",
