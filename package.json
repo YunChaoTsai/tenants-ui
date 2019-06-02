@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@reach/router": "1.2.1",
+    "@tourepedia/badge": "0.1.14",
     "@tourepedia/button": "0.1.15",
     "@tourepedia/css": "0.4.3",
     "@tourepedia/dialog": "0.4.5",

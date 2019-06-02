@@ -36,6 +36,8 @@ import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
 import { UsersIcon, ChildIcon } from "@tourepedia/icons"
+import Badge from "@tourepedia/badge"
+import classNames from "classnames"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -198,15 +200,27 @@ function InstalmentStatus({
   dueAmount: number
   dueDate: string
 }) {
+  let state: string = "Due"
   if (dueAmount <= 0) {
-    return <b>&lt;PAID&gt;</b>
+    state = "Paid"
+  } else {
+    const due_date = moment.utc(dueDate).local()
+    const today = moment()
+    if (due_date.isBefore(today)) {
+      state = "Overdue"
+    }
   }
-  const due_date = moment.utc(dueDate).local()
-  const today = moment()
-  if (due_date.isBefore(today)) {
-    return <b>&lt;OVERDUE&gt;</b>
-  }
-  return <b>&lt;PENDING&gt;</b>
+  return (
+    <Badge
+      className={classNames(
+        state === "Paid" && "bg-green-300",
+        state === "Overdue" && "bg-red-300",
+        state === "Due" && "bg-yellow-300"
+      )}
+    >
+      {state}
+    </Badge>
+  )
 }
 
 function DateString({ date }: { date: string }) {
