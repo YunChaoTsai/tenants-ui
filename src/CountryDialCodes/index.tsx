@@ -4,7 +4,7 @@ import { AxiosInstance } from "axios"
 import { ICountryDialCode } from "./store"
 
 import { withXHR, XHRProps } from "./../xhr"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import * as store from "./store"
 
 export function XHR(xhr: AxiosInstance) {

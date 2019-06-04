@@ -15,7 +15,7 @@ import {
   selectors,
 } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import { withXHR, XHRProps } from "./../xhr"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
