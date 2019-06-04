@@ -75,19 +75,19 @@ export const hotelActions = {
     "@HOTELS/LIST_FETCH_REQUEST",
     "@HOTELS/LIST_FETCH_SUCCESS",
     "@HOTELS/LIST_FETCH_FAILED"
-  )<any, { data: IHotel[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IHotel[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@HOTELS/ITEM_FETCH_REQUEST",
     "@HOTELS/ITEM_FETCH_SUCCESS",
     "@HOTELS/ITEM_FETCH_FAILED"
-  )<any, IHotel, Error>(),
+  )<undefined, IHotel, Error>(),
 }
 export const priceActions = {
   list: createAsyncAction(
     "@HOTEL_PRICES/LIST_FETCH_REQUEST",
     "@HOTEL_PRICES/LIST_FETCH_SUCCESS",
     "@HOTEL_PRICES/LIST_FETCH_FAILED"
-  )<any, { data: IPrice[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IPrice[]; meta: IMeta }, Error>(),
 }
 
 export const actions = {

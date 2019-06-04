@@ -35,7 +35,7 @@ export const actions = {
     "@ROOM_TYPES/LIST_FETCH_REQUEST",
     "@ROOM_TYPES/LIST_FETCH_SUCCESS",
     "@ROOM_TYPES/LIST_FETCH_FAILED"
-  )<any, { data: IRoomType[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IRoomType[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

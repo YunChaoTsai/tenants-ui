@@ -8,7 +8,7 @@ import { Omit } from "utility-types"
 import { ICabType, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import { PaginateProps, Paginate } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
@@ -93,7 +93,7 @@ function List({ getCabTypes, cabTypes, ...otherProps }: ListProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getCabTypes({ ...params, page })}

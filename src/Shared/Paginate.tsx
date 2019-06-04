@@ -1,6 +1,6 @@
 import React from "react"
 import Button from "@tourepedia/button"
-import { RefreshIcon } from "./Icons"
+import { RefreshIcon } from "@tourepedia/icons"
 
 export interface PaginateProps {
   total: number

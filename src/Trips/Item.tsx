@@ -27,15 +27,17 @@ import GivenQuotes, {
   IInstalment,
 } from "./GivenQuotes"
 import NewQuote from "./NewQuote"
-import { Dialog, useDialog } from "./../Shared/Dialog"
+import Dialog, { useDialog } from "@tourepedia/dialog"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
-import { useFetch } from "../hooks"
+import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "../Shared/Spinner"
 import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
-import { UsersIcon, ChildIcon } from "../Shared/Icons"
+import { UsersIcon, ChildIcon } from "@tourepedia/icons"
+import Badge from "@tourepedia/badge"
+import classNames from "classnames"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -144,12 +146,10 @@ const LogTransaction = withXHR(function LogTransaction({
                 />
 
                 <Dialog.Footer>
-                  <Button disabled={isSubmitting} type="submit">
+                  <Button primary disabled={isSubmitting} type="submit">
                     Update
                   </Button>
-                  <Button className="btn--secondary" onClick={close}>
-                    Cancel
-                  </Button>
+                  <Button onClick={close}>Cancel</Button>
                 </Dialog.Footer>
               </Form>
             )}
@@ -200,15 +200,27 @@ function InstalmentStatus({
   dueAmount: number
   dueDate: string
 }) {
+  let state: string = "Due"
   if (dueAmount <= 0) {
-    return <b>&lt;PAID&gt;</b>
+    state = "Paid"
+  } else {
+    const due_date = moment.utc(dueDate).local()
+    const today = moment()
+    if (due_date.isBefore(today)) {
+      state = "Overdue"
+    }
   }
-  const due_date = moment.utc(dueDate).local()
-  const today = moment()
-  if (due_date.isBefore(today)) {
-    return <b>&lt;OVERDUE&gt;</b>
-  }
-  return <b>&lt;PENDING&gt;</b>
+  return (
+    <Badge
+      className={classNames(
+        state === "Paid" && "bg-green-300",
+        state === "Overdue" && "bg-red-300",
+        state === "Due" && "bg-yellow-300"
+      )}
+    >
+      {state}
+    </Badge>
+  )
 }
 
 function DateString({ date }: { date: string }) {
@@ -298,7 +310,7 @@ function HotelPayments({
                   {i == 0 ? (
                     <td
                       rowSpan={instalments.length}
-                      className="vertical-align--middle"
+                      className="vertical-align-middle"
                     >
                       <b>{hotel.name}</b>
                       <br />
@@ -366,7 +378,7 @@ function CabPayments({
                   {i == 0 ? (
                     <td
                       rowSpan={instalments.length}
-                      className="vertical-align--middle"
+                      className="vertical-align-middle"
                     >
                       <b>{transportService.name}</b>
                       <br />
@@ -423,7 +435,7 @@ function BasicDetails({ trip }: { trip: ITrip }) {
         <Grid>
           <Col>
             <dt>Dates</dt>
-            <dd className="white-space--pre">
+            <dd className="white-space-pre">
               {moment
                 .utc(start_date)
                 .local()
@@ -650,7 +662,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
-  ] = useFetch<IInstalment[]>(
+  ] = useFetchState<IInstalment[]>(
     () => {
       if (!latest_given_quote) {
         return Promise.reject("No given quote for the trip")
@@ -946,12 +958,10 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                 />
                 {status ? <p className="error">{status}</p> : null}
                 <Dialog.Footer>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button primary type="submit" disabled={isSubmitting}>
                     Mark as converted
                   </Button>
-                  <Button onClick={hideConvert} className="btn--secondary">
-                    Cancel
-                  </Button>
+                  <Button onClick={hideConvert}>Cancel</Button>
                 </Dialog.Footer>
               </Form>
             )}

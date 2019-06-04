@@ -121,10 +121,10 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
                 value={values.email_verified_link}
               />
               <footer>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button primary type="submit" disabled={isSubmitting}>
                   Submit
                 </Button>
-                <Link to=".." className="btn btn--secondary">
+                <Link to=".." className="btn">
                   Cancel
                 </Link>
               </footer>

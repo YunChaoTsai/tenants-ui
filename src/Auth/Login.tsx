@@ -78,72 +78,81 @@ function Login({ login, navigate, location }: LoginProps) {
   return (
     <RedirectIfAuthenticated to={next}>
       <Helmet>
-        <title>Login</title>
+        <title>Sign in to TAD</title>
       </Helmet>
-      <div className="text--center">
-        <img
-          src={process.env.PUBLIC_URL + "/logo.jpg"}
-          style={{
-            marginTop: "4rem",
-            maxWidth: "5rem",
-          }}
-        />
-      </div>
-      <h1 className="text--center">Sign in to TAD</h1>
-      <div className="w--sm">
-        <Formik
-          initialValues={initialValues}
-          onSubmit={(
-            values: ILoginCredentials,
-            actions: FormikActions<ILoginCredentials>
-          ) => {
-            actions.setStatus()
-            return login(values).catch(error => {
-              actions.setStatus(error.message)
-              actions.setSubmitting(false)
-            })
-          }}
-          validationSchema={loginCredentialsSchema}
-          render={({
-            errors,
-            isSubmitting,
-            touched,
-            isValid,
-            status,
-          }: FormikProps<ILoginCredentials>) => (
-            <Form noValidate>
-              <fieldset>
-                {status ? <p className="error">{status}</p> : null}
-                <InputField
-                  label="Email"
-                  name="email"
-                  type="email"
-                  autoFocus
-                  id="email"
-                  placeholder="username@domain.com"
-                  autoComplete="username email"
-                  required
-                />
-                <Link to="/forgot-password" className="float--right">
-                  Forgot Password ?
-                </Link>
-                <InputField
-                  label="Password"
-                  name="password"
-                  type="password"
-                  id="password"
-                  required
-                  autoComplete="current-password"
-                />
-                <footer>
-                  <Button type="submit" disabled={isSubmitting}>
-                    Sign in
-                  </Button>
-                </footer>
-              </fieldset>
-            </Form>
-          )}
-        />
+      <div className="min-h-screen">
+        <div className="text-center">
+          <img
+            src={process.env.PUBLIC_URL + "/logo.jpg"}
+            className="inline-block mt-16 w-20"
+          />
+        </div>
+        <h1 className="text-center my-4">Sign in to TAD</h1>
+        <div className="max-w-sm mx-auto">
+          <Formik
+            initialValues={initialValues}
+            onSubmit={(
+              values: ILoginCredentials,
+              actions: FormikActions<ILoginCredentials>
+            ) => {
+              actions.setStatus()
+              login(values).catch(error => {
+                actions.setStatus(error.message)
+                actions.setSubmitting(false)
+              })
+            }}
+            validationSchema={loginCredentialsSchema}
+            render={({
+              errors,
+              isSubmitting,
+              touched,
+              isValid,
+              status,
+            }: FormikProps<ILoginCredentials>) => (
+              <Form noValidate>
+                <fieldset>
+                  {status ? <p className="error">{status}</p> : null}
+                  <InputField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    autoFocus
+                    id="email"
+                    placeholder="username@domain.com"
+                    autoComplete="username email"
+                    required
+                    tabIndex={1}
+                  />
+                  <Link
+                    to="/forgot-password"
+                    className="float-right text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    Forgot Password ?
+                  </Link>
+                  <InputField
+                    label="Password"
+                    name="password"
+                    type="password"
+                    id="password"
+                    required
+                    autoComplete="current-password"
+                    tabIndex={2}
+                  />
+                  <footer>
+                    <Button
+                      primary
+                      tabIndex={3}
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
+                      Sign in
+                    </Button>
+                  </footer>
+                </fieldset>
+              </Form>
+            )}
+          />
+        </div>
       </div>
     </RedirectIfAuthenticated>
   )

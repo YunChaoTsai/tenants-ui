@@ -12,7 +12,7 @@ import {
 import { ThunkDispatch, ThunkAction } from "./../types"
 import Prices from "./Prices"
 import AddPrices from "./AddPrices"
-import { Dialog, useDialog } from "./../Shared/Dialog"
+import { Dialog, useDialog } from "@tourepedia/dialog"
 import Button from "@tourepedia/button"
 import { AddContactForm } from "../Contacts"
 import { withXHR, XHRProps } from "./../xhr"
@@ -216,8 +216,12 @@ export function Item({
             </Grid>
             <hr />
             <div>
-              <h4>Prices</h4>
-              <Link to="add-prices">Add Prices</Link>
+              <div className="clearfix mb-4">
+                <Link to="add-prices" className="btn btn-primary float-right">
+                  Add Prices
+                </Link>
+                <h4>Prices</h4>
+              </div>
               <Router>
                 <AddPrices path="add-prices" hotel={hotel} />
                 <Prices path="/" hotel={hotel} />

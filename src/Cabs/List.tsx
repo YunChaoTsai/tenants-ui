@@ -8,11 +8,12 @@ import { Omit } from "utility-types"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { ICab, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import { List } from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
+import { Table } from "../Shared/Table"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -68,7 +69,7 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getCabs({ ...params, page })}
@@ -76,24 +77,14 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
         </Col>
       </Grid>
       <List isFetching={isFetching} total={total}>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Number Plate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cabs.map(r => (
-              <tr key={r.id}>
-                <td>
-                  <Link to={r.id.toString()}>{r.name}</Link>
-                </td>
-                <td>{r.number_plate}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          headers={["Name", "Number Plate"]}
+          autoWidth
+          rows={cabs.map(r => [
+            <Link to={r.id.toString()}>{r.name}</Link>,
+            r.number_plate,
+          ])}
+        />
       </List>
     </Fragment>
   )

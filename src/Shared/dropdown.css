@@ -1,5 +1,4 @@
 .drop-down {
-  display: inline-block;
   position: relative;
 }
 .drop-down > .toggler,

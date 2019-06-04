@@ -61,7 +61,7 @@ export const actions = {
     "@LOCATIONS/LIST_FETCH_REQUEST",
     "@LOCATIONS/LIST_FETCH_SUCCESS",
     "@LOCATIONS/LIST_FETCH_FAILED"
-  )<any, { data: ILocation[]; meta: IMeta }, Error>(),
+  )<undefined, { data: ILocation[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

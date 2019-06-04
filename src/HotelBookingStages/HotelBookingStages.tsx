@@ -11,7 +11,7 @@ export default function MealPlansModule(props: RouteComponentProps) {
     <RedirectUnlessAuthenticated>
       <Grid>
         <Col>
-          <h2 className="white-space--pre">Hotel Booking Stages</h2>
+          <h2 className="white-space-pre">Hotel Booking Stages</h2>
         </Col>
         <Col className="d-flex align-items-center justify-content-end">
           <Link to="new" className="btn">

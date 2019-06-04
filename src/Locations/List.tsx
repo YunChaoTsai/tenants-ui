@@ -15,7 +15,7 @@ import {
   selectors,
 } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import { withXHR, XHRProps } from "./../xhr"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
@@ -115,7 +115,7 @@ function List({ getLocations, locations, ...otherProps }: ListProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getLocations({ ...params, page })}

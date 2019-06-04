@@ -62,15 +62,19 @@ function ForgotPassword({
       <Helmet>
         <title>Forgot Password</title>
       </Helmet>
-      <div className="text--center">
+      <div className="text-center mt-16">
         <h1>Forgot Your Password?</h1>
         <p>
           No problem? Just enter your email address and we will send
           instructions to reset your password. <br />
-          or <Link to="/login">Login</Link> if you remember your password!
+          Or{" "}
+          <Link to="/login" className="text-blue-600 hover:text-blue-800">
+            Login
+          </Link>{" "}
+          if you remember your password!
         </p>
       </div>
-      <div className="w--sm">
+      <div className="max-w-sm mx-auto">
         <Formik
           initialValues={{
             email,
@@ -113,6 +117,7 @@ function ForgotPassword({
                   autoFocus
                   type="email"
                   id="email"
+                  tabIndex={1}
                 />
                 <input
                   type="hidden"
@@ -121,7 +126,12 @@ function ForgotPassword({
                   value={values.reset_password_link}
                 />
                 <footer>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button
+                    primary
+                    tabIndex={2}
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
                     Get Instructions
                   </Button>
                 </footer>

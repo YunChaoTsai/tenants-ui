@@ -43,12 +43,12 @@ export const actions = {
     "@USERS/LIST_FETCH_REQUEST",
     "@USERS/LIST_FETCH_SUCCESS",
     "@USERS/LIST_FETCH_FAILED"
-  )<any, { data: IUser[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IUser[]; meta: IMeta }, Error>(),
   item: createAsyncAction(
     "@USERS/ITEM_FETCH_REQUEST",
     "@USERS/ITEM_FETCH_SUCCESS",
     "@USERS/ITEM_FETCH_FAILED"
-  )<any, IUser, Error>(),
+  )<undefined, IUser, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

@@ -10,7 +10,7 @@ import CalculatePrice from "./CalculatePrice"
 export default function HotelsModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <div className="float--right button-group">
+      <div className="float-right button-group">
         <Link to="new" className="btn">
           New Hotel
         </Link>

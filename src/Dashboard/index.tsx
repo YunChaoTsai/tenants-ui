@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { RouteComponentProps } from "@reach/router"
+import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
 import moment from "moment"
@@ -7,6 +7,8 @@ import moment from "moment"
 import { RedirectUnlessAuthenticated } from "./../Auth"
 import { withXHR, XHRProps } from "./../xhr"
 import { store as tripStore } from "./../Trips"
+import { Table } from "../Shared/Table"
+import { PhoneIcon, MailIcon } from "@tourepedia/icons"
 
 type IConvertedTripAnalytics = tripStore.ITrip[]
 type IDuePayments = {
@@ -34,9 +36,9 @@ function XHR(xhr: AxiosInstance) {
 }
 
 function ConvertedTrips({ xhr }: XHRProps) {
-  const [convertedTripAnalytics, setConvertedTripAnalytics] = useState<
-    IConvertedTripAnalytics
-  >([])
+  const [trips, setConvertedTripAnalytics] = useState<IConvertedTripAnalytics>(
+    []
+  )
   useEffect(() => {
     XHR(xhr)
       .getConvertedTripAnalytics()
@@ -44,15 +46,55 @@ function ConvertedTrips({ xhr }: XHRProps) {
   }, [])
   return (
     <section>
-      <h3>Converted trips over time</h3>
-      {convertedTripAnalytics
-        .map(a =>
-          moment
-            .utc(a.converted_at)
-            .local()
-            .format("DD/MM/YYYY")
-        )
-        .join(" • ")}
+      <h2>Converted trips over time</h2>
+      <Table
+        responsive
+        headers={["ID", "Dates", "Stages", "Destinations", "Traveler", "Pax"]}
+        rows={trips.map(
+          ({
+            id,
+            trip_source,
+            trip_id,
+            start_date,
+            end_date,
+            locations,
+            no_of_adults,
+            children,
+            contact,
+            latest_stage,
+          }) => [
+            <Link to={"/trips/" + id.toString()}>
+              {trip_source.short_name}-{trip_id || id}
+            </Link>,
+            `${moment
+              .utc(start_date)
+              .local()
+              .format("DD/MM/YYYY")} to ${moment
+              .utc(end_date)
+              .local()
+              .format("DD/MM/YYYY")}`,
+            latest_stage ? latest_stage.name : "Initiated",
+            locations.map(l => l.short_name).join(" • "),
+            contact ? (
+              <div>
+                {contact.name}
+                <br />
+                <a href={`tel:${contact.phone_number}`} className="btn--icon">
+                  <PhoneIcon
+                    title={`Call to ${contact.name} on ${contact.phone_number}`}
+                  />
+                </a>
+                <a href={`mailto:${contact.email}`} className="btn--icon">
+                  <MailIcon
+                    title={`Send Email to ${contact.name} at ${contact.email}`}
+                  />
+                </a>
+              </div>
+            ) : null,
+            `${no_of_adults} Adults${children ? " with " + children : ""}`,
+          ]
+        )}
+      />
     </section>
   )
 }
@@ -66,7 +108,7 @@ function DuePayments({ xhr }: XHRProps) {
   }, [])
   return (
     <section>
-      <h3>Due payments</h3>
+      <h2>Due payments</h2>
       <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
         <table>
           <thead>
@@ -112,7 +154,7 @@ function Transactions({ xhr }: XHRProps) {
   }, [])
   return (
     <section>
-      <h3>Transactions</h3>
+      <h2>Transactions</h2>
       <div>
         Credited: {transactions.credited} • Debited: {transactions.debited}
       </div>
@@ -156,7 +198,6 @@ function Dashboard({ xhr }: DashboardProps) {
       <Helmet>
         <title>Dashboard</title>
       </Helmet>
-      <h2>Dashboard</h2>
       <ConvertedTrips xhr={xhr} />
       <DuePayments xhr={xhr} />
       <Transactions xhr={xhr} />

@@ -2,15 +2,7 @@ import React from "react"
 import { RouteComponentProps } from "@reach/router"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
-import {
-  Formik,
-  FormikProps,
-  FormikActions,
-  Form,
-  Field,
-  FieldProps,
-  ErrorMessage,
-} from "formik"
+import { Formik, FormikProps, FormikActions, Form } from "formik"
 import Button from "@tourepedia/button"
 import * as Validator from "yup"
 
@@ -127,7 +119,9 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
                 autoComplete="new-password"
               />
               <footer>
-                <Button type="submit">Update</Button>
+                <Button primary type="submit">
+                  Update
+                </Button>
               </footer>
             </fieldset>
           </Form>

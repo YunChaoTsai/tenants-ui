@@ -80,7 +80,9 @@ export function Table({
             {headers.map((header, h) => (
               <th
                 key={h}
-                className={alignCols[h] ? "text--" + alignCols[h] : ""}
+                style={{
+                  textAlign: alignCols[h],
+                }}
               >
                 {header}
               </th>

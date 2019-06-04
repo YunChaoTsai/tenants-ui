@@ -8,7 +8,7 @@ import { Omit } from "utility-types"
 import { ITransportService, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
@@ -102,7 +102,7 @@ function List({
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getTransportServices({ ...params, page })}

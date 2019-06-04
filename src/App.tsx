@@ -28,9 +28,12 @@ import { HotelBookingStages } from "./HotelBookingStages"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
+
+import "@tourepedia/icons/styles/icon.css"
+import "@tourepedia/css/lib/styles.css"
 import "./main.css"
 import "./typography.css"
-import { CogAltIcon, OffIcon } from "./Shared/Icons"
+import { CogAltIcon, OffIcon } from "@tourepedia/icons"
 
 interface HeaderProps extends AuthProps {}
 
@@ -38,28 +41,27 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
   if (!user) return null
   const { name } = user
   return (
-    <header>
+    <header className="border-b-2 border-gray-200 mb-4">
       <nav>
-        <ul className="list--inline">
-          <NavLink to="/">
+        <ul>
+          <NavLink to="/" className="inline-block">
             <img
               src={process.env.PUBLIC_URL + "/logo.jpg"}
+              className="inline-block align-middle mr-3"
               style={{
-                maxHeight: "1.5em",
-                marginRight: "1em",
-                verticalAlign: "middle",
+                maxHeight: "1em",
               }}
             />
             Tourepedia Dashboard
           </NavLink>
-          <Dropdown as="li">
+          <Dropdown as="li" className="inline-block">
             <Link to="/trips">Trips</Link>
             <ul>
               <NavLink to="/trip-sources">Trip Sources</NavLink>
               <NavLink to="/trip-stages">Trip Stages</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li">
+          <Dropdown as="li" className="inline-block">
             <Link to="/hotels">Hotels</Link>
             <ul>
               <NavLink to="/meal-plans">Meal Plans</NavLink>
@@ -70,7 +72,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
               <NavLink to="/hotel-booking-stages">Booking Stages</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li">
+          <Dropdown as="li" className="inline-block">
             <Link to="/transport-services">Transport Services</Link>
             <ul>
               <NavLink to="/cab-types">Cab Types</NavLink>
@@ -81,13 +83,13 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
               <NavLink to="/cabs">Cabs</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li">
+          <Dropdown as="li" className="inline-block">
             <Link to="/users">Users</Link>
             <ul className="menu">
               <NavLink to="/roles">Roles</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li">
+          <Dropdown as="li" className="inline-block">
             <a className="toggler" href="#">
               Hi {name}
             </a>

@@ -75,7 +75,9 @@ function NewQuote({ xhr, navigate, trip }: NewQuoteProps) {
           maxLength={191}
         />
       </FormGroup>
-      <Button onClick={saveQuote}>Save Quote</Button>
+      <Button primary onClick={saveQuote}>
+        Save Quote
+      </Button>
     </div>
   )
 }

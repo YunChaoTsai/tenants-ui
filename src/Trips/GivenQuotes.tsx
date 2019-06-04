@@ -8,10 +8,10 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Quote } from "./Quotes"
 import Button from "@tourepedia/button"
 import { Table } from "../Shared/Table"
-import { useFetch } from "../hooks"
+import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
-import { RupeeIcon } from "../Shared/Icons"
+import { RupeeIcon } from "@tourepedia/icons"
 
 export interface IInstalment {
   amount: number
@@ -58,7 +58,7 @@ export const GivenQuote = withXHR(function GivenQuote({
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
-  ] = useFetch<IInstalment[]>(() =>
+  ] = useFetchState<IInstalment[]>(() =>
     XHR(xhr)
       .getInstalments(id)
       .then(resp => resp.data)
@@ -128,7 +128,7 @@ function Quotes({ xhr, trip }: QuotesProps) {
     <Fragment>
       <h4>Given Quotes</h4>
       {givenQuotes.length === 0 ? (
-        <p className="text--center">No quote given yet</p>
+        <p className="text-center">No quote given yet</p>
       ) : (
         <ol className="list list--bordered">
           {givenQuotes.map(givenQuote => (

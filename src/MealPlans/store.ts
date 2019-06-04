@@ -35,7 +35,7 @@ export const actions = {
     "@MEAL_PLANS/LIST_FETCH_REQUEST",
     "@MEAL_PLANS/LIST_FETCH_SUCCESS",
     "@MEAL_PLANS/LIST_FETCH_FAILED"
-  )<any, { data: IMealPlan[]; meta: IMeta }, Error>(),
+  )<undefined, { data: IMealPlan[]; meta: IMeta }, Error>(),
 }
 
 export type TActions = ActionType<typeof actions>

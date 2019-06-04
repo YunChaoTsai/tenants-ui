@@ -8,15 +8,15 @@ import moment from "moment"
 
 import { ITrip, IQuote, IGivenQuote, IQuoteHotel } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
-import { Dialog, useDialog } from "./../Shared/Dialog"
+import Dialog, { useDialog } from "@tourepedia/dialog"
 import { InputField, FormGroup, FormikFormGroup } from "./../Shared/InputField"
 import { Table } from "../Shared/Table"
 import { $PropertyType } from "utility-types"
-import { useFetch } from "../hooks"
+import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
-import { BedIcon, BusIcon } from "../Shared/Icons"
+import { BedIcon, BusIcon } from "@tourepedia/icons"
 
 interface IInstalment {
   amount: number
@@ -156,7 +156,7 @@ export const Quote = withXHR(function Quote({
     instalments,
     fetchInstalments,
     { isFetching: isFetchingInstalments },
-  ] = useFetch<IInstalment[]>(() =>
+  ] = useFetchState<IInstalment[]>(() =>
     XHR(xhr)
       .getInstalments(id)
       .then(resp => resp.data)
@@ -210,7 +210,7 @@ export const Quote = withXHR(function Quote({
               given_price,
             } = quoteHotel
             return [
-              <span className="white-space--pre">
+              <span className="white-space-pre">
                 {moment
                   .utc(date)
                   .local()
@@ -259,7 +259,7 @@ export const Quote = withXHR(function Quote({
               comments,
               given_price,
             }) => [
-              <span className="white-space--pre">
+              <span className="white-space-pre">
                 {moment
                   .utc(date)
                   .local()
@@ -402,7 +402,7 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
     <Fragment>
       <h4>Quotes</h4>
       {quotes.length === 0 ? (
-        <p className="text--center">No quote created for this trip</p>
+        <p className="text-center">No quote created for this trip</p>
       ) : (
         <ol className="list list--bordered">
           {quotes.map(quote => (

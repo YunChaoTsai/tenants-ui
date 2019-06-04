@@ -74,14 +74,14 @@ function ResetPassword({
       <Helmet>
         <title>Reset Password</title>
       </Helmet>
-      <div className="text--center">
+      <div className="text-center mt-16">
         <h1>Reset Password</h1>
         <p>
           Just enter your new password to reset the password for your email
           address ({email})
         </p>
       </div>
-      <div className="w--sm">
+      <div className="max-w-sm mx-auto">
         <Formik
           initialValues={{
             email,
@@ -151,7 +151,7 @@ function ResetPassword({
                   required
                 />
                 <footer>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button primary type="submit" disabled={isSubmitting}>
                     Reset Password
                   </Button>
                 </footer>
@@ -159,9 +159,22 @@ function ResetPassword({
             </Form>
           )}
         />
-        or get instructions{" "}
-        <Link to={`/forgot-password?email=${email}`}>again</Link> or{" "}
-        <Link to="/login">login</Link> if you remember your password!
+        <div className="text-center">
+          Get instructions{" "}
+          <Link
+            to={`/forgot-password?email=${email}`}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            again
+          </Link>{" "}
+          <br />
+          OR
+          <br />
+          <Link to="/login" className="text-blue-600 hover:text-blue-800">
+            Login
+          </Link>{" "}
+          if you remember your password!
+        </div>
       </div>
     </div>
   )

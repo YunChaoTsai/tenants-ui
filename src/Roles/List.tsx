@@ -8,7 +8,7 @@ import { Omit } from "utility-types"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { IRole, IPermission, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
-import { Async, AsyncProps } from "./../Shared/Select"
+import { Async, AsyncProps } from "@tourepedia/select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
@@ -72,7 +72,7 @@ export function Roles({ getRoles, roles, ...otherProps }: RolesProps) {
             }}
           />
         </Col>
-        <Col className="text--right">
+        <Col className="text-right">
           <Paginate
             {...otherProps}
             onChange={page => getRoles({ ...params, page })}
