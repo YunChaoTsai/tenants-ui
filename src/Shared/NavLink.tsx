@@ -1,5 +1,6 @@
 import React from "react"
-import { Link } from "@reach/router"
+import { Link, Match } from "@reach/router"
+import classNames from "classnames"
 
 export function NavLink({
   to,
@@ -11,9 +12,13 @@ export function NavLink({
   className?: string
 }) {
   return (
-    <li className={className}>
-      <Link to={to}>{children}</Link>
-    </li>
+    <Match path={to}>
+      {({ match }) => (
+        <li className={classNames(className, match ? "active" : undefined)}>
+          <Link to={to}>{children}</Link>
+        </li>
+      )}
+    </Match>
   )
 }
 
