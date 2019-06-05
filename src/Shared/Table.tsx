@@ -97,7 +97,9 @@ export function Table({
               {row.map((data, d) => (
                 <td
                   key={d}
-                  className={alignCols[d] ? "text--" + alignCols[d] : ""}
+                  style={{
+                    textAlign: alignCols[d],
+                  }}
                 >
                   {data}
                 </td>
