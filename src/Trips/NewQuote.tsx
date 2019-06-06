@@ -41,10 +41,18 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
         cabs,
         comments,
       })
-      .then(resp => {
+      .then(() => {
         navigate && navigate("../quotes")
       })
   }
+  const bookingFrom = moment
+    .utc(trip.start_date)
+    .local()
+    .format("YYYY-MM-DD HH:mm:ss")
+  const bookingTo = moment
+    .utc(trip.end_date)
+    .local()
+    .format("YYYY-MM-DD HH:mm:ss")
   return (
     <div className="pb-8">
       <h3 className="mb-8">Create a new quote</h3>
@@ -59,6 +67,8 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
           </Col>
           <Col>
             <CalculateHotelPrice
+              bookingFrom={bookingFrom}
+              bookingTo={bookingTo}
               initialValues={
                 quote
                   ? {
@@ -116,6 +126,8 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
           </Col>
           <Col>
             <CalculateCabPrice
+              bookingFrom={bookingFrom}
+              bookingTo={bookingTo}
               initialValues={
                 quote
                   ? {
