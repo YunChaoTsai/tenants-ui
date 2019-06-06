@@ -63,4 +63,5 @@ npm run test # to run the unit tests
 npm run cypress # to run any E2E tests
 npm run cypress:all # to run all E2E tests
 npm run commit # to commit the changes
+npm run release # to release a new version, make sure to have a personal token in your .env file
 ```

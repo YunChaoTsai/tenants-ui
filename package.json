@@ -73,6 +73,8 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@commitlint/cli": "8.0.0",
+    "@commitlint/config-conventional": "8.0.0",
     "@cypress/webpack-preprocessor": "4.0.3",
     "commitizen": "3.1.1",
     "cross-env": "5.2.0",
@@ -91,6 +93,7 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged",
       "pre-push": "cross-env CI=true npm run test"
     }
@@ -99,6 +102,11 @@
     "*.{js,jsx,ts,tsx,json,html,css,scss,sass,yml}": [
       "prettier --write",
       "git add"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   },
   "config": {
