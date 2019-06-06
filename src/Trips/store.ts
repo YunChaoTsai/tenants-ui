@@ -31,9 +31,9 @@ export interface IQuoteHotel {
   hotel_id: number
   hotel: hotelStore.IHotel
   meal_plan_id: number
-  meal_plan: mealPlanStore.IMealPlan
+  meal_plan: hotelStore.IHotelMealPlan
   room_type_id: number
-  room_type: roomTypeStore.IRoomType
+  room_type: hotelStore.IHotelRoomType
   adults_with_extra_bed: number
   children_with_extra_bed: number
   children_without_extra_bed: number
@@ -62,7 +62,7 @@ export interface IQuote {
   trip_id: number
   total_price: number
   given_price: number
-  comments?: string
+  comments: string
   hotels: IQuoteHotel[]
   cabs: IQuoteCab[]
   created_by: userStore.IUser

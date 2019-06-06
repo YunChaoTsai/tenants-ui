@@ -206,6 +206,19 @@ svg:not(:root) {
 }
 
 /**
+ * Utility
+ */
+.rotate-90 {
+  transform: rotate(90deg);
+}
+.rotate-180 {
+  transform: rotate(180deg);
+}
+.rotate-270 {
+  transform: rotate(270deg);
+}
+
+/**
  * Components
  */
 .list {
@@ -268,4 +281,14 @@ svg:not(:root) {
 }
 .btn--icon + .btn--icon {
   margin-left: 10px;
+}
+
+.tabs > li > a {
+  display: inline-block;
+  padding: 0.5em 1em;
+}
+
+.tabs li.active {
+  background: #667eea;
+  color: white;
 }

@@ -65,23 +65,25 @@ export const GivenQuote = withXHR(function GivenQuote({
   )
   return (
     <div>
-      <h5>
-        Given Price:{" "}
-        <mark>
-          <RupeeIcon /> {numberToLocalString(given_price)} /-
-        </mark>
-      </h5>
-      {comments ? <blockquote>{comments}</blockquote> : null}
-      <p>
-        <em>
-          on{" "}
-          {moment
-            .utc(created_at)
-            .local()
-            .format("DD MMM, YYYY [at] hh:mm A")}{" "}
-          by {created_by.name}&lt;{created_by.email}&gt;
-        </em>
-      </p>
+      <header className="mb-8">
+        <h5>
+          Given Price:{" "}
+          <mark>
+            <RupeeIcon /> {numberToLocalString(given_price)} /-
+          </mark>
+        </h5>
+        <blockquote>
+          {comments ? <p>{comments}</p> : null}
+          <em>
+            on{" "}
+            {moment
+              .utc(created_at)
+              .local()
+              .format("DD MMM, YYYY [at] hh:mm A")}{" "}
+            by {created_by.name}&lt;{created_by.email}&gt;
+          </em>
+        </blockquote>
+      </header>
       <Quote
         quote={quote}
         readOnly

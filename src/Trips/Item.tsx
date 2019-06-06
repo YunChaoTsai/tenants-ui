@@ -35,9 +35,15 @@ import Spinner from "../Shared/Spinner"
 import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
-import { UsersIcon, ChildIcon } from "@tourepedia/icons"
+import {
+  UsersIcon,
+  ChildIcon,
+  ChevronDownIcon,
+  RupeeIcon,
+} from "@tourepedia/icons"
 import Badge from "@tourepedia/badge"
 import classNames from "classnames"
+import NavLink from "../Shared/NavLink"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -307,7 +313,7 @@ function HotelPayments({
             <Fragment key={payment.id}>
               {payment.instalments.map((instalment, i, instalments) => (
                 <tr key={instalment.id}>
-                  {i == 0 ? (
+                  {i === 0 ? (
                     <td
                       rowSpan={instalments.length}
                       className="vertical-align-middle"
@@ -375,7 +381,7 @@ function CabPayments({
             <Fragment key={payment.id}>
               {payment.instalments.map((instalment, i, instalments) => (
                 <tr key={instalment.id}>
-                  {i == 0 ? (
+                  {i === 0 ? (
                     <td
                       rowSpan={instalments.length}
                       className="vertical-align-middle"
@@ -521,7 +527,9 @@ const LatestGivenQuote = withXHR(function LatestGivenQuote({
       />
       {converted_at ? null : (
         <footer>
-          <Button onClick={showConvert}>Mark as converted</Button>
+          <Button onClick={showConvert} primary>
+            Mark as converted
+          </Button>
         </footer>
       )}
     </fieldset>
@@ -537,7 +545,7 @@ interface DispatchProps {
 }
 interface OwnProps extends RouteComponentProps<{ tripId: string }> {}
 
-interface ItemProps extends StateProps, DispatchProps, OwnProps, XHRProps {}
+interface ItemProps extends StateProps, DispatchProps, OwnProps {}
 
 const connectWithItem = connect<
   StateProps,
@@ -557,19 +565,7 @@ const connectWithItem = connect<
   })
 )
 
-function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
-  useEffect(() => {
-    tripId && getTrip(tripId)
-  }, [])
-  if (!tripId) {
-    navigate && navigate("..")
-    return null
-  }
-  if (isFetching) return <span>Loading...</span>
-  if (!trip) {
-    navigate && navigate("..")
-    return null
-  }
+function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
   const {
     id,
     locations,
@@ -595,17 +591,53 @@ function Item({ tripId, isFetching, getTrip, navigate, trip, xhr }: ItemProps) {
       {hotel_payments ? <HotelPayments payments={hotel_payments} /> : null}
       {cab_payments ? <CabPayments payments={cab_payments} /> : null}
       <LatestGivenQuote trip={trip} />
-      <Link to="given-quotes">Given Quotes</Link> •{" "}
-      <Link to="quotes">Quotes</Link> • <Link to="new-quote">New Quote</Link>
+    </div>
+  )
+}
+
+function Item({ tripId, isFetching, getTrip, navigate, trip }: ItemProps) {
+  useEffect(() => {
+    tripId && getTrip(tripId)
+  }, [])
+  if (!tripId) {
+    navigate && navigate("..")
+    return null
+  }
+  if (isFetching) return <span>Loading...</span>
+  if (!trip) {
+    navigate && navigate("..")
+    return null
+  }
+  return (
+    <div>
+      <ul className="border-b flex mb-4 tabs">
+        <NavLink to=".." className="border">
+          <ChevronDownIcon className="rotate-90" />
+        </NavLink>
+        <NavLink to="" className="border">
+          Trip Details
+        </NavLink>
+        <NavLink to="given-quotes" className="border">
+          Given Quotes
+        </NavLink>
+        <NavLink to="quotes" className="border">
+          Quotes
+        </NavLink>
+        <NavLink to="new-quote" className="border">
+          New Quote
+        </NavLink>
+      </ul>
       <Router>
+        <Index path="/" trip={trip} />
         <GivenQuotes path="given-quotes" trip={trip} />
-        <GivenQuotes path="/" trip={trip} />
         <Quotes path="quotes" trip={trip} />
         <NewQuote path="new-quote" trip={trip} />
       </Router>
     </div>
   )
 }
+
+export default connectWithItem(Item)
 
 const tripConversionValidationSchema = Validator.object()
   .shape({
@@ -800,7 +832,11 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                         {children ? ` and ${children} children` : ""}
                       </mark>{" "}
                       where the package cost is{" "}
-                      <mark>INR {latest_given_quote.given_price} /-</mark>.
+                      <mark>
+                        <RupeeIcon />{" "}
+                        {numberToLocalString(latest_given_quote.given_price)} /-
+                      </mark>
+                      .
                     </b>
                   </p>
                   <h5>Quote Details</h5>
@@ -828,7 +864,11 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                                   </Col>
                                   <Col>
                                     <FormGroup>
-                                      <label>Percentage</label>
+                                      <label
+                                        htmlFor={`${name}.${index}.percentage`}
+                                      >
+                                        Percentage
+                                      </label>
                                       <Field
                                         name={`${name}.${index}.percentage`}
                                         render={({
@@ -861,7 +901,11 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                                   </Col>
                                   <Col>
                                     <FormGroup>
-                                      <label>Amount</label>
+                                      <label
+                                        htmlFor={`${name}.${index}.amount`}
+                                      >
+                                        Amount
+                                      </label>
                                       <Field
                                         name={`${name}.${index}.amount`}
                                         render={({
@@ -971,5 +1015,3 @@ export const ConvertTrip = withXHR(function ConvertTrip({
     </Dialog>
   )
 })
-
-export default connectWithItem(withXHR(Item))
