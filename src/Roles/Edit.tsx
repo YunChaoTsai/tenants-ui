@@ -1,6 +1,6 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import { Formik, FormikProps, FormikActions, Form, ErrorMessage } from "formik"
+import { Formik, FormikProps, FormikActions, Form } from "formik"
 import Helmet from "react-helmet-async"
 import * as Validator from "yup"
 import Button from "@tourepedia/button"
@@ -15,9 +15,6 @@ const newRoleSchema = Validator.object().shape({
     .min(4, "Minimum 4 characters required")
     .max(199, "Maximum 199 characters allowed"),
 })
-const initialValues = {
-  name: "",
-}
 
 interface EditRoleProps
   extends RouteComponentProps<{ roleId: string }>,

@@ -1,15 +1,7 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
-import {
-  Formik,
-  FormikActions,
-  FormikProps,
-  Form,
-  FieldArray,
-  ErrorMessage,
-  Field,
-} from "formik"
+import { Formik, FormikActions, FormikProps, Form, FieldArray } from "formik"
 import Button from "@tourepedia/button"
 import * as Validator from "yup"
 import moment from "moment"
@@ -19,7 +11,6 @@ import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 

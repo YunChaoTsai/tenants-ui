@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import {
   Formik,
@@ -28,6 +28,7 @@ import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { ChevronDownIcon } from "@tourepedia/icons"
 import { useDidMount } from "@tourepedia/react-hooks"
+import Select from "@tourepedia/select"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -118,11 +119,15 @@ export const INITIAL_VALUES: CalculatePriceParams = {
 interface CalculatePriceFormProps extends XHRProps {
   initialValues?: CalculatePriceParams
   onChange?: (price: number, hotels: any) => void
+  bookingFrom?: string
+  bookingTo?: string
 }
 export const CalculatePriceForm = withXHR(function CalculatePriceForm({
   initialValues = INITIAL_VALUES,
   xhr,
   onChange,
+  bookingFrom,
+  bookingTo,
 }: CalculatePriceFormProps) {
   function notifyOnChange(flattenValues: CalculatePriceParams) {
     onChange &&
@@ -167,6 +172,19 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
   useDidMount(() => {
     notifyOnChange(initialValues)
   })
+  const bookingDates: Array<{ id: number; name: string }> = useMemo(() => {
+    const dates = []
+    const days = moment(bookingTo).diff(moment(bookingFrom), "days")
+    for (let i = 0; i <= days; i++) {
+      dates.push({
+        id: i,
+        name: moment(bookingFrom)
+          .add(i, "day")
+          .format("YYYY-MM-DD"),
+      })
+    }
+    return dates
+  }, [bookingFrom, bookingTo])
   return (
     <Formik
       initialValues={initialValues}
@@ -273,10 +291,36 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                     <fieldset key={index}>
                       <Grid>
                         <Col md={3} sm={6}>
-                          <DatePicker
-                            label="Checkin Date"
-                            name={`${name}.${index}.start_date`}
-                          />
+                          {bookingFrom && bookingTo ? (
+                            <FormikFormGroup
+                              name={`${name}.${index}.start_date`}
+                              render={({
+                                field,
+                              }: FieldProps<CalculatePriceParams>) => (
+                                <Select
+                                  {...field}
+                                  label="Checkin Date"
+                                  options={bookingDates}
+                                  searchable={false}
+                                  placeholder="Select a date..."
+                                  required
+                                  onQuery={() => {}}
+                                  value={bookingDates.find(
+                                    d => d.name === hotel.start_date
+                                  )}
+                                  onChange={(startDate, name) => {
+                                    setFieldValue(name, startDate.name)
+                                  }}
+                                />
+                              )}
+                            />
+                          ) : (
+                            <DatePicker
+                              label="Checkin Date"
+                              name={`${name}.${index}.start_date`}
+                              required
+                            />
+                          )}
                         </Col>
                         <Col md={3} sm={6}>
                           <InputField
