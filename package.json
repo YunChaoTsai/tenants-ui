@@ -74,9 +74,6 @@
   ],
   "devDependencies": {
     "@cypress/webpack-preprocessor": "4.0.3",
-    "@semantic-release/commit-analyzer": "6.1.0",
-    "@semantic-release/github": "5.3.3",
-    "@semantic-release/release-notes-generator": "7.1.4",
     "commitizen": "3.1.1",
     "cross-env": "5.2.0",
     "cypress": "3.3.1",
