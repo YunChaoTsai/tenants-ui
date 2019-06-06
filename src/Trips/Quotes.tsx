@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment } from "react"
-import { RouteComponentProps } from "@reach/router"
+import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
 import Button from "@tourepedia/button"
 import { Formik, Form } from "formik"
@@ -16,7 +16,7 @@ import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
-import { BedIcon, BusIcon } from "@tourepedia/icons"
+import { BedIcon, BusIcon, RupeeIcon } from "@tourepedia/icons"
 
 interface IInstalment {
   amount: number
@@ -150,6 +150,7 @@ export const Quote = withXHR(function Quote({
     comments,
     created_by,
     created_at,
+    trip_id,
   } = quote
   const [showGiveQuote, open, close] = useDialog()
   const [
@@ -174,21 +175,28 @@ export const Quote = withXHR(function Quote({
   }
   return (
     <div>
-      <header>
-        <h6>Cost Price: INR {numberToLocalString(total_price)} /-</h6>
-        {comments ? <blockquote>{comments}</blockquote> : null}
-        <p>
-          on{" "}
-          {moment
-            .utc(created_at)
-            .local()
-            .format("DD MMM, YYYY [at] hh:mm A")}{" "}
-          by {created_by.name}&lt;{created_by.email}&gt;
-        </p>
+      <header className="mb-4">
+        <h6>
+          Cost Price: <RupeeIcon /> {numberToLocalString(total_price)} /-
+        </h6>
+        <blockquote>
+          {comments ? <p>{comments}</p> : null}
+          <em>
+            on{" "}
+            {moment
+              .utc(created_at)
+              .local()
+              .format("DD MMM, YYYY [at] hh:mm A")}{" "}
+            by {created_by.name}&lt;{created_by.email}&gt;
+          </em>
+        </blockquote>
       </header>
       <section>
         <h6>
-          <BedIcon /> Accommodation
+          <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
+            <BedIcon />
+          </span>
+          Accommodation
         </h6>
         <Table
           caption={
@@ -241,7 +249,10 @@ export const Quote = withXHR(function Quote({
       </section>
       <section>
         <h6>
-          <BusIcon /> Transportation
+          <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
+            <BusIcon />
+          </span>
+          Transportation
         </h6>
         <Table
           caption={
@@ -348,7 +359,7 @@ export const Quote = withXHR(function Quote({
                         placeholder="Write comments regarding prices or anything else..."
                       />
                       <Dialog.Footer>
-                        <Button type="submit" disabled={isSubmitting}>
+                        <Button primary type="submit" disabled={isSubmitting}>
                           Give Quote
                         </Button>
                         <Button onClick={close} className="btn--secondary">
@@ -364,6 +375,13 @@ export const Quote = withXHR(function Quote({
               Get Instalments for Hotels and Cabs{" "}
               {isFetchingInstalments ? <Spinner /> : null}
             </Button>
+            <Link
+              to={`/trips/${trip_id}/new-quote`}
+              state={{ quote }}
+              className="btn"
+            >
+              Edit
+            </Link>
           </div>
           {instalments ? (
             <Table
@@ -400,7 +418,7 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
   }, [])
   return (
     <Fragment>
-      <h4>Quotes</h4>
+      <h4 className="my-4">All Quotes</h4>
       {quotes.length === 0 ? (
         <p className="text-center">No quote created for this trip</p>
       ) : (

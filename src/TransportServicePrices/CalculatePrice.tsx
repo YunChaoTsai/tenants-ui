@@ -28,6 +28,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { ChevronDownIcon } from "@tourepedia/icons"
+import { useDidMount } from "@tourepedia/react-hooks"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -97,7 +98,8 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
       onChange(
         flattenValues.cabs.reduce(
           (price: number, cab) =>
-            price + (cab.given_price ? cab.given_price : 0),
+            price +
+            parseFloat((cab.given_price ? cab.given_price : 0).toString()),
           0
         ),
         flattenValues.cabs.map(
@@ -121,6 +123,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
         )
       )
   }
+  useDidMount(() => {
+    notifyOnChange(initialValues)
+  })
   return (
     <Formik
       initialValues={initialValues}

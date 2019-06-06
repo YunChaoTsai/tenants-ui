@@ -24,10 +24,10 @@ import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { ChevronDownIcon } from "@tourepedia/icons"
+import { useDidMount } from "@tourepedia/react-hooks"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -129,7 +129,8 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
       onChange(
         flattenValues.hotels.reduce(
           (price: number, hotel) =>
-            price + (hotel.given_price ? hotel.given_price : 0),
+            price +
+            parseFloat((hotel.given_price ? hotel.given_price : 0).toString()),
           0
         ),
         flattenValues.hotels.map(
@@ -163,6 +164,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
         )
       )
   }
+  useDidMount(() => {
+    notifyOnChange(initialValues)
+  })
   return (
     <Formik
       initialValues={initialValues}
@@ -173,7 +177,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
       ) => {
         actions.setStatus()
         const hotels: any[] = []
-        // flatten values so that we cab show the prices for each row
+        // flatten values so that we can show the prices for each row
         const flattenValues: CalculatePriceParams = {
           hotels: [],
         }
