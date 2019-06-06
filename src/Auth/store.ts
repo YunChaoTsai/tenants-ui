@@ -1,6 +1,4 @@
 import { createAsyncAction, ActionType, getType } from "typesafe-actions"
-import { AnyAction } from "redux"
-import { AxiosInstance } from "axios"
 
 export const key = "AUTHENTICATED_USER_STATE"
 

@@ -1,8 +1,7 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
-import { Formik, FormikProps, FormikActions, Form, FieldArray } from "formik"
-import * as Validator from "yup"
+import { Formik, FormikProps, FormikActions, Form } from "formik"
 import Button from "@tourepedia/button"
 
 import { withXHR, XHRProps } from "./../xhr"
@@ -32,7 +31,7 @@ export function EditPermissions({
           navigate && navigate("/roles")
           return null
         }
-        const { id, name, permissions = [] } = role
+        const { name, permissions = [] } = role
         const initialValues = {
           permissions,
         }

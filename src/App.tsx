@@ -1,5 +1,5 @@
 import React, { Fragment } from "react"
-import { Router, Link, Location, LinkProps } from "@reach/router"
+import { Router, Link, Location } from "@reach/router"
 import Helmet from "react-helmet-async"
 
 import { Login, Logout, connectWithAuth } from "./Auth"
@@ -46,6 +46,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
         <ul>
           <NavLink to="/" className="inline-block">
             <img
+              alt="Logo"
               src={process.env.PUBLIC_URL + "/logo.jpg"}
               className="inline-block align-middle mr-3"
               style={{
@@ -90,7 +91,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
             </ul>
           </Dropdown>
           <Dropdown as="li" className="inline-block">
-            <a className="toggler" href="#">
+            <a className="toggler" href="#profile-and-settings">
               Hi {name}
             </a>
             <ul className="menu">

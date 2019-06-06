@@ -6,7 +6,6 @@ import { connect } from "react-redux"
 import moment from "moment"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
-import { RedirectUnlessAuthenticated } from "./../Auth"
 import { IUser, actions, IStateWithKey, selectors } from "./store"
 
 function XHR(xhr: AxiosInstance) {

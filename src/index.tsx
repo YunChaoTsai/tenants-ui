@@ -1,9 +1,8 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
-import { combineReducers, Reducer } from "redux"
+import { combineReducers } from "redux"
 import { HelmetProvider } from "react-helmet-async"
-import { AxiosInstance } from "axios"
 
 import App from "./App"
 import * as serviceWorker from "./serviceWorker"

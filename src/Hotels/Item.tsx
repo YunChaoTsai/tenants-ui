@@ -95,7 +95,7 @@ export const HotelDataProvider = connectWithItem(function HotelDataProvider({
 }: ItemProps) {
   useEffect(() => {
     hotelId && getHotel(hotelId)
-  }, [])
+  }, [hotelId, getHotel])
   return <Fragment>{render({ hotel, isFetching, hotelId, getHotel })}</Fragment>
 })
 
@@ -119,7 +119,6 @@ export function Item({
           return null
         }
         const {
-          id,
           name,
           stars,
           extra_bed_child_age_start,

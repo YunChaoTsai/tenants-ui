@@ -1,6 +1,6 @@
 import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import { Formik, FormikProps, FormikActions, Form, ErrorMessage } from "formik"
+import { Formik, FormikProps, FormikActions, Form } from "formik"
 import * as Validator from "yup"
 import Button from "@tourepedia/button"
 

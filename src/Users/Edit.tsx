@@ -1,15 +1,7 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
-import {
-  Formik,
-  FormikProps,
-  FormikActions,
-  Form,
-  Field,
-  FieldProps,
-  ErrorMessage,
-} from "formik"
+import { Formik, FormikProps, FormikActions, Form } from "formik"
 import * as Validator from "yup"
 import Button from "@tourepedia/button"
 
@@ -42,7 +34,7 @@ export function EditUser({ xhr, navigate, userId }: EditUserProps) {
           navigate && navigate("/users")
           return null
         }
-        const { id, name } = user
+        const { name } = user
         const initialValues = {
           name: name,
         }
@@ -60,7 +52,7 @@ export function EditUser({ xhr, navigate, userId }: EditUserProps) {
                 actions: FormikActions<UserCredentials>
               ) => {
                 actions.setStatus()
-                return xhr
+                xhr
                   .patch(`/users/${userId}`, values)
                   .then(({ data }) => {
                     const { data: user } = data

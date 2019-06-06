@@ -1,7 +1,6 @@
 import {
   createStore,
   applyMiddleware,
-  compose,
   Middleware,
   Reducer,
   StoreEnhancer,

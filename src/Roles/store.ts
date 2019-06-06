@@ -1,4 +1,4 @@
-import { createAsyncAction, getType, ActionType } from "typesafe-actions"
+import { createAsyncAction, ActionType } from "typesafe-actions"
 
 import {
   IBaseItem,

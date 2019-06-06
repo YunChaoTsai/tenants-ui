@@ -1,8 +1,7 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
-import { Formik, FormikProps, FormikActions, Form, FieldArray } from "formik"
-import * as Validator from "yup"
+import { Formik, FormikProps, FormikActions, Form } from "formik"
 import Button from "@tourepedia/button"
 
 import { withXHR, XHRProps } from "./../xhr"
@@ -28,7 +27,7 @@ export function EditRoles({ xhr, navigate, userId }: EditRolesProps) {
           navigate && navigate("/users")
           return null
         }
-        const { id, name, roles = [] } = user
+        const { name, roles = [] } = user
         const initialValues = {
           roles: roles,
         }
@@ -45,7 +44,7 @@ export function EditRoles({ xhr, navigate, userId }: EditRolesProps) {
                 actions: FormikActions<EditRolesCredentials>
               ) => {
                 actions.setStatus()
-                return xhr
+                xhr
                   .post(`/users/${userId}/roles`, {
                     roles: values.roles.map(({ name }) => ({
                       name,
