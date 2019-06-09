@@ -4,16 +4,16 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { ICabType, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import { PaginateProps, Paginate } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
-import { Table } from "@tourepedia/ui"
+import { IPaginate } from "./../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -41,8 +41,9 @@ export const getCabTypes = (params?: any): ThunkAction<Promise<ICabType[]>> => (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   cabTypes: ICabType[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getCabTypes: (params?: any) => Promise<ICabType[]>
@@ -73,8 +74,16 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getCabTypes, cabTypes, ...otherProps }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
+function List({
+  getCabTypes,
+  cabTypes,
+  isFetching,
+  total,
+  currentPage,
+  lastPage,
+  from,
+  to,
+}: ListProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getCabTypes({ page: currentPage })
@@ -95,7 +104,12 @@ function List({ getCabTypes, cabTypes, ...otherProps }: ListProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getCabTypes({ ...params, page })}
           />
         </Col>

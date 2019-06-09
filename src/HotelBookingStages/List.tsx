@@ -4,16 +4,16 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { IHotelBookingStage, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
-import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -47,8 +47,9 @@ export const getHotelBookingStages = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   hotelBookingStages: IHotelBookingStage[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getHotelBookingStages: (params?: any) => Promise<any>
@@ -83,9 +84,13 @@ interface ListProps
 function List({
   getHotelBookingStages,
   hotelBookingStages,
-  ...otherProps
+  total,
+  from,
+  to,
+  isFetching,
+  currentPage,
+  lastPage,
 }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
   const [params, setParams] = useSearch()
   useEffect(() => {
     getHotelBookingStages({ page: currentPage })
@@ -106,7 +111,12 @@ function List({
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getHotelBookingStages({ ...params, page })}
           />
         </Col>

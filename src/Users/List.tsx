@@ -4,14 +4,14 @@ import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 import moment from "moment"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { IUser, actions, IStateWithKey, selectors } from "./store"
 import { List } from "./../Shared/List"
-import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
-import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -39,7 +39,7 @@ export const getUsers = (params?: any): ThunkAction<Promise<IUser[]>> => (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   users: IUser[]
 }
 interface DispatchProps {
@@ -47,9 +47,17 @@ interface DispatchProps {
 }
 interface OwnProps extends RouteComponentProps {}
 interface UsersProps extends OwnProps, StateProps, DispatchProps {}
-export function Users({ getUsers, users, ...otherProps }: UsersProps) {
+export function Users({
+  getUsers,
+  users,
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
+}: UsersProps) {
   const [params, setParams] = useSearch()
-  const { currentPage, total, isFetching } = otherProps
   useEffect(() => {
     getUsers({ page: currentPage })
   }, [])
@@ -69,7 +77,12 @@ export function Users({ getUsers, users, ...otherProps }: UsersProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            isFetching={isFetching}
+            currentPage={currentPage}
+            lastPage={lastPage}
             onChange={page => getUsers({ ...params, page })}
           />
         </Col>

@@ -3,6 +3,7 @@ import { connect } from "react-redux"
 import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import {
   IHotel,
@@ -14,11 +15,10 @@ import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import { List as Listable } from "./../Shared/List"
-import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import Helmet from "react-helmet-async"
-import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "./../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -46,8 +46,9 @@ export const getHotels = (params?: any): ThunkAction<Promise<IHotel[]>> => (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   hotels: IHotel[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getHotels: (params?: any) => Promise<IHotel[]>
@@ -80,8 +81,16 @@ interface ListProps
     OwnProps,
     RouteComponentProps {}
 
-function List({ getHotels, hotels, ...otherProps }: ListProps) {
-  const { currentPage, total, isFetching } = otherProps
+function List({
+  getHotels,
+  hotels,
+  total,
+  from,
+  to,
+  lastPage,
+  currentPage,
+  isFetching,
+}: ListProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getHotels({ page: currentPage })
@@ -102,7 +111,12 @@ function List({ getHotels, hotels, ...otherProps }: ListProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            isFetching={isFetching}
+            currentPage={currentPage}
+            from={from}
+            to={to}
+            lastPage={lastPage}
             onChange={page => getHotels({ ...params, page })}
           />
         </Col>
