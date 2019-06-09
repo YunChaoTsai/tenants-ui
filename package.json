@@ -1,6 +1,6 @@
 {
   "name": "tp-admin-ui",
-  "version": "0.0.0-semantice-released",
+  "version": "0.0.0-semantic-released",
   "description": "Manage all your travel agent needs at one place",
   "private": true,
   "bugs": {
@@ -12,14 +12,7 @@
   },
   "dependencies": {
     "@reach/router": "1.2.1",
-    "@tourepedia/badge": "0.1.14",
-    "@tourepedia/button": "0.1.15",
-    "@tourepedia/css": "0.5.0",
-    "@tourepedia/dialog": "0.4.5",
-    "@tourepedia/dom-helpers": "0.2.6",
-    "@tourepedia/icons": "0.2.2",
-    "@tourepedia/react-hooks": "0.3.0",
-    "@tourepedia/select": "0.2.0",
+    "@tourepedia/ui": "1.1.0",
     "@types/classnames": "2.2.7",
     "@types/jest": "24.0.5",
     "@types/node": "11.9.4",
@@ -29,7 +22,7 @@
     "@types/react-dom": "16.8.4",
     "@types/react-redux": "7.0.1",
     "@types/yup": "0.26.9",
-    "axios": "0.18.0",
+    "axios": "0.19.0",
     "classnames": "2.2.6",
     "env-cmd": "9.0.1",
     "formik": "1.5.1",
@@ -73,10 +66,9 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@commitlint/cli": "8.0.0",
+    "@commitlint/config-conventional": "8.0.0",
     "@cypress/webpack-preprocessor": "4.0.3",
-    "@semantic-release/commit-analyzer": "6.1.0",
-    "@semantic-release/github": "5.3.3",
-    "@semantic-release/release-notes-generator": "7.1.4",
     "commitizen": "3.1.1",
     "cross-env": "5.2.0",
     "cypress": "3.3.1",
@@ -94,6 +86,7 @@
   },
   "husky": {
     "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "lint-staged",
       "pre-push": "cross-env CI=true npm run test"
     }
@@ -102,6 +95,11 @@
     "*.{js,jsx,ts,tsx,json,html,css,scss,sass,yml}": [
       "prettier --write",
       "git add"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   },
   "config": {

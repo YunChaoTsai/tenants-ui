@@ -3,7 +3,7 @@ import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { Formik, FormikProps, FormikActions, Form } from "formik"
 import * as Validator from "yup"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 
 import { InputField } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"

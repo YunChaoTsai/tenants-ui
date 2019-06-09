@@ -6,12 +6,9 @@ import moment from "moment"
 import { ITrip, IGivenQuote } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Quote } from "./Quotes"
-import Button from "@tourepedia/button"
-import { Table } from "../Shared/Table"
-import { useFetchState } from "@tourepedia/react-hooks"
+import { Button, Table, useFetchState, Icons } from "@tourepedia/ui"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
-import { RupeeIcon } from "@tourepedia/icons"
 
 export interface IInstalment {
   amount: number
@@ -69,7 +66,7 @@ export const GivenQuote = withXHR(function GivenQuote({
         <h5>
           Given Price:{" "}
           <mark>
-            <RupeeIcon /> {numberToLocalString(given_price)} /-
+            <Icons.RupeeIcon /> {numberToLocalString(given_price)} /-
           </mark>
         </h5>
         <blockquote>
@@ -97,6 +94,8 @@ export const GivenQuote = withXHR(function GivenQuote({
       )}
       {instalments ? (
         <Table
+          striped
+          bordered
           headers={["Amount", "Due Date"]}
           alignCols={{ 0: "right" }}
           autoWidth

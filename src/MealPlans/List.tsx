@@ -4,16 +4,16 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { IMealPlan, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -39,8 +39,9 @@ export const getMealPlans = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   mealPlans: IMealPlan[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getMealPlans: (params?: any) => Promise<any>
@@ -71,8 +72,16 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getMealPlans, mealPlans, ...otherProps }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
+function List({
+  getMealPlans,
+  mealPlans,
+  total,
+  from,
+  to,
+  isFetching,
+  currentPage,
+  lastPage,
+}: ListProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getMealPlans({ page: currentPage })
@@ -93,13 +102,20 @@ function List({ getMealPlans, mealPlans, ...otherProps }: ListProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getMealPlans({ ...params, page })}
           />
         </Col>
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          striped
+          bordered
           headers={["Name", "Description"]}
           rows={mealPlans.map(mealPlan => [
             mealPlan.name,

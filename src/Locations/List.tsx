@@ -4,6 +4,7 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import {
   ILocation,
@@ -17,11 +18,10 @@ import {
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { Async, AsyncProps } from "@tourepedia/select"
 import { withXHR, XHRProps } from "./../xhr"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -62,9 +62,9 @@ export const getLocations = (
     })
 }
 
-interface StateProps extends PaginateProps {
-  isFetching: boolean
+interface StateProps extends IPaginate {
   locations: ILocation[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getLocations: (params?: any) => Promise<ILocation[]>
@@ -95,8 +95,16 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getLocations, locations, ...otherProps }: ListProps) {
-  const { total, isFetching, currentPage } = otherProps
+function List({
+  getLocations,
+  locations,
+  total,
+  from,
+  to,
+  isFetching,
+  currentPage,
+  lastPage,
+}: ListProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getLocations({ page: currentPage })
@@ -117,13 +125,20 @@ function List({ getLocations, locations, ...otherProps }: ListProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getLocations({ ...params, page })}
           />
         </Col>
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          striped
+          bordered
           headers={["Name", "Latitude", "Longitude"]}
           responsive
           rows={locations.map(location => [

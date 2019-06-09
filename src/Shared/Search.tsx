@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Formik, Form } from "formik"
 import { InputField } from "./InputField"
-import { SearchIcon } from "@tourepedia/icons"
+import { InputGroup, Icons } from "@tourepedia/ui"
 
 export interface SearchProps {
   initialParams?: {
@@ -29,17 +29,17 @@ export function Search({
       onSubmit={values => onSearch(values)}
       render={() => (
         <Form noValidate style={{ marginBottom: "1em" }}>
-          <div className="input-group">
+          <InputGroup>
             <InputField
               name="q"
+              noGroup
               placeholder="Search..."
               type="search"
-              style={{ minWidth: "200px" }}
             />
-            <button type="submit">
-              <SearchIcon />
+            <button className="input-group-addon btn" type="submit">
+              <Icons.SearchIcon />
             </button>
-          </div>
+          </InputGroup>
         </Form>
       )}
     />

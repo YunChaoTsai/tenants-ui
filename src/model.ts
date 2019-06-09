@@ -13,6 +13,15 @@ export interface IMeta {
   path?: string
 }
 
+export interface IPaginate {
+  total: number
+  from: number
+  to: number
+  currentPage: number
+  lastPage: number
+  isFetching: boolean
+}
+
 export interface ILinks {
   first?: string
   last?: string

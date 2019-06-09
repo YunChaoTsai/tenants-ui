@@ -1,7 +1,7 @@
 import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { Formik, FormikProps, FormikActions, Form, FieldArray } from "formik"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import * as Validator from "yup"
 
 import { InputField, FormikFormGroup } from "./../Shared/InputField"

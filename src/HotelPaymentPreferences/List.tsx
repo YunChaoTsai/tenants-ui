@@ -4,6 +4,7 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import {
   IHotelPaymentPreference,
@@ -14,11 +15,10 @@ import {
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "./../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -59,8 +59,9 @@ export const getHotelPaymentPreferences = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   hotelPaymentPreferences: IHotelPaymentPreference[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getHotelPaymentPreferences: (
@@ -97,9 +98,13 @@ interface ListProps
 function List({
   getHotelPaymentPreferences,
   hotelPaymentPreferences,
-  ...otherProps
+  total,
+  from,
+  to,
+  isFetching,
+  currentPage,
+  lastPage,
 }: ListProps) {
-  const { total, isFetching, currentPage } = otherProps
   const [params, setParams] = useSearch()
   useEffect(() => {
     getHotelPaymentPreferences({ page: currentPage })
@@ -120,7 +125,12 @@ function List({
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getHotelPaymentPreferences({ ...params, page })}
           />
         </Col>
@@ -128,6 +138,8 @@ function List({
       <Listable total={total} isFetching={isFetching}>
         <Table
           headers={["Description"]}
+          bordered
+          striped
           rows={hotelPaymentPreferences.map(hotelPaymentPreference => [
             hotelPaymentPreference.name,
           ])}

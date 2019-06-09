@@ -4,16 +4,16 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { ITripSource, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -39,7 +39,7 @@ export const getTripSources = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   tripSources: ITripSource[]
 }
 interface DispatchProps {
@@ -71,8 +71,16 @@ interface ListProps
     StateProps,
     DispatchProps,
     RouteComponentProps {}
-function List({ getTripSources, tripSources, ...otherProps }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
+function List({
+  getTripSources,
+  tripSources,
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
+}: ListProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getTripSources({ page: currentPage })
@@ -93,13 +101,20 @@ function List({ getTripSources, tripSources, ...otherProps }: ListProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            lastPage={lastPage}
+            currentPage={currentPage}
+            isFetching={isFetching}
             onChange={page => getTripSources({ ...params, page })}
           />
         </Col>
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          striped
+          bordered
           headers={["Name", "Short Name"]}
           rows={tripSources.map(tripSource => [
             tripSource.name,

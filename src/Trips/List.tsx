@@ -4,15 +4,14 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import moment from "moment"
 import Helmet from "react-helmet-async"
+import { Table, Icons, Paginate } from "@tourepedia/ui"
 
 import { ITrip, IStateWithKey, actions, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
-import { MailIcon, PhoneIcon } from "@tourepedia/icons"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -40,7 +39,7 @@ export const getTrips = (params?: any): ThunkAction<Promise<ITrip[]>> => (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   trips: ITrip[]
 }
 interface DispatchProps {
@@ -69,8 +68,16 @@ export const connectWithList = connect<
   })
 )
 
-function List({ trips, getTrips, ...otherProps }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
+function List({
+  trips,
+  getTrips,
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
+}: ListProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getTrips({ page: currentPage })
@@ -91,13 +98,20 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getTrips({ ...params, page })}
           />
         </Col>
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          striped
+          bordered
           responsive
           headers={["ID", "Dates", "Stages", "Destinations", "Traveler", "Pax"]}
           rows={trips.map(
@@ -130,14 +144,14 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
                   {contact.name}
                   <br />
                   <a href={`tel:${contact.phone_number}`} className="btn--icon">
-                    <PhoneIcon
+                    <Icons.PhoneIcon
                       title={`Call to ${contact.name} on ${
                         contact.phone_number
                       }`}
                     />
                   </a>
                   <a href={`mailto:${contact.email}`} className="btn--icon">
-                    <MailIcon
+                    <Icons.MailIcon
                       title={`Send Email to ${contact.name} at ${
                         contact.email
                       }`}

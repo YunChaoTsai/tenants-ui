@@ -2,7 +2,7 @@ import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { Formik, FormikProps, FormikActions, Form } from "formik"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 
 import { withXHR, XHRProps } from "./../xhr"
 import { RoleDataProvider } from "./Item"

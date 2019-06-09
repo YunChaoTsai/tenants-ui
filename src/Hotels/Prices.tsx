@@ -3,6 +3,7 @@ import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 import moment from "moment"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
 import {
@@ -12,11 +13,10 @@ import {
   selectors,
   IStateWithKey,
 } from "./store"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import List from "../Shared/List"
 import Search, { useSearch } from "../Shared/Search"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -48,8 +48,9 @@ export const getPrices = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   prices: IPrice[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getPrices: (hotelId: number, params?: any) => Promise<IPrice[]>
@@ -66,9 +67,13 @@ function Prices({
   prices,
   hotelId,
   hotel,
-  ...otherProps
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
 }: PricesProps) {
-  const { isFetching, total, currentPage } = otherProps
   const [params, setParams] = useSearch()
   let id: number = parseInt(hotelId || "", 10)
   useEffect(() => {
@@ -93,7 +98,12 @@ function Prices({
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getPrices(id, { page })}
           />
         </Col>
@@ -101,6 +111,8 @@ function Prices({
       <List isFetching={isFetching} total={total}>
         <Table
           responsive
+          bordered
+          striped
           headers={[
             "Start Date",
             "End Date",

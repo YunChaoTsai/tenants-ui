@@ -1,6 +1,8 @@
 import React, { Fragment } from "react"
 import { Router, Link, Location } from "@reach/router"
 import Helmet from "react-helmet-async"
+import { Icons } from "@tourepedia/ui"
+import "@tourepedia/ui/styles/index.css"
 
 import { Login, Logout, connectWithAuth } from "./Auth"
 import { AuthProps } from "./Auth/User"
@@ -29,11 +31,8 @@ import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
 
-import "@tourepedia/icons/styles/icon.css"
-import "@tourepedia/css/lib/styles.css"
 import "./main.css"
 import "./typography.css"
-import { CogAltIcon, OffIcon } from "@tourepedia/icons"
 
 interface HeaderProps extends AuthProps {}
 
@@ -96,12 +95,12 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
             </a>
             <ul className="menu">
               <NavLink to="/settings">
-                <CogAltIcon /> Settings
+                <Icons.CogAltIcon /> Settings
               </NavLink>
               <Location>
                 {({ location }) => (
                   <NavLink to={`/logout?from=${location.pathname}`}>
-                    <OffIcon /> Logout
+                    <Icons.OffIcon /> Logout
                   </NavLink>
                 )}
               </Location>

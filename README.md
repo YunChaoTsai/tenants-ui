@@ -40,6 +40,17 @@ npm install
 npm start
 ```
 
+## Scripts
+
+```bash
+npm start # to start the development server
+npm run test # to run the unit tests
+npm run cypress # to run any E2E tests
+npm run cypress:all # to run all E2E tests
+npm run commit # to commit the changes
+npm run release # to release a new version, make sure to have a personal token in your .env file
+```
+
 ## HOW TO?
 
 ### Q: How to add a new module ?
@@ -54,13 +65,3 @@ Let's support we are creating a new Module called `Role Management`. This module
 
 We will start by creating a new Folder inside `src` directory, named `Roles` with a `index.tsx` file in it which will
 contain all the exports from Roles management module.
-
-## Scripts
-
-```bash
-npm start # to start the development server
-npm run test # to run the unit tests
-npm run cypress # to run any E2E tests
-npm run cypress:all # to run all E2E tests
-npm run commit # to commit the changes
-```

@@ -8,7 +8,7 @@ import {
   FieldArray,
   FieldProps,
 } from "formik"
-import Button from "@tourepedia/button"
+import { Button, Icons, useDidMount, Select } from "@tourepedia/ui"
 import * as Validator from "yup"
 import moment from "moment"
 import { AxiosInstance } from "axios"
@@ -27,9 +27,6 @@ import {
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
-import { ChevronDownIcon } from "@tourepedia/icons"
-import { useDidMount } from "@tourepedia/react-hooks"
-import Select from "@tourepedia/select"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -443,7 +440,7 @@ export default function CalculatePrice(props: RouteComponentProps) {
           to=".."
           className="mr-4 text-blue-600 hover:text-blue-800 text-lg px-2 border rounded-full"
         >
-          <ChevronDownIcon className="rotate-90" />
+          <Icons.ChevronDownIcon className="rotate-90" />
         </Link>
         <h3 className="m-0">Calculate Transportation Prices</h3>
       </div>

@@ -4,16 +4,16 @@ import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import { ITransportService, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction, ThunkDispatch } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -45,7 +45,7 @@ export const getTransportServices = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   transportServices: ITransportService[]
 }
 interface DispatchProps {
@@ -81,9 +81,13 @@ interface ListProps
 function List({
   getTransportServices,
   transportServices,
-  ...otherProps
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
 }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
   const [params, setParams] = useSearch()
   useEffect(() => {
     getTransportServices({ page: currentPage })
@@ -104,7 +108,12 @@ function List({
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            isFetching={isFetching}
+            currentPage={currentPage}
+            lastPage={lastPage}
             onChange={page => getTransportServices({ ...params, page })}
           />
         </Col>
@@ -112,6 +121,8 @@ function List({
       <Listable total={total} isFetching={isFetching}>
         <Table
           responsive
+          striped
+          bordered
           headers={["Destinations", "Distance (kms)"]}
           alignCols={{ 1: "right" }}
           rows={transportServices.map(transportService => [

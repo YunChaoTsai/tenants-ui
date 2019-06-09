@@ -1,8 +1,9 @@
-import React, { useState, useEffect, Fragment } from "react"
+import React, { useEffect, Fragment } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
 import moment from "moment"
 import { connect } from "react-redux"
+import { Table, Paginate } from "@tourepedia/ui"
 
 import {
   ITransportServicePrice,
@@ -10,13 +11,12 @@ import {
   selectors,
   IStateWithKey,
 } from "./store"
-import Paginate, { PaginateProps } from "../Shared/Paginate"
 import { ThunkAction, ThunkDispatch } from "../types"
 import Helmet from "react-helmet-async"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
 import { Grid, Col } from "../Shared/Layout"
+import { IPaginate } from "../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -48,7 +48,7 @@ export const getTransportServicePrices = (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   transportServicePrices: ITransportServicePrice[]
 }
 interface DispatchProps {
@@ -85,9 +85,13 @@ interface ListProps
 function List({
   getTransportServicePrices,
   transportServicePrices,
-  ...otherProps
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
 }: ListProps) {
-  const { isFetching, total, currentPage } = otherProps
   const [params, setParams] = useSearch()
   useEffect(() => {
     getTransportServicePrices({ page: currentPage })
@@ -108,7 +112,12 @@ function List({
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => {
               getTransportServicePrices({ ...params, page })
             }}
@@ -117,6 +126,8 @@ function List({
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          bordered
+          striped
           responsive
           headers={[
             "Start Date",

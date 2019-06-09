@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import moment from "moment"
 
 import { withXHR, XHRProps } from "./../xhr"

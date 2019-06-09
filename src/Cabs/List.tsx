@@ -9,11 +9,11 @@ import { ThunkAction, ThunkDispatch } from "./../types"
 import { ICab, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
-import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import { List } from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
-import { Table } from "../Shared/Table"
+import { Table, Paginate } from "@tourepedia/ui"
+import { IPaginate } from "./../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -41,16 +41,25 @@ export const getCabs = (params?: any): ThunkAction<Promise<ICab[]>> => (
     })
 }
 
-interface StateProps extends PaginateProps {
+interface StateProps extends IPaginate {
   cabs: ICab[]
+  isFetching: boolean
 }
 interface DispatchProps {
   getCabs: (params?: any) => Promise<any>
 }
 interface OwnProps extends RouteComponentProps {}
 interface CabsProps extends OwnProps, StateProps, DispatchProps {}
-export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
-  const { isFetching, currentPage, total } = otherProps
+export function Cabs({
+  getCabs,
+  cabs,
+  total,
+  from,
+  to,
+  currentPage,
+  lastPage,
+  isFetching,
+}: CabsProps) {
   const [params, setParams] = useSearch()
   useEffect(() => {
     getCabs({ page: currentPage })
@@ -71,7 +80,12 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
         </Col>
         <Col className="text-right">
           <Paginate
-            {...otherProps}
+            total={total}
+            from={from}
+            to={to}
+            currentPage={currentPage}
+            lastPage={lastPage}
+            isFetching={isFetching}
             onChange={page => getCabs({ ...params, page })}
           />
         </Col>
@@ -79,7 +93,8 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
       <List isFetching={isFetching} total={total}>
         <Table
           headers={["Name", "Number Plate"]}
-          autoWidth
+          striped
+          bordered
           rows={cabs.map(r => [
             <Link to={r.id.toString()}>{r.name}</Link>,
             r.number_plate,
@@ -118,7 +133,7 @@ export const SelectCabs = withXHR<SelectCabsProps>(function SelectCabs({
       multiple
       fetch={q =>
         XHR(xhr)
-          .getCabs()
+          .getCabs({ q })
           .then(resp => resp.data)
       }
       {...otherProps}

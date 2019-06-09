@@ -9,7 +9,7 @@ import {
   FieldProps,
   FieldArray,
 } from "formik"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import * as Validator from "yup"
 import moment from "moment"
 
