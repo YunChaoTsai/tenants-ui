@@ -17,7 +17,7 @@ import { Async, AsyncProps } from "@tourepedia/select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -128,6 +128,8 @@ function List({
       <Listable total={total} isFetching={isFetching}>
         <Table
           headers={["Description"]}
+          bordered
+          striped
           rows={hotelPaymentPreferences.map(hotelPaymentPreference => [
             hotelPaymentPreference.name,
           ])}

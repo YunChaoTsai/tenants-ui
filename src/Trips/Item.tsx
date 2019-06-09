@@ -1,10 +1,18 @@
 import React, { useEffect, Fragment } from "react"
 import { RouteComponentProps, Link, Router } from "@reach/router"
-import Button from "@tourepedia/button"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 import moment from "moment"
 import Helmet from "react-helmet-async"
+import {
+  Table,
+  Icons,
+  Button,
+  useFetchState,
+  Badge,
+  Dialog,
+  useDialog,
+} from "@tourepedia/ui"
 import { $PropertyType } from "utility-types"
 import {
   Formik,
@@ -16,6 +24,7 @@ import {
   FieldProps,
 } from "formik"
 import * as Validator from "yup"
+import classNames from "classnames"
 
 import { InputField, Input, FormGroup } from "./../Shared/InputField"
 import { ITrip, actions, IStateWithKey, selectors } from "./store"
@@ -27,22 +36,11 @@ import GivenQuotes, {
   IInstalment,
 } from "./GivenQuotes"
 import NewQuote from "./NewQuote"
-import Dialog, { useDialog } from "@tourepedia/dialog"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
-import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "../Shared/Spinner"
-import { Table } from "../Shared/Table"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
-import {
-  UsersIcon,
-  ChildIcon,
-  ChevronDownIcon,
-  RupeeIcon,
-} from "@tourepedia/icons"
-import Badge from "@tourepedia/badge"
-import classNames from "classnames"
 import NavLink from "../Shared/NavLink"
 
 export function XHR(xhr: AxiosInstance) {
@@ -265,8 +263,6 @@ function CustomerPayments({
       caption={"Payments towards customer"}
       headers={["Due Date", "Due", "Total", "Paid", "Transactions"]}
       alignCols={{ 0: "right", 2: "right", 3: "right" }}
-      bordered
-      striped={false}
       rows={payments
         .reduce(
           (
@@ -456,11 +452,11 @@ function BasicDetails({ trip }: { trip: ITrip }) {
           <Col>
             <dt>Pax</dt>
             <dd>
-              <UsersIcon /> {no_of_adults} Adults
+              <Icons.UsersIcon /> {no_of_adults} Adults
               <br />
               {children ? (
                 <span>
-                  <ChildIcon />
+                  <Icons.ChildIcon />
                   {children} Children
                 </span>
               ) : (
@@ -612,7 +608,7 @@ function Item({ tripId, isFetching, getTrip, navigate, trip }: ItemProps) {
     <div>
       <ul className="border-b flex mb-4 tabs">
         <NavLink to=".." className="border">
-          <ChevronDownIcon className="rotate-90" />
+          <Icons.ChevronDownIcon className="rotate-90" />
         </NavLink>
         <NavLink to="" className="border">
           Trip Details
@@ -833,7 +829,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                       </mark>{" "}
                       where the package cost is{" "}
                       <mark>
-                        <RupeeIcon />{" "}
+                        <Icons.RupeeIcon />{" "}
                         {numberToLocalString(latest_given_quote.given_price)} /-
                       </mark>
                       .

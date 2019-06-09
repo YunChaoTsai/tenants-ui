@@ -2,7 +2,7 @@ import React from "react"
 import { Formik, Form } from "formik"
 import { InputField, FormikFormGroup } from "../Shared/InputField"
 import { SelectCountryDialCodes } from "../CountryDialCodes"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import * as Validator from "yup"
 import { store as countryDialCodesStore } from "../CountryDialCodes"
 

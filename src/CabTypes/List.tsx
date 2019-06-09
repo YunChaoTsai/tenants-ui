@@ -13,7 +13,7 @@ import { PaginateProps, Paginate } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -104,7 +104,8 @@ function List({ getCabTypes, cabTypes, ...otherProps }: ListProps) {
         <Table
           headers={["Name", "Capacity"]}
           alignCols={{ 1: "right" }}
-          autoWidth
+          bordered
+          striped
           rows={cabTypes.map(cabType => [cabType.name, cabType.capacity])}
         />
       </Listable>

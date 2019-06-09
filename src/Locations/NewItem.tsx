@@ -8,7 +8,7 @@ import {
   Field,
   FieldProps,
 } from "formik"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import Helmet from "react-helmet-async"
 import * as Validator from "yup"
 

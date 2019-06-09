@@ -2,7 +2,7 @@ import React, { Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { Formik, FormikActions, FormikProps, Form, FieldArray } from "formik"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import * as Validator from "yup"
 import moment from "moment"
 

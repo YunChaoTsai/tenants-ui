@@ -12,7 +12,7 @@ import { Async, AsyncProps } from "@tourepedia/select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -82,6 +82,8 @@ export function Roles({ getRoles, roles, ...otherProps }: RolesProps) {
       <Listable total={total} isFetching={isFetching}>
         <Table
           headers={["Name", "Permissions"]}
+          striped
+          bordered
           rows={roles.map(r => [
             <Link to={r.id.toString()}>{r.name}</Link>,
             (r.permissions || []).map(p => p.name).join(" • "),

@@ -17,7 +17,7 @@ import { List as Listable } from "./../Shared/List"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import Helmet from "react-helmet-async"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -110,6 +110,8 @@ function List({ getHotels, hotels, ...otherProps }: ListProps) {
       <Listable isFetching={isFetching} total={total}>
         <Table
           responsive
+          striped
+          bordered
           headers={["Name", "Meal Plans", "Room Type", "Child extra bed age"]}
           rows={hotels.map(hotel => [
             <Fragment>

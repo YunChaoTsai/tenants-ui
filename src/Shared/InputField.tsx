@@ -7,14 +7,13 @@ import {
   getIn,
 } from "formik"
 import { Omit } from "utility-types"
-
-import "./input-field.css"
+import { ErrorMessage as ErrorM, FormGroup } from "@tourepedia/ui"
 
 export function ErrorMessage({ className = "", ...props }: ErrorMessageProps) {
   return (
     <FormikErrorMessage
-      component="span"
-      className={`error ${className}`}
+      component={ErrorM}
+      className={`${className}`}
       {...props}
     />
   )
@@ -32,21 +31,24 @@ export function Input({
   name,
   ...otherProps
 }: InputProps) {
-  return <Component name={name} id={id || name} {...otherProps} type={type} />
+  return (
+    <Component
+      className="input"
+      name={name}
+      id={id || name}
+      {...otherProps}
+      type={type}
+    />
+  )
 }
 
-export function FormGroup({
-  className = "",
-  ...props
-}: React.HTMLProps<HTMLDivElement>) {
-  return <div role="group" className={`form-group ${className}`} {...props} />
-}
+export { FormGroup }
 
 export function FormikFormGroup({
   name,
-  className,
   render,
   children,
+  ref,
   ...props
 }: Omit<React.HTMLProps<HTMLDivElement>, "name"> & {
   name: string
@@ -64,9 +66,7 @@ export function FormikFormGroup({
         const error: string = getIn(errors, name)
         return (
           <FormGroup
-            className={`${touched ? "is-touched " : ""}${
-              error ? "has-error " : ""
-            }${className || ""}`}
+            hasError={!!(touched && error)}
             aria-errormessage={error}
             {...props}
           >
@@ -85,6 +85,7 @@ export interface InputFieldProps extends InputProps {
   label?: React.ReactNode
   className?: string
   labelPlacement?: "before" | "after"
+  noGroup?: boolean
 }
 
 export function InputField({
@@ -93,6 +94,7 @@ export function InputField({
   type = "text",
   className,
   labelPlacement,
+  noGroup,
   ...otherProps
 }: InputFieldProps) {
   // for radio or checkbox, default to after
@@ -100,17 +102,17 @@ export function InputField({
     labelPlacement ||
     (type === "checkbox" || type === "radio" ? "after" : "before")
   const renderLabel = label ? <label htmlFor={name}>{label}</label> : null
-  return (
-    <FormikFormGroup
-      name={name}
-      className={className}
-      render={({ field }) => (
-        <Fragment>
-          {labelPlacement === "before" ? renderLabel : null}
-          <Input {...otherProps} type={type} {...field} />
-          {labelPlacement === "after" ? renderLabel : null}
-        </Fragment>
-      )}
-    />
-  )
+  function render({ field }: FieldProps) {
+    return (
+      <Fragment>
+        {labelPlacement === "before" ? renderLabel : null}
+        <Input {...otherProps} type={type} {...field} />
+        {labelPlacement === "after" ? renderLabel : null}
+      </Fragment>
+    )
+  }
+  if (noGroup) {
+    return <Field name={name} render={render} />
+  }
+  return <FormikFormGroup name={name} className={className} render={render} />
 }

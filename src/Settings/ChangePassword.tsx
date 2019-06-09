@@ -3,7 +3,7 @@ import { RouteComponentProps } from "@reach/router"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { Formik, FormikProps, FormikActions, Form } from "formik"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import * as Validator from "yup"
 
 import { RedirectUnlessAuthenticated, AuthUserProvider } from "./../Auth"

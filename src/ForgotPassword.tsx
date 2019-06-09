@@ -1,6 +1,6 @@
 import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
 import { Formik, FormikProps, Form, FormikActions } from "formik"

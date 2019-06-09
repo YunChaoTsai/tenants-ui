@@ -2,7 +2,7 @@ import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { Formik, FormikProps, FormikActions, Form } from "formik"
 import * as Validator from "yup"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField } from "./../Shared/InputField"

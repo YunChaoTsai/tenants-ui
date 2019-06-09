@@ -7,8 +7,8 @@ import moment from "moment"
 import { RedirectUnlessAuthenticated } from "./../Auth"
 import { withXHR, XHRProps } from "./../xhr"
 import { store as tripStore } from "./../Trips"
-import { Table } from "../Shared/Table"
-import { PhoneIcon, MailIcon } from "@tourepedia/icons"
+import { Table } from "@tourepedia/ui"
+import { Icons } from "@tourepedia/ui"
 
 type IConvertedTripAnalytics = tripStore.ITrip[]
 type IDuePayments = {
@@ -49,6 +49,8 @@ function ConvertedTrips({ xhr }: XHRProps) {
       <h2>Converted trips over time</h2>
       <Table
         responsive
+        bordered
+        striped
         headers={["ID", "Dates", "Stages", "Destinations", "Traveler", "Pax"]}
         rows={trips.map(
           ({
@@ -80,12 +82,12 @@ function ConvertedTrips({ xhr }: XHRProps) {
                 {contact.name}
                 <br />
                 <a href={`tel:${contact.phone_number}`} className="btn--icon">
-                  <PhoneIcon
+                  <Icons.PhoneIcon
                     title={`Call to ${contact.name} on ${contact.phone_number}`}
                   />
                 </a>
                 <a href={`mailto:${contact.email}`} className="btn--icon">
-                  <MailIcon
+                  <Icons.MailIcon
                     title={`Send Email to ${contact.name} at ${contact.email}`}
                   />
                 </a>
@@ -109,34 +111,32 @@ function DuePayments({ xhr }: XHRProps) {
   return (
     <section>
       <h2>Due payments</h2>
-      <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
-        <table>
-          <thead>
-            <tr>
-              <th>Due Date</th>
-              {duePayments.map((a, i) => (
-                <th key={i}>
-                  {moment
-                    .utc(a.due_date)
-                    .local()
-                    .format("DD/MM/YYYY")}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Amount</th>
-              {duePayments.map((a, i) => (
-                <td key={i}>
-                  {a.is_credit ? "+" : "-"}
-                  {a.due_amount}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <Table bordered responsive>
+        <thead>
+          <tr>
+            <th>Due Date</th>
+            {duePayments.map((a, i) => (
+              <th key={i}>
+                {moment
+                  .utc(a.due_date)
+                  .local()
+                  .format("DD/MM/YYYY")}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Amount</th>
+            {duePayments.map((a, i) => (
+              <td key={i}>
+                {a.is_credit ? "+" : "-"}
+                {a.due_amount}
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </Table>
     </section>
   )
 }
@@ -158,34 +158,32 @@ function Transactions({ xhr }: XHRProps) {
       <div>
         Credited: {transactions.credited} • Debited: {transactions.debited}
       </div>
-      <div style={{ maxWidth: "100%", overflow: "auto", whiteSpace: "nowrap" }}>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              {transactions.data.map((a, i) => (
-                <th key={i}>
-                  {moment
-                    .utc(a.date)
-                    .local()
-                    .format("DD/MM/YYYY")}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Amount</th>
-              {transactions.data.map((a, i) => (
-                <td key={i}>
-                  {a.is_credited ? "+" : "-"}
-                  {a.amount}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <Table responsive bordered>
+        <thead>
+          <tr>
+            <th>Date</th>
+            {transactions.data.map((a, i) => (
+              <th key={i}>
+                {moment
+                  .utc(a.date)
+                  .local()
+                  .format("DD/MM/YYYY")}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Amount</th>
+            {transactions.data.map((a, i) => (
+              <td key={i}>
+                {a.is_credited ? "+" : "-"}
+                {a.amount}
+              </td>
+            ))}
+          </tr>
+        </tbody>
+      </Table>
     </section>
   )
 }

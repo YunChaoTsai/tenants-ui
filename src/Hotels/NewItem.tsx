@@ -10,7 +10,7 @@ import {
 } from "formik"
 import * as Validator from "yup"
 import Helmet from "react-helmet-async"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"

@@ -10,9 +10,9 @@ import { ThunkAction, ThunkDispatch } from "./../types"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
-import { MailIcon, PhoneIcon } from "@tourepedia/icons"
+import { Icons } from "@tourepedia/ui"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -98,6 +98,8 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          striped
+          bordered
           responsive
           headers={["ID", "Dates", "Stages", "Destinations", "Traveler", "Pax"]}
           rows={trips.map(
@@ -130,14 +132,14 @@ function List({ trips, getTrips, ...otherProps }: ListProps) {
                   {contact.name}
                   <br />
                   <a href={`tel:${contact.phone_number}`} className="btn--icon">
-                    <PhoneIcon
+                    <Icons.PhoneIcon
                       title={`Call to ${contact.name} on ${
                         contact.phone_number
                       }`}
                     />
                   </a>
                   <a href={`mailto:${contact.email}`} className="btn--icon">
-                    <MailIcon
+                    <Icons.MailIcon
                       title={`Send Email to ${contact.name} at ${
                         contact.email
                       }`}

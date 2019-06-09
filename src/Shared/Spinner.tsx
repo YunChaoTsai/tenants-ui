@@ -1,12 +1,12 @@
 import React from "react"
 
 import "./spinner.css"
-import { SpinnerIcon } from "@tourepedia/icons"
+import { Icons } from "@tourepedia/ui"
 
 export function Spinner() {
   return (
     <span className="spin">
-      <SpinnerIcon />
+      <Icons.SpinnerIcon />
     </span>
   )
 }

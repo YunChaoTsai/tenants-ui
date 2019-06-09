@@ -20,7 +20,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -124,6 +124,8 @@ function List({ getLocations, locations, ...otherProps }: ListProps) {
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          striped
+          bordered
           headers={["Name", "Latitude", "Longitude"]}
           responsive
           rows={locations.map(location => [

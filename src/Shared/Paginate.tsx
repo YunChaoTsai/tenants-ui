@@ -1,6 +1,5 @@
 import React from "react"
-import Button from "@tourepedia/button"
-import { RefreshIcon } from "@tourepedia/icons"
+import { Button, Icons } from "@tourepedia/ui"
 
 export interface PaginateProps {
   total: number
@@ -30,16 +29,16 @@ export function Paginate({
           disabled={isFetching || currentPage <= 1}
           onClick={() => onChange(currentPage - 1)}
         >
-          &lt;
+          <Icons.ChevronDownIcon className="rotate-90" />
         </Button>
         <Button disabled={isFetching} onClick={() => onChange(currentPage)}>
-          <RefreshIcon />
+          <Icons.RefreshIcon />
         </Button>
         <Button
           disabled={isFetching || lastPage <= currentPage}
           onClick={() => onChange(currentPage + 1)}
         >
-          &gt;
+          <Icons.ChevronDownIcon className="rotate-270" />
         </Button>
       </span>
     </span>

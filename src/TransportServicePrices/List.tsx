@@ -15,7 +15,7 @@ import { ThunkAction, ThunkDispatch } from "../types"
 import Helmet from "react-helmet-async"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -117,6 +117,8 @@ function List({
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          bordered
+          striped
           responsive
           headers={[
             "Start Date",

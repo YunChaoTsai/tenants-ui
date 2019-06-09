@@ -12,7 +12,7 @@ import { Async, AsyncProps } from "@tourepedia/select"
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -113,6 +113,8 @@ function List({
       </Grid>
       <Listable total={total} isFetching={isFetching}>
         <Table
+          bordered
+          striped
           headers={["Name", "Description"]}
           rows={hotelBookingStages.map(hotelBookingStage => [
             hotelBookingStage.name,

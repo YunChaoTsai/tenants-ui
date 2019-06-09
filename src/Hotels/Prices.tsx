@@ -15,7 +15,7 @@ import {
 import Paginate, { PaginateProps } from "../Shared/Paginate"
 import List from "../Shared/List"
 import Search, { useSearch } from "../Shared/Search"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -101,6 +101,8 @@ function Prices({
       <List isFetching={isFetching} total={total}>
         <Table
           responsive
+          bordered
+          striped
           headers={[
             "Start Date",
             "End Date",

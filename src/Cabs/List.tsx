@@ -13,7 +13,7 @@ import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
 import { List } from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -79,7 +79,8 @@ export function Cabs({ getCabs, cabs, ...otherProps }: CabsProps) {
       <List isFetching={isFetching} total={total}>
         <Table
           headers={["Name", "Number Plate"]}
-          autoWidth
+          striped
+          bordered
           rows={cabs.map(r => [
             <Link to={r.id.toString()}>{r.name}</Link>,
             r.number_plate,

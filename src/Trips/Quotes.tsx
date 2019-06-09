@@ -1,22 +1,25 @@
 import React, { useEffect, useState, Fragment } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
-import Button from "@tourepedia/button"
+import {
+  Button,
+  Icons,
+  Table,
+  useFetchState,
+  Dialog,
+  useDialog,
+} from "@tourepedia/ui"
 import { Formik, Form } from "formik"
 import * as Validator from "yup"
 import moment from "moment"
+import { $PropertyType } from "utility-types"
 
 import { ITrip, IQuote, IGivenQuote, IQuoteHotel } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
-import Dialog, { useDialog } from "@tourepedia/dialog"
 import { InputField, FormGroup, FormikFormGroup } from "./../Shared/InputField"
-import { Table } from "../Shared/Table"
-import { $PropertyType } from "utility-types"
-import { useFetchState } from "@tourepedia/react-hooks"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
-import { BedIcon, BusIcon, RupeeIcon } from "@tourepedia/icons"
 
 interface IInstalment {
   amount: number
@@ -177,7 +180,7 @@ export const Quote = withXHR(function Quote({
     <div>
       <header className="mb-4">
         <h6>
-          Cost Price: <RupeeIcon /> {numberToLocalString(total_price)} /-
+          Cost Price: <Icons.RupeeIcon /> {numberToLocalString(total_price)} /-
         </h6>
         <blockquote>
           {comments ? <p>{comments}</p> : null}
@@ -194,11 +197,13 @@ export const Quote = withXHR(function Quote({
       <section>
         <h6>
           <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
-            <BedIcon />
+            <Icons.BedIcon />
           </span>
           Accommodation
         </h6>
         <Table
+          striped
+          bordered
           caption={
             "Bellow are the details of daywise hotel accomodation and their prices"
           }
@@ -250,11 +255,13 @@ export const Quote = withXHR(function Quote({
       <section>
         <h6>
           <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
-            <BusIcon />
+            <Icons.BusIcon />
           </span>
           Transportation
         </h6>
         <Table
+          striped
+          bordered
           caption={
             "Bellow are the details for the daywise transportation and their prices"
           }
@@ -385,6 +392,8 @@ export const Quote = withXHR(function Quote({
           </div>
           {instalments ? (
             <Table
+              striped
+              bordered
               headers={["Amount", "Due Date"]}
               alignCols={{ 0: "right" }}
               autoWidth

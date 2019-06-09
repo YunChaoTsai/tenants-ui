@@ -1,6 +1,6 @@
 import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
-import Button from "@tourepedia/button"
+import { Button } from "@tourepedia/ui"
 import Helmet from "react-helmet-async"
 import { connect } from "react-redux"
 import { AxiosInstance } from "axios"

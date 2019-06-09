@@ -10,7 +10,7 @@ import { IUser, actions, IStateWithKey, selectors } from "./store"
 import { List } from "./../Shared/List"
 import { Paginate, PaginateProps } from "./../Shared/Paginate"
 import { Search, useSearch } from "./../Shared/Search"
-import { Table } from "../Shared/Table"
+import { Table } from "@tourepedia/ui"
 import { Grid, Col } from "../Shared/Layout"
 
 export function XHR(xhr: AxiosInstance) {
@@ -76,6 +76,8 @@ export function Users({ getUsers, users, ...otherProps }: UsersProps) {
       </Grid>
       <List isFetching={isFetching} total={total}>
         <Table
+          striped
+          bordered
           responsive
           headers={["Name", "Email", "Roles", "Email Verified At"]}
           rows={users.map(r => [
