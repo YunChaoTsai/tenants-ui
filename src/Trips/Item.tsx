@@ -1,5 +1,5 @@
 import React, { useEffect, Fragment } from "react"
-import { RouteComponentProps, Link, Router } from "@reach/router"
+import { RouteComponentProps, Router } from "@reach/router"
 import { AxiosInstance } from "axios"
 import { connect } from "react-redux"
 import moment from "moment"
@@ -12,6 +12,7 @@ import {
   Badge,
   Dialog,
   useDialog,
+  BadgeList,
 } from "@tourepedia/ui"
 import { $PropertyType } from "utility-types"
 import {
@@ -42,16 +43,18 @@ import Spinner from "../Shared/Spinner"
 import { store as paymentStore } from "./../Payments"
 import { numberToLocalString } from "./../utils"
 import NavLink from "../Shared/NavLink"
+import Component from "../Shared/Component"
+import EditTags from "../Tags/EditTags"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getTrip(tripId: string): Promise<ITrip> {
+    async getTrip(tripId: string): Promise<ITrip> {
       return xhr.get(`/trips/${tripId}`).then(resp => resp.data.data)
     },
-    convertTrip(data: any): Promise<ITrip> {
+    async convertTrip(data: any): Promise<ITrip> {
       return xhr.post("/converted-trips", data).then(resp => resp.data.data)
     },
-    logTransaction(data: any): Promise<paymentStore.IPayment<any>> {
+    async logTransaction(data: any): Promise<paymentStore.IPayment<any>> {
       return xhr
         .post("/payment-transactions", data)
         .then(resp => resp.data.data)
@@ -426,6 +429,7 @@ function BasicDetails({ trip }: { trip: ITrip }) {
     trip_source,
     trip_id,
     contacts,
+    tags,
   } = trip
   return (
     <div>
@@ -452,9 +456,11 @@ function BasicDetails({ trip }: { trip: ITrip }) {
             </dd>
           </Col>
           <Col>
-            <dt>Pax</dt>
+            <dt>
+              <Icons.UsersIcon /> Pax
+            </dt>
             <dd>
-              <Icons.UsersIcon /> {no_of_adults} Adults
+              {no_of_adults} Adults
               <br />
               {children ? (
                 <span>
@@ -464,6 +470,48 @@ function BasicDetails({ trip }: { trip: ITrip }) {
               ) : (
                 ""
               )}
+            </dd>
+          </Col>
+          <Col>
+            <dt>
+              <Icons.TagsIcon /> Tags
+            </dt>
+            <dd>
+              <Component initialState={false}>
+                {({ state: isEditing, setState: setIsEditing }) =>
+                  isEditing ? (
+                    <EditTags
+                      type="trip"
+                      tags={tags}
+                      itemId={trip.id}
+                      onSuccess={() => {
+                        setIsEditing(false)
+                      }}
+                      onCancel={() => {
+                        setIsEditing(false)
+                      }}
+                    />
+                  ) : (
+                    <div>
+                      {tags && tags.length ? (
+                        <BadgeList>
+                          {tags.map(t => (
+                            <Badge key={t.id}>{t.name}</Badge>
+                          ))}
+                        </BadgeList>
+                      ) : null}
+                      <Button
+                        onClick={() => {
+                          setIsEditing(true)
+                        }}
+                        className="p-0 w-8 h-8 ml-2 rounded-full"
+                      >
+                        <span className="rotate-90 inline-block">&#9998;</span>
+                      </Button>
+                    </div>
+                  )
+                }
+              </Component>
             </dd>
           </Col>
           <Col>

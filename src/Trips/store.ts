@@ -1,4 +1,4 @@
-import { createAsyncAction, getType, ActionType } from "typesafe-actions"
+import { createAsyncAction, ActionType } from "typesafe-actions"
 
 import {
   IBaseItem,
@@ -13,14 +13,13 @@ import { store as locationStore } from "./../Locations"
 import { store as transportServiceStore } from "./../TransportServices"
 import { store as tripSourceStore } from "./../TripSources"
 import { store as hotelStore } from "./../Hotels"
-import { store as roomTypeStore } from "./../RoomTypes"
-import { store as mealPlanStore } from "./../MealPlans"
 import { store as cabTypeStore } from "./../CabTypes"
 import { store as userStore } from "./../Users"
 import { store as contactStore } from "./../Contacts"
 import { store as tripStageStore } from "./../TripStages"
 import { store as paymentStore } from "./../Payments"
 import { store as hotelBookingStageStore } from "./../HotelBookingStages"
+import { store as tagStore } from "./../Tags"
 
 export const key = "TRIP_LIST_STATE"
 
@@ -102,6 +101,7 @@ export interface ITrip extends IBaseItem {
   customer_payments?: paymentStore.IPayment<ITrip>[]
   hotel_payments?: paymentStore.IPayment<IQuoteHotel>[]
   cab_payments?: paymentStore.IPayment<IQuoteCab>[]
+  tags?: Array<tagStore.ITag>
 }
 
 export interface ITrips extends IBaseState<ITrip> {}
