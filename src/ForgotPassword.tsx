@@ -57,7 +57,7 @@ function ForgotPassword({
       <div className="text-center mt-16">
         <h1>Forgot Your Password?</h1>
         <p>
-          No problem? Just enter your email address and we will send
+          No problem. Just enter your email address and we will send
           instructions to reset your password. <br />
           Or{" "}
           <Link to="/login" className="text-blue-600 hover:text-blue-800">

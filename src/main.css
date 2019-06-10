@@ -70,7 +70,7 @@ fieldset {
   box-shadow: 0 1px 3px 0 hsla(0, 0%, 0%, 0.2);
   margin-bottom: 20px;
   background: white;
-  padding: 1em;
+  padding: 1em 1.5em;
 }
 fieldset fieldset {
   box-shadow: none;
@@ -82,6 +82,8 @@ legend {
   background: white;
   box-shadow: 0 1px 3px 0 hsla(0, 0%, 0%, 0.2);
   margin-bottom: 1em;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 legend h1,
 legend h2,
@@ -94,7 +96,7 @@ legend h6 {
 }
 
 fieldset > footer {
-  margin: 1em -1em -1em;
+  margin: 1em -1.5em -1em;
   background: #fbfbfb;
   padding: 0.8em 1em;
   border-top: 1px solid #eee;
@@ -109,20 +111,6 @@ footer .btn + .btn {
 
 .btn--secondary {
   border-color: transparent;
-}
-
-nav a {
-  padding: 10px 15px;
-  display: inline-block;
-  text-decoration: none;
-  color: black;
-}
-nav a:hover {
-  background: #e3e7ea;
-}
-
-nav a[aria-current="page"] {
-  background: #e3e7ea;
 }
 
 blockquote {
@@ -145,6 +133,11 @@ mark {
 
 svg:not(:root) {
   overflow: hidden;
+}
+
+nav a {
+  padding: 0.5em 0.75rem;
+  display: inline-block;
 }
 
 /**

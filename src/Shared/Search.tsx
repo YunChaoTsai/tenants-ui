@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Formik, Form } from "formik"
 import { InputField } from "./InputField"
-import { InputGroup, Icons } from "@tourepedia/ui"
+import { InputGroup, Icons, Button } from "@tourepedia/ui"
 
 export interface SearchProps {
   initialParams?: {
@@ -36,9 +36,9 @@ export function Search({
               placeholder="Search..."
               type="search"
             />
-            <button className="input-group-addon btn" type="submit">
+            <Button type="submit">
               <Icons.SearchIcon />
-            </button>
+            </Button>
           </InputGroup>
         </Form>
       )}

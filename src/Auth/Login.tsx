@@ -84,7 +84,7 @@ function Login({ login, navigate, location }: LoginProps) {
         <div className="text-center">
           <img
             src={process.env.PUBLIC_URL + "/logo.jpg"}
-            className="inline-block mt-16 w-20"
+            className="inline-block mt-16 w-20 rounded-full shadow"
           />
         </div>
         <h1 className="text-center my-4">Sign in to TAD</h1>
@@ -143,6 +143,7 @@ function Login({ login, navigate, location }: LoginProps) {
                       primary
                       tabIndex={3}
                       type="submit"
+                      className="w-full"
                       disabled={isSubmitting}
                     >
                       Sign in

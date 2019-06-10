@@ -40,22 +40,23 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
   if (!user) return null
   const { name } = user
   return (
-    <header className="border-b-2 border-gray-200 mb-4">
+    <header className="bg-black mb-4 text-white  text-lg">
       <nav>
-        <ul>
-          <NavLink to="/" className="inline-block">
+        <ul className="flex items-center h-16">
+          <li className="inline-block px-2">
             <img
               alt="Logo"
               src={process.env.PUBLIC_URL + "/logo.jpg"}
-              className="inline-block align-middle mr-3"
-              style={{
-                maxHeight: "1em",
-              }}
+              className="inline-block align-middle rounded-full shadow h-8"
             />
+          </li>
+          <NavLink to="/" className="inline-block">
             Tourepedia Dashboard
           </NavLink>
           <Dropdown as="li" className="inline-block">
-            <Link to="/trips">Trips</Link>
+            <Link to="/trips" className="inline-block">
+              Trips
+            </Link>
             <ul>
               <NavLink to="/trip-sources">Trip Sources</NavLink>
               <NavLink to="/trip-stages">Trip Stages</NavLink>
