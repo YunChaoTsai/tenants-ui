@@ -5,21 +5,6 @@
 .drop-down > a:first-child {
   cursor: pointer;
 }
-.drop-down > .toggler:after,
-.drop-down > a:first-child:after {
-  content: "\005E";
-  display: inline-block;
-  margin-left: 3px;
-  transition: transform 0.15s ease-in;
-  transform: rotateX(180deg);
-  transform-origin: center;
-}
-.drop-down:hover > .toggler:after,
-.drop-down:hover > a:first-child:after,
-.drop-down > .toggler:focus:after,
-.drop-down > a:focus:first-child:after {
-  transform: rotateX(0);
-}
 .drop-down > .menu,
 .drop-down > ul,
 .drop-down > ol {
@@ -33,10 +18,43 @@
   white-space: nowrap;
   z-index: 2;
 }
+.drop-down > .menu:before,
+.drop-down > ul:before,
+.drop-down > ol:before,
+.drop-down > .menu:after,
+.drop-down > ul:after,
+.drop-down > ol:after {
+  border-top: none;
+  bottom: 100%;
+  content: "";
+  display: block;
+  height: 0;
+  position: absolute;
+  width: 0;
+}
+.drop-down > .menu:before,
+.drop-down > ul:before,
+.drop-down > ol:before {
+  border-color: transparent transparent white transparent;
+  border-width: 10px;
+  left: 20px;
+  z-index: 2;
+}
+.drop-down > .menu:after,
+.drop-down > ul:after,
+.drop-down > ol:after {
+  border-color: transparent transparent #f7f7f7 transparent;
+  border-width: 11px;
+  left: 19px;
+  z-index: 1;
+}
+
 .drop-down > .menu a,
 .drop-down > ul a,
 .drop-down > ol a {
   width: 100%;
+  padding: 0.5rem 0.75rem;
+  display: inline-block;
 }
 .drop-down:hover > .menu,
 .drop-down:hover > ul,
@@ -46,6 +64,7 @@
 .drop-down a:focus + ol {
   display: block;
   background: white;
-  border-radius: 0 0 0.2em 0.2em;
+  border-radius: 0.25em;
+  color: black;
   box-shadow: 0 1px 2px 0 hsla(0, 0%, 0%, 0.2);
 }

@@ -430,8 +430,10 @@ function BasicDetails({ trip }: { trip: ITrip }) {
   return (
     <div>
       <h3>
-        {locations.map(l => l.short_name).join(" • ")} ({trip_source.short_name}
-        -{trip_id || id})
+        {locations.map(l => l.short_name).join(" • ")}
+        <small>
+          ({trip_source.short_name}-{trip_id || id})
+        </small>
       </h3>
       <dl>
         <Grid>
@@ -579,7 +581,6 @@ function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
           {trip_source.short_name}-{trip_id || id.toString()})
         </title>
       </Helmet>
-      <Link to="..">Back to Listing</Link>
       <BasicDetails trip={trip} />
       {customer_payments ? (
         <CustomerPayments payments={customer_payments} />

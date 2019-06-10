@@ -25,20 +25,13 @@ interface InputProps
 }
 
 export function Input({
-  type = "text",
   as: Component = "input",
   id,
   name,
   ...otherProps
 }: InputProps) {
   return (
-    <Component
-      className="input"
-      name={name}
-      id={id || name}
-      {...otherProps}
-      type={type}
-    />
+    <Component className="input" name={name} id={id || name} {...otherProps} />
   )
 }
 
@@ -91,7 +84,7 @@ export interface InputFieldProps extends InputProps {
 export function InputField({
   label,
   name,
-  type = "text",
+  type,
   className,
   labelPlacement,
   noGroup,

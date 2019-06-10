@@ -111,20 +111,6 @@ footer .btn + .btn {
   border-color: transparent;
 }
 
-nav a {
-  padding: 10px 15px;
-  display: inline-block;
-  text-decoration: none;
-  color: black;
-}
-nav a:hover {
-  background: #e3e7ea;
-}
-
-nav a[aria-current="page"] {
-  background: #e3e7ea;
-}
-
 blockquote {
   border-left: 0.25em solid #dfe2e5;
   color: #6a737d;
@@ -145,6 +131,11 @@ mark {
 
 svg:not(:root) {
   overflow: hidden;
+}
+
+nav a {
+  padding: 0.5em 0.75rem;
+  display: inline-block;
 }
 
 /**
