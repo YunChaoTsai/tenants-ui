@@ -15,6 +15,8 @@ export interface ICountry {
   id: number
   name: string
   short_name: string
+  dial_code: string
+  flag: string
 }
 
 export interface ICountryState {

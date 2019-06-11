@@ -13,11 +13,13 @@ import * as Validator from "yup"
 import moment from "moment"
 
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
-import { SelectLocations, store as locationStore } from "./../Locations"
+import {
+  SelectLocations,
+  // SelectCountries,
+  store as locationStore,
+} from "./../Locations"
 import { SelectTripSources, store as tripSourceStore } from "./../TripSources"
 import { withXHR, XHRProps } from "./../xhr"
-import { ICountryDialCode } from "../CountryDialCodes/store"
-import { SelectCountryDialCodes } from "../CountryDialCodes"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 
@@ -72,7 +74,7 @@ interface NewItemSchema {
     name: string
     email: string
     phone_number?: number
-    phone_number_country_dial_code?: ICountryDialCode
+    country?: locationStore.ICountry
   }
 }
 
@@ -88,7 +90,7 @@ const initialValues: NewItemSchema = {
     name: "",
     email: "",
     phone_number: undefined,
-    phone_number_country_dial_code: undefined,
+    country: undefined,
   },
 }
 
@@ -119,8 +121,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           no_of_adults &&
           destinations &&
           destinations.length &&
-          contact.phone_number &&
-          contact.phone_number_country_dial_code
+          contact.phone_number
         ) {
           const data = {
             start_date: moment(start_date)
@@ -147,8 +148,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               name: contact.name,
               email: contact.email,
               phone_number: contact.phone_number,
-              phone_number_country_dial_code_id:
-                contact.phone_number_country_dial_code.id,
+              country_id: contact.country ? contact.country.id : undefined,
             },
           }
           xhr
@@ -301,6 +301,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                             name={`${name}.name`}
                             label="Contact Name"
                             required
+                            placeholder="Anoop Rai"
                           />
                         </Col>
                         <Col sm="auto">
@@ -309,30 +310,35 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                             label="Email"
                             required
                             type="email"
+                            placeholder="user@domain.com"
                           />
                         </Col>
-                        <Col>
-                          <FormikFormGroup
-                            name={`${name}.phone_number_country_dial_code`}
-                            render={({ field }) => (
-                              <SelectCountryDialCodes
-                                {...field}
-                                label="Country code"
-                                placeholder="Type here... eg India or +91"
-                                required
-                                onChange={(value, name) =>
-                                  setFieldValue(name, value)
-                                }
-                              />
-                            )}
-                          />
-                        </Col>
+                        {
+                          // <Col>
+                          //   <FormikFormGroup
+                          //     name={`${name}.country`}
+                          //     render={({ field }) => (
+                          //       <SelectCountries
+                          //         {...field}
+                          //         multiple={false}
+                          //         label="Country code"
+                          //         placeholder="Type here... eg India or +91"
+                          //         required
+                          //         onChange={(value, name) =>
+                          //           setFieldValue(name, value)
+                          //         }
+                          //       />
+                          //     )}
+                          //   />
+                          // </Col>
+                        }
                         <Col>
                           <InputField
                             name={`${name}.phone_number`}
                             label="Phone Number"
                             type="number"
                             required
+                            placeholder="9779212232"
                           />
                         </Col>
                       </Grid>

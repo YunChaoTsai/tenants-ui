@@ -8,7 +8,7 @@ export interface IEmail<TEmailable> {
 export interface IPhoneNumber<TCallable> {
   id: number
   number: number
-  country_dial_code_id: number
+  country_id: number
   is_primary: boolean
   callable: TCallable
   phone_number: string // number with dial_code appended to the number
