@@ -19,26 +19,21 @@ import { ICountry, ICountryState, ICity } from "./store"
 
 const validationSchema = Validator.object().shape({
   country: Validator.object().required("Country field is required"),
-  country_short_name: Validator.string().required(
-    "Short Name for country is required"
-  ),
   latitue: Validator.string(),
   longitude: Validator.string(),
 })
 
 interface NewItemCredentials {
   country?: ICountry
-  country_short_name: string
   state?: ICountryState
   city?: ICity
   latitude?: string
   longitude?: string
 }
-const initialValues = {
+const initialValues: NewItemCredentials = {
   city: undefined,
   state: undefined,
   country: undefined,
-  country_short_name: "",
   latitude: "",
   longitude: "",
 }
@@ -59,24 +54,16 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           actions: FormikActions<NewItemCredentials>
         ) => {
           actions.setStatus()
-          const {
-            country,
-            state,
-            city,
-            country_short_name,
-            latitude,
-            longitude,
-          } = values
-          return xhr
+          const { country, state, city, latitude, longitude } = values
+          xhr
             .post("/locations", {
-              country: country ? country.name : undefined,
-              country_short_name,
+              country: country ? country.id : undefined,
               state: state ? state.name : undefined,
               city: city ? city.name : undefined,
               latitude,
               longitude,
             })
-            .then(({ data }) => {
+            .then(() => {
               navigate && navigate(`..`)
               actions.setSubmitting(false)
             })
@@ -108,22 +95,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                     placeholder="Type to search.. (e.g. India)"
                     onChange={(value, name) => {
                       setFieldValue(name, value)
-                      setFieldValue(
-                        "country_short_name",
-                        value ? value.short_name : null
-                      )
                     }}
-                  />
-                )}
-              />
-              <Field
-                name="country"
-                render={(_: FieldProps<NewItemCredentials>) => (
-                  <InputField
-                    label="Country Short Name"
-                    name="country_short_name"
-                    placeholder="IN"
-                    readOnly={!!values.country}
                   />
                 )}
               />
