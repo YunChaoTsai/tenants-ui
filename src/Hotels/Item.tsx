@@ -186,20 +186,18 @@ export function Item({
                     <Dialog.Body>
                       <AddContactForm
                         onCancel={hideAddContact}
-                        onCreate={({
+                        onCreate={async ({
                           name,
                           email,
                           phone_number,
-                          phone_number_dial_code,
+                          country,
                         }) => {
                           return XHR(xhr)
                             .createContact(hotelId, {
                               name,
                               email,
                               phone_number,
-                              country_dial_code_id: phone_number_dial_code
-                                ? phone_number_dial_code.id
-                                : null,
+                              country_id: country ? country.id : undefined,
                             })
                             .then(hotel => {
                               getHotel(hotelId)
