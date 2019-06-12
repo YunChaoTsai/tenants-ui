@@ -4,14 +4,14 @@ import { Subtract, Diff } from "utility-types"
 
 export function searchToQuery(
   search: string = "?",
-  options: { [key: string]: any } = {}
+  options: qs.IParseOptions = {}
 ): { [key: string]: any } {
   return qs.parse(search, { ignoreQueryPrefix: true, ...options })
 }
 
 export function queryToSearch(
   query: any = {},
-  options: { [key: string]: any } = {}
+  options: qs.IStringifyOptions = {}
 ): string {
   return qs.stringify(query, { addQueryPrefix: true, ...options })
 }

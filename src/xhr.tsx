@@ -5,9 +5,8 @@ import axios, {
   AxiosInstance,
   AxiosError,
 } from "axios"
-import qs from "qs"
 import { compose } from "redux"
-import { withContext } from "./utils"
+import { withContext, queryToSearch } from "./utils"
 
 /**
  * Request interceptor for Authorization Header
@@ -45,8 +44,8 @@ function contentTypeXWWWFormUrlencodedInterceptor(
     return config
   }
   // else stringify the data and update it
-  config.data = qs.stringify(data)
-  config.url = config.url + qs.stringify(params, { addQueryPrefix: true })
+  config.data = queryToSearch(data, { addQueryPrefix: false })
+  config.url = config.url + queryToSearch(params)
   config.params = undefined
   return config
 }
