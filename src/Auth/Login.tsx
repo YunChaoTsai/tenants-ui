@@ -83,7 +83,7 @@ function Login({ login, navigate, location }: LoginProps) {
       <div className="min-h-screen">
         <div className="text-center">
           <img
-            src={process.env.PUBLIC_URL + "/logo.jpg"}
+            src={process.env.PUBLIC_URL + "/logo.png"}
             className="inline-block mt-16 w-20 rounded-full shadow"
           />
         </div>

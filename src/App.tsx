@@ -46,7 +46,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
           <li className="inline-block px-2">
             <img
               alt="Logo"
-              src={process.env.PUBLIC_URL + "/logo.jpg"}
+              src={process.env.PUBLIC_URL + "/logo.png"}
               className="inline-block align-middle rounded-full shadow h-8"
             />
           </li>
