@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "https://admintest.tourepedia.com/static/css/main.750560e7.chunk.css",
-    "main.js": "https://admintest.tourepedia.com/static/js/main.a8210f65.chunk.js",
-    "main.js.map": "https://admintest.tourepedia.com/static/js/main.a8210f65.chunk.js.map",
-    "runtime~main.js": "https://admintest.tourepedia.com/static/js/runtime~main.e935fbb4.js",
-    "runtime~main.js.map": "https://admintest.tourepedia.com/static/js/runtime~main.e935fbb4.js.map",
-    "static/css/2.29647bb1.chunk.css": "https://admintest.tourepedia.com/static/css/2.29647bb1.chunk.css",
-    "static/js/2.72c1ed88.chunk.js": "https://admintest.tourepedia.com/static/js/2.72c1ed88.chunk.js",
-    "static/js/2.72c1ed88.chunk.js.map": "https://admintest.tourepedia.com/static/js/2.72c1ed88.chunk.js.map",
-    "index.html": "https://admintest.tourepedia.com/index.html",
-    "precache-manifest.0bc8461f2a5155831b754173a4693388.js": "https://admintest.tourepedia.com/precache-manifest.0bc8461f2a5155831b754173a4693388.js",
-    "service-worker.js": "https://admintest.tourepedia.com/service-worker.js",
-    "static/css/2.29647bb1.chunk.css.map": "https://admintest.tourepedia.com/static/css/2.29647bb1.chunk.css.map",
-    "static/css/main.750560e7.chunk.css.map": "https://admintest.tourepedia.com/static/css/main.750560e7.chunk.css.map"
+    "main.css": "/static/css/main.750560e7.chunk.css",
+    "main.js": "/static/js/main.5924d5b3.chunk.js",
+    "main.js.map": "/static/js/main.5924d5b3.chunk.js.map",
+    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
+    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
+    "static/css/2.29647bb1.chunk.css": "/static/css/2.29647bb1.chunk.css",
+    "static/js/2.72c1ed88.chunk.js": "/static/js/2.72c1ed88.chunk.js",
+    "static/js/2.72c1ed88.chunk.js.map": "/static/js/2.72c1ed88.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.f57c3f2d6ed4449229148c41df467bed.js": "/precache-manifest.f57c3f2d6ed4449229148c41df467bed.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/2.29647bb1.chunk.css.map": "/static/css/2.29647bb1.chunk.css.map",
+    "static/css/main.750560e7.chunk.css.map": "/static/css/main.750560e7.chunk.css.map"
   }
 }
