@@ -2,12 +2,11 @@ html {
   background: black;
   font-family: sans-serif;
   line-height: 1.15;
-  font-size: 14px;
 }
 
 @media (max-width: 425px) {
   html {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 

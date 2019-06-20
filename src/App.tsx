@@ -40,19 +40,21 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
   if (!user) return null
   const { name } = user
   return (
-    <header className="bg-black mb-4 text-white  text-lg">
-      <nav>
-        <ul className="flex items-center h-16">
-          <li className="inline-block px-2">
+    <header className="mb-4 border-b text-base">
+      <nav className="flex h-16 items-stretch md:justify-between">
+        <Link to="/" className="inline-flex px-2 mr-4 sm:mr-auto">
+          <div className="flex items-center">
             <img
-              alt="Logo"
+              alt="Tourepedia Logo"
               src={process.env.PUBLIC_URL + "/logo.png"}
-              className="inline-block align-middle rounded-full shadow h-8"
+              className="inline-block align-middle rounded-full shadow h-8 w-8 mr-2"
             />
-          </li>
-          <NavLink to="/" className="inline-block">
-            Tourepedia Dashboard
-          </NavLink>
+            <h1 className="font-normal text-base m-0 hidden md:block">
+              Tourepedia Dashboard
+            </h1>
+          </div>
+        </Link>
+        <ul className="flex w-full md:w-auto md:px-4 items-center justify-between md:justify-end">
           <Dropdown as="li" className="inline-block">
             <Link to="/trips" className="inline-block">
               Trips
@@ -73,8 +75,10 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
               <NavLink to="/hotel-booking-stages">Booking Stages</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li" className="inline-block">
-            <Link to="/transport-services">Transport Services</Link>
+          <Dropdown as="li" className="inline-block" alignRight>
+            <Link to="/transport-services">
+              <Icons.BusIcon title="Transport Services" />
+            </Link>
             <ul>
               <NavLink to="/cab-types">Cab Types</NavLink>
               <NavLink to="/transport-service-prices">
@@ -84,15 +88,17 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
               <NavLink to="/cabs">Cabs</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li" className="inline-block">
-            <Link to="/users">Users</Link>
+          <Dropdown as="li" className="inline-block" alignRight>
+            <Link to="/users">
+              <Icons.UsersIcon title="Users" />
+            </Link>
             <ul className="menu">
               <NavLink to="/roles">Roles</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li" className="inline-block">
+          <Dropdown as="li" className="inline-block" alignRight>
             <a className="toggler" href="#profile-and-settings">
-              Hi {name}
+              <Icons.CogAltIcon title={`Hi ${name}`} />
             </a>
             <ul className="menu">
               <NavLink to="/settings">

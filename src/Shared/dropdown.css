@@ -18,6 +18,12 @@
   white-space: nowrap;
   z-index: 2;
 }
+.drop-down.align-right > .menu,
+.drop-down.align-right > ul,
+.drop-down.align-right > ol {
+  right: 0;
+}
+
 .drop-down > .menu:before,
 .drop-down > ul:before,
 .drop-down > ol:before,
@@ -40,6 +46,12 @@
   left: 20px;
   z-index: 2;
 }
+.drop-down.align-right > .menu:before,
+.drop-down.align-right > ul:before,
+.drop-down.align-right > ol:before {
+  left: auto;
+  right: 20px;
+}
 .drop-down > .menu:after,
 .drop-down > ul:after,
 .drop-down > ol:after {
@@ -47,6 +59,12 @@
   border-width: 11px;
   left: 19px;
   z-index: 1;
+}
+.drop-down.align-right > .menu:after,
+.drop-down.align-right > ul:after,
+.drop-down.align-right > ol:after {
+  left: auto;
+  right: 19px;
 }
 
 .drop-down > .menu a,
