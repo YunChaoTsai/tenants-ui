@@ -64,6 +64,7 @@ interface CalculatePriceSchema {
     calculated_price?: number
     given_price?: number
     comments?: string
+    no_price_for_dates?: Array<string>
   }[]
 }
 
@@ -113,10 +114,17 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             ...cab
           }) => ({
             ...cab,
-            date: moment(start_date)
-              .hours(12)
+            from_date: moment(start_date)
+              .hours(0)
               .minutes(0)
               .seconds(0)
+              .utc()
+              .format("YYYY-MM-DD HH:mm:ss"),
+            to_date: moment(start_date)
+              .add(no_of_days - 1, "days")
+              .hours(23)
+              .minutes(59)
+              .seconds(59)
               .utc()
               .format("YYYY-MM-DD HH:mm:ss"),
             cab_type_id: cab_type && cab_type.id,
@@ -170,27 +178,29 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             transport_service &&
             no_of_cabs
           ) {
-            for (let i = 0; i < no_of_days; i++) {
-              flattenValues.cabs.push({
-                ...values,
-                start_date: moment(start_date)
-                  .add(i, "days")
-                  .format("YYYY-MM-DD"),
-                no_of_days: 1,
-              })
-              cabs.push({
-                date: moment(start_date)
-                  .add(i, "days")
-                  .hours(12)
-                  .minutes(0)
-                  .seconds(0)
-                  .utc()
-                  .format("YYYY-MM-DD HH:mm:ss"),
-                cab_type_id: cab_type.id,
-                transport_service_id: transport_service.id,
-                no_of_cabs,
-              })
-            }
+            flattenValues.cabs.push({
+              ...values,
+              start_date: moment(start_date).format("YYYY-MM-DD"),
+              no_of_days,
+            })
+            cabs.push({
+              from_date: moment(start_date)
+                .hours(0)
+                .minutes(0)
+                .seconds(0)
+                .utc()
+                .format("YYYY-MM-DD HH:mm:ss"),
+              to_date: moment(start_date)
+                .add(no_of_days - 1, "days")
+                .hours(23)
+                .minutes(59)
+                .seconds(59)
+                .utc()
+                .format("YYYY-MM-DD HH:mm:ss"),
+              cab_type_id: cab_type.id,
+              transport_service_id: transport_service.id,
+              no_of_cabs,
+            })
           }
         })
         XHR(xhr)
@@ -198,8 +208,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           .then(data => {
             flattenValues.cabs = flattenValues.cabs.map((cab, i) => ({
               ...cab,
-              calculated_price: data.cab_prices_per_row[i],
-              given_price: data.cab_prices_per_row[i],
+              calculated_price: data.cabs[i].price,
+              given_price: data.cabs[i].price,
+              no_price_for_dates: data.cabs[i].no_price_for_dates,
             }))
             actions.setValues(flattenValues)
             actions.setSubmitting(false)
@@ -323,13 +334,23 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           Get Prices
                         </Button>
                         {cab.calculated_price !== undefined ? (
-                          <Button disabled>
-                            {cab.calculated_price === null
-                              ? "NOT SET"
-                              : cab.calculated_price}
-                          </Button>
+                          <span className="btn">{cab.calculated_price}</span>
                         ) : null}
                       </div>
+                      {cab.no_price_for_dates &&
+                      cab.no_price_for_dates.length ? (
+                        <p className="text-yellow-800">
+                          No prices available for{" "}
+                          {cab.no_price_for_dates
+                            .map(date =>
+                              moment
+                                .utc(date)
+                                .local()
+                                .format("Do MMM")
+                            )
+                            .join(", ")}
+                        </p>
+                      ) : null}
                     </FormGroup>
                     <Grid>
                       <Col sm="auto">

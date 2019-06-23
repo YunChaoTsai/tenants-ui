@@ -50,6 +50,7 @@ export interface CalculatePriceParams {
     }[]
     calculated_price?: number
     given_price?: number
+    no_price_for_dates?: Array<string>
     comments?: string
   }[]
 }
@@ -151,10 +152,17 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             const { room_type, ...otherRoomDetails } = room
             return {
               ...otherData,
-              date: moment(start_date)
-                .hours(12)
+              checkin: moment(start_date)
+                .hours(0)
                 .minutes(0)
                 .seconds(0)
+                .utc()
+                .format("YYYY-MM-DD HH:mm:ss"),
+              checkout: moment(start_date)
+                .add(no_of_nights - 1, "days")
+                .hours(23)
+                .minutes(59)
+                .seconds(59)
                 .utc()
                 .format("YYYY-MM-DD HH:mm:ss"),
               hotel_id: hotel && hotel.id,
@@ -221,33 +229,34 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                   children_without_extra_bed,
                   no_of_rooms,
                 } = room_detail
-                // create a entry for all the nights, one by one
-                for (let i = 0; i < no_of_nights; i++) {
-                  flattenValues.hotels.push({
-                    ...values,
-                    start_date: moment(start_date)
-                      .add(i, "days")
-                      .format("YYYY-MM-DD"),
-                    no_of_nights: 1,
-                    room_details: [room_detail],
-                  })
-                  hotels.push({
-                    date: moment(start_date)
-                      .add(i, "days")
-                      .hours(12)
-                      .minutes(0)
-                      .seconds(0)
-                      .utc()
-                      .format("YYYY-MM-DD HH:mm:ss"),
-                    hotel_id: hotel.id,
-                    meal_plan_id: meal_plan.id,
-                    room_type_id: room_type.id,
-                    adults_with_extra_bed,
-                    children_with_extra_bed,
-                    children_without_extra_bed,
-                    no_of_rooms,
-                  })
-                }
+                flattenValues.hotels.push({
+                  ...values,
+                  start_date: moment(start_date).format("YYYY-MM-DD"),
+                  no_of_nights,
+                  room_details: [room_detail],
+                })
+                hotels.push({
+                  checkin: moment(start_date)
+                    .hours(0)
+                    .minutes(0)
+                    .seconds(0)
+                    .utc()
+                    .format("YYYY-MM-DD HH:mm:ss"),
+                  checkout: moment(start_date)
+                    .add(no_of_nights - 1, "days")
+                    .hours(23)
+                    .minutes(59)
+                    .seconds(59)
+                    .utc()
+                    .format("YYYY-MM-DD HH:mm:ss"),
+                  hotel_id: hotel.id,
+                  meal_plan_id: meal_plan.id,
+                  room_type_id: room_type.id,
+                  adults_with_extra_bed,
+                  children_with_extra_bed,
+                  children_without_extra_bed,
+                  no_of_rooms,
+                })
               }
             })
           }
@@ -257,8 +266,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           .then(data => {
             flattenValues.hotels = flattenValues.hotels.map((hotel, i) => ({
               ...hotel,
-              calculated_price: data.hotel_prices_per_row[i],
-              given_price: data.hotel_prices_per_row[i],
+              calculated_price: data.hotels[i].price,
+              given_price: data.hotels[i].price,
+              no_price_for_dates: data.hotels[i].no_price_for_dates,
             }))
             actions.setValues(flattenValues)
             // we get the prices
@@ -511,13 +521,25 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                             Get Price
                           </Button>{" "}
                           {hotel.calculated_price !== undefined ? (
-                            <Button disabled>
-                              {hotel.calculated_price === null
-                                ? "NOT SET"
-                                : hotel.calculated_price}
-                            </Button>
+                            <span className="btn">
+                              {hotel.calculated_price}
+                            </span>
                           ) : null}
                         </div>
+                        {hotel.no_price_for_dates &&
+                        hotel.no_price_for_dates.length ? (
+                          <p className="text-yellow-800">
+                            No prices available for{" "}
+                            {hotel.no_price_for_dates
+                              .map(date =>
+                                moment
+                                  .utc(date)
+                                  .local()
+                                  .format("Do MMM")
+                              )
+                              .join(", ")}
+                          </p>
+                        ) : null}
                       </FormGroup>
                       <Grid>
                         <Col sm="auto">
