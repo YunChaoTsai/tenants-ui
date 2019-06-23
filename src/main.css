@@ -220,6 +220,7 @@ nav a {
 .tabs > li > a {
   display: inline-block;
   padding: 0.5em 1em;
+  color: inherit;
 }
 
 .tabs li.active {

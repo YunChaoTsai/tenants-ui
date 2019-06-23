@@ -215,7 +215,8 @@ export const Quote = withXHR(function Quote({
           rows={hotels.map(quoteHotel => {
             const {
               hotel,
-              date,
+              checkin,
+              checkout,
               meal_plan,
               room_type,
               no_of_rooms,
@@ -223,11 +224,16 @@ export const Quote = withXHR(function Quote({
               given_price,
             } = quoteHotel
             return [
-              <span className="white-space-pre">
+              <span className="whitespace-pre">
                 {moment
-                  .utc(date)
+                  .utc(checkin)
                   .local()
-                  .format("DD MMM [\n] YYYY")}
+                  .format("DD MMM YYYY")}
+                <br />
+                <small>
+                  {moment.utc(checkout).diff(moment.utc(checkin), "days") + 1}{" "}
+                  Nights
+                </small>
               </span>,
               <div>
                 <b>{hotel.name}</b>
@@ -270,18 +276,24 @@ export const Quote = withXHR(function Quote({
           alignCols={{ 3: "right" }}
           rows={cabs.map(
             ({
-              date,
+              from_date,
+              to_date,
               cab_type,
               transport_service,
               no_of_cabs,
               comments,
               given_price,
             }) => [
-              <span className="white-space-pre">
+              <span className="whitespace-pre">
                 {moment
-                  .utc(date)
+                  .utc(from_date)
                   .local()
-                  .format("DD MMM [\n] YYYY")}
+                  .format("DD MMM YYYY")}{" "}
+                <br />
+                <small>
+                  {moment.utc(to_date).diff(moment.utc(from_date), "days") + 1}{" "}
+                  Days
+                </small>
               </span>,
               <div>
                 {transport_service.name}

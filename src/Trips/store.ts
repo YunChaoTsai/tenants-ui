@@ -26,7 +26,8 @@ export const key = "TRIP_LIST_STATE"
 export interface IQuoteHotel {
   id: number
   quote_id: number
-  date: string
+  checkin: string
+  checkout: string
   hotel_id: number
   hotel: hotelStore.IHotel
   meal_plan_id: number
@@ -46,7 +47,8 @@ export interface IQuoteHotel {
 export interface IQuoteCab {
   id: number
   quote_id: number
-  date: string
+  from_date: string
+  to_date: string
   cab_type_id: number
   cab_type: cabTypeStore.ICabType
   transport_service_id: number

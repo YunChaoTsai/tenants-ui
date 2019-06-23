@@ -74,7 +74,8 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
                   ? {
                       hotels: quote.hotels.map(
                         ({
-                          date,
+                          checkin,
+                          checkout,
                           room_type,
                           adults_with_extra_bed,
                           children_with_extra_bed,
@@ -84,10 +85,13 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
                         }) => ({
                           ...hotel,
                           start_date: moment
-                            .utc(date)
+                            .utc(checkin)
                             .local()
                             .format("YYYY-MM-DD"),
-                          no_of_nights: 1,
+                          no_of_nights:
+                            moment
+                              .utc(checkout)
+                              .diff(moment.utc(checkin), "days") + 1,
                           room_details: [
                             {
                               room_type,
@@ -131,14 +135,19 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
               initialValues={
                 quote
                   ? {
-                      cabs: quote.cabs.map(({ date, ...cab }) => ({
-                        start_date: moment
-                          .utc(date)
-                          .local()
-                          .format("YYYY-MM-DD"),
-                        no_of_days: 1,
-                        ...cab,
-                      })),
+                      cabs: quote.cabs.map(
+                        ({ from_date, to_date, ...cab }) => ({
+                          start_date: moment
+                            .utc(from_date)
+                            .local()
+                            .format("YYYY-MM-DD"),
+                          no_of_days:
+                            moment
+                              .utc(to_date)
+                              .diff(moment.utc(from_date), "days") + 1,
+                          ...cab,
+                        })
+                      ),
                     }
                   : undefined
               }
