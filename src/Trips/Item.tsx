@@ -217,6 +217,9 @@ function InstalmentStatus({
       state = "Overdue"
     }
   }
+  if (state == "Due") {
+    return null
+  }
   return (
     <Badge
       className={classNames(
@@ -265,7 +268,8 @@ function CustomerPayments({
       autoWidth
       caption={"Payments towards customer"}
       headers={["Due Date", "Due", "Total", "Paid", "Transactions"]}
-      alignCols={{ 0: "right", 2: "right", 3: "right" }}
+      alignCols={{ 2: "right", 3: "right" }}
+      bordered
       rows={payments
         .reduce(
           (
