@@ -89,7 +89,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
         ) => {
           actions.setStatus()
           return xhr
-            .post(`/hotels/${hotel.id}/prices`, {
+            .post(`/hotel-prices`, {
               prices: values.prices.reduce(
                 (
                   carry,
@@ -116,6 +116,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                       .seconds(59)
                       .utc()
                       .format("YYYY-MM-DD HH:mm:ss"),
+                    hotel_id: hotel.id,
                     meal_plan_id: mealPlan && mealPlan.id,
                     room_type_id: roomType && roomType.id,
                   })

@@ -25,7 +25,7 @@ export function XHR(xhr: AxiosInstance) {
       params?: any
     ): Promise<{ data: IPrice[]; meta: any }> {
       return xhr
-        .get(`/hotels/${hotelId}/prices`, { params })
+        .get(`/hotel-prices`, { params: { ...params, hotels: [hotelId] } })
         .then(resp => resp.data)
     },
   }
@@ -80,7 +80,7 @@ function Prices({
     if (id) {
       getPrices(id, { page: currentPage })
     }
-  }, [])
+  }, [id])
   if (isNaN(id)) {
     return null
   }
@@ -92,7 +92,7 @@ function Prices({
             initialParams={params}
             onSearch={params => {
               setParams(params)
-              getPrices({ ...params, page: 1 })
+              getPrices(id, { ...params, page: 1 })
             }}
           />
         </Col>
