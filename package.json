@@ -48,9 +48,11 @@
     "commit": "git-cz",
     "release": "env-cmd semantic-release",
     "build": "react-scripts build",
-    "deploy": "gh-pages -d build -t",
+    "deploy": "gh-pages-clean && gh-pages -d build -t",
     "predeploy:testing": "env-cmd -f ./.env.test npm run build",
-    "deploy:testing": "npm run deploy -- -b gh-pages__test"
+    "predeploy:production": "env-cmd -f ./.env.production npm run build",
+    "deploy:testing": "npm run deploy -- -b gh-pages__test",
+    "deploy:production": "npm run deploy -- -b gh-pages__production"
   },
   "eslintConfig": {
     "extends": "react-app",
