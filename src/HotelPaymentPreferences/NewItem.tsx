@@ -133,7 +133,11 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                         </Col>
                         <Col md={3}>
                           <InputField
-                            label="Amount share from total amount"
+                            label={
+                              <span className="whitespace-pre">
+                                Amount share from total amount
+                              </span>
+                            }
                             name={`${name}.${index}.amount_share`}
                             required
                             type="number"

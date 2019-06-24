@@ -1,10 +1,10 @@
-import React, { useState } from "react"
+import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
 import { Button } from "@tourepedia/ui"
 import Helmet from "react-helmet-async"
 import { connect } from "react-redux"
-import { Formik, FormikActions, FormikProps, Form, ErrorMessage } from "formik"
+import { Formik, FormikActions, FormikProps, Form } from "formik"
 import * as Validator from "yup"
 
 import { RedirectIfAuthenticated } from "./User"
@@ -72,7 +72,7 @@ interface DispatchProps {
   login: (data: ILoginCredentials) => Promise<IUser>
 }
 interface LoginProps extends OwnProps, DispatchProps {}
-function Login({ login, navigate, location }: LoginProps) {
+function Login({ login, location }: LoginProps) {
   const query = searchToQuery(location && location.search)
   const next = query["next"]
   return (
@@ -103,15 +103,16 @@ function Login({ login, navigate, location }: LoginProps) {
             }}
             validationSchema={loginCredentialsSchema}
             render={({
-              errors,
               isSubmitting,
-              touched,
-              isValid,
               status,
             }: FormikProps<ILoginCredentials>) => (
               <Form noValidate>
                 <fieldset>
-                  {status ? <p className="error">{status}</p> : null}
+                  {status ? (
+                    <p className="text-red-700" role="alert">
+                      {status}
+                    </p>
+                  ) : null}
                   <InputField
                     label="Email"
                     name="email"

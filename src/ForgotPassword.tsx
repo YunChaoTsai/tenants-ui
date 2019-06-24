@@ -99,7 +99,11 @@ function ForgotPassword({
           }: FormikProps<IForgotPasswordCredentials>) => (
             <Form noValidate>
               <fieldset>
-                {status ? <div className="error">{status}</div> : null}
+                {status ? (
+                  <p role="alert" className="text-red-700">
+                    {status}
+                  </p>
+                ) : null}
                 <InputField
                   name="email"
                   label="Email"
