@@ -1,4 +1,6 @@
 describe("Forgot password fow", () => {
+  const baseUrl = "/forgot-password"
+
   beforeEach(() => {
     cy.server()
     cy.route("GET", "/me").as("check_auth")
@@ -7,7 +9,7 @@ describe("Forgot password fow", () => {
 
   describe("Success", () => {
     before(() => {
-      cy.visit("/forgot-password")
+      cy.visit(baseUrl)
     })
     it("Should check for login status", () => {
       cy.wait("@check_auth")
@@ -29,24 +31,23 @@ describe("Forgot password fow", () => {
     })
   })
   it("Should have a link to login", () => {
-    cy.visit("/forgot-password")
-    cy.contains("Login").as("login_link")
-    cy.get("@login_link").should("have.attr", "href")
-    cy.get("@login_link").click()
-    cy.url().should("contains", "/login")
+    cy.visit(baseUrl)
+    cy.get("[href='/login']").click()
+    cy.hasUrl("/login")
   })
   it("Should show error for bad requests", () => {
-    cy.visit("/forgot-password")
+    cy.visit(baseUrl)
     cy.get("#email").type("invalid@emailaddress.com")
     cy.get("button[type='submit']").click()
     cy.wait("@forgot_password")
-    cy.get(".error").should("exist")
+    cy.get("[role='alert'").should("exist")
   })
   it("Should redirect to dashboard if the user is logged in", () => {
     cy.login()
-    cy.visit("/forgot-password")
+    cy.visit(baseUrl)
     cy.wait(1000)
-    cy.url().should("not.contains", "/forgot-password")
+    cy.url().should("not.contains", baseUrl)
     cy.url().should("not.contains", "/login")
+    cy.hasUrl("/")
   })
 })

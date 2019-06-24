@@ -9,5 +9,6 @@ module.exports = (on, config) => {
   on("file:preprocessor", wp(options))
   // `config` is the resolved Cypress config
   config.baseUrl = process.env.APP_URL
+  config.apiBaseUrl = process.env.REACT_APP_API_BASE_URL
   return config
 }

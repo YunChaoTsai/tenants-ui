@@ -1,7 +1,6 @@
-/**
- * Test the login flow
- */
 describe("login flow", () => {
+  const baseUrl = "/login"
+
   beforeEach(() => {
     cy.server()
     cy.route("GET", "/me").as("check_auth")
@@ -11,7 +10,7 @@ describe("login flow", () => {
   it("Should redirect to `/login` with `?next=url` when not authenticated", () => {
     cy.visit("/trips")
     cy.wait("@check_auth")
-    cy.url().should("include", "/login?next=/trips")
+    cy.url().should("include", `${baseUrl}?next=/trips`)
   })
 
   it("Should redirect to `/login` when not authenticated", () => {
@@ -21,36 +20,47 @@ describe("login flow", () => {
   })
 
   it("Should autofocus the email field", () => {
-    cy.visit("/login")
+    cy.visit(baseUrl)
     cy.focused().should("have.id", "email")
   })
 
   it("Should show an error message for invalid credentials", () => {
-    cy.login("/", "invalid@email.com", "invalid.password")
-    cy.get(".error").should("exist")
+    cy.visit(baseUrl)
+    cy.wait("@check_auth")
+    cy.get("#email")
+      .type("invalid@email.com")
+      .should("have.value", "invalid@email.com")
+    cy.get("#password")
+      .type("whatonworldisthispassword")
+      .should("have.value", "whatonworldisthispassword")
+    cy.get("[type='submit']").click()
+    cy.wait("@login")
+    cy.get("[role='alert']").should("exist")
   })
 
   it("Should login successfully when credentials are valid", () => {
-    cy.visit("/login")
+    cy.visit(baseUrl)
+    cy.wait("@check_auth")
     cy.get("#email")
       .type("developer@local.com")
       .should("have.value", "developer@local.com")
     cy.get("#password")
       .type("welcome@tpdev")
       .should("have.value", "welcome@tpdev")
-    cy.get("button").click()
+    cy.get("[type='submit']").click()
     cy.wait("@login")
-    cy.url().should("equal", "http://localhost:3000/")
+    cy.hasUrl("/")
+  })
+  it("Should redirect to dashboard if the user is already logged in", () => {
+    cy.login("/")
+    cy.visit("/login")
+    cy.wait(100)
+    cy.hasUrl("/")
   })
 
-  it("Should have a forgot password", () => {
-    cy.visit("/login")
-    cy.contains("Forgot").as("forgot_password_link")
-    cy.get("@forgot_password_link")
-      .should("exist")
-      .should("have.attr", "href")
-
-    cy.get("@forgot_password_link").click()
-    cy.url().should("include", "forgot-password")
+  it("Should have a forgot password link", () => {
+    cy.visit(baseUrl)
+    cy.get("[href='/forgot-password']").click()
+    cy.hasUrl("/forgot-password")
   })
 })
