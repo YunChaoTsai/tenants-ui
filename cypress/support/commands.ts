@@ -27,7 +27,7 @@ Cypress.Commands.add("hasUrl", hasUrl)
 
 function checkForAuth(url: string) {
   cy.visit(url)
-  cy.wait(100)
+  cy.wait(1)
   cy.hasUrl(`${loginUrl}?next=${url}`)
 }
 Cypress.Commands.add("checkForAuth", checkForAuth)
