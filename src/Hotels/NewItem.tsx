@@ -29,11 +29,11 @@ const validationSchema = Validator.object().shape({
     .positive("Star rating field should a positive integer.")
     .integer("Star rating field should be positive integer")
     .required("Stars rating field is required"),
-  eb_child_age_start: Validator.number()
+  extra_bed_child_age_start: Validator.number()
     .positive("Child start age should be a positive number")
     .integer("Child start age should be an integer")
     .required("Child start age is required"),
-  eb_child_age_end: Validator.number()
+  extra_bed_child_age_end: Validator.number()
     .positive("Child end age should be a positive number")
     .integer("Child end age should be an integer")
     .required("Child end age is required"),
@@ -57,8 +57,8 @@ const validationSchema = Validator.object().shape({
 interface NewItemCredentials {
   name: string
   stars: number
-  eb_child_age_start: number
-  eb_child_age_end: number
+  extra_bed_child_age_start: number
+  extra_bed_child_age_end: number
   meal_plans: mealPlanStore.IMealPlan[]
   room_types: {
     room_types: roomTypeStore.IRoomType[]
@@ -70,8 +70,8 @@ interface NewItemCredentials {
 const initialValues: NewItemCredentials = {
   name: "",
   stars: 1,
-  eb_child_age_start: 6,
-  eb_child_age_end: 12,
+  extra_bed_child_age_start: 6,
+  extra_bed_child_age_end: 12,
   meal_plans: [],
   room_types: [{ room_types: [], allowed_extra_beds: 1 }],
   location: undefined,
@@ -267,7 +267,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   <Col sm="auto">
                     <InputField
                       label="Extra bed child start age"
-                      name="eb_child_age_start"
+                      name="extra_bed_child_age_start"
                       required
                       type="number"
                       min={1}
@@ -276,7 +276,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   <Col sm="auto">
                     <InputField
                       label="Extra bed child end age"
-                      name="eb_child_age_end"
+                      name="extra_bed_child_age_end"
                       required
                       type="number"
                       min={1}
