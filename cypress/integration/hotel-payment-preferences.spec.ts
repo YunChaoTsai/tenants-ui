@@ -16,7 +16,6 @@ describe("Hotel Payment Preferences", () => {
       })
       beforeEach(() => {
         cy.login(baseUrl)
-        cy.wait(1000)
       })
       it("Should fetch the data from apis", () => {
         cy.wait("@fetch_payment_preferences")
@@ -34,28 +33,13 @@ describe("Hotel Payment Preferences", () => {
     describe("After authentication", () => {
       beforeEach(() => {
         cy.login(`${baseUrl}/new`)
-        cy.wait(1000)
       })
       it("Should have a form to create the payment preference", () => {
         cy.server()
         cy.route("POST", "/hotel-payment-preferences*").as(
           "save_payment_preferences"
         )
-        cy.get("#breakdowns\\.0\\.reference").as("breakdown")
-        cy.get("@breakdown").click()
-        cy.get(".select [role='listbox'] [role='option']:first-child").as(
-          "first_breakdown"
-        )
-        cy.get("@first_breakdown").click()
-        cy.get("@first_breakdown")
-          .invoke("text")
-          .then(firstBreakDown => {
-            cy.get("@breakdown")
-              .invoke("val")
-              .should(value => {
-                expect(value).to.be.eq(firstBreakDown)
-              })
-          })
+        cy.selectOption("#breakdowns\\.0\\.reference")
         const dayOffset = faker.random.number({ min: -10, max: 100 }).toString()
         cy.get("#breakdowns\\.0\\.day_offset")
           .clear()

@@ -1,8 +1,7 @@
 import * as faker from "faker"
 
-const baseUrl = "/meal-plans"
-
 describe("Meal Plans", () => {
+  const baseUrl = "/meal-plans"
   describe("List", () => {
     it("Should require authentication", () => {
       cy.checkForAuth(baseUrl)
@@ -14,7 +13,6 @@ describe("Meal Plans", () => {
       })
       beforeEach(() => {
         cy.login(baseUrl)
-        cy.wait(1000)
       })
       it("Should fetch the data from apis", () => {
         cy.wait("@fetch_meal_plans")
@@ -28,13 +26,11 @@ describe("Meal Plans", () => {
   describe("New Item", () => {
     it("Should require authentication", () => {
       cy.visit(`${baseUrl}/new`)
-      cy.wait(1000)
       cy.hasUrl(`/login?next=${baseUrl}/new`)
     })
     describe("After authentication", () => {
       beforeEach(() => {
         cy.login(`${baseUrl}/new`)
-        cy.wait(1000)
       })
       it("Should have a form to create the meal plan", () => {
         cy.server()

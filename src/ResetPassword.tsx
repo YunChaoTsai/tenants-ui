@@ -116,7 +116,11 @@ function ResetPassword({
           }: FormikProps<IResetPasswordCredentials>) => (
             <Form noValidate>
               <fieldset>
-                {status ? <p className="error">{status}</p> : null}
+                {status ? (
+                  <p className="text-red-700" role="alert">
+                    {status}
+                  </p>
+                ) : null}
                 <Field
                   name="email"
                   render={({
