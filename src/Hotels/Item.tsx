@@ -207,7 +207,9 @@ export function Item({
                       />
                     </Dialog.Body>
                   </Dialog>
-                  <Button onClick={showAddContact}>Add Contact</Button>
+                  <Button onClick={showAddContact} data-testid="add_contact">
+                    Add Contact
+                  </Button>
                 </fieldset>
               </Col>
             </Grid>

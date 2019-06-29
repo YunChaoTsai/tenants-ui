@@ -21,20 +21,19 @@ describe("Users", () => {
     })
   })
   describe("New User", () => {
-    const baseUrl = "/users/new"
     it("should require authentication", () => {
-      cy.checkForAuth(baseUrl)
+      cy.checkForAuth(`${baseUrl}/new`)
     })
     describe("After authentication", () => {
       beforeEach(() => {
         cy.server()
         cy.route("POST", "/users*").as("create_user")
-        cy.login(baseUrl)
+        cy.login(`${baseUrl}/new`)
       })
-      it.only("should allow to register a new user", () => {
-        const name = faker.random.word()
+      it("should allow to register a new user", () => {
+        const name = faker.random.words(2)
         const email = faker.internet.exampleEmail()
-        const password = faker.random.uuid()
+        const password = faker.internet.password(10)
         cy.get("#name")
           .type(name)
           .should("have.value", name)
@@ -48,8 +47,10 @@ describe("Users", () => {
           .type(password)
           .should("have.value", password)
         cy.get("[type='submit']").click()
-        cy.wait("@create_user")
-        cy.url().should("not.contain", "/users/new")
+        cy.wait("@create_user").then(response => {
+          const data = (response.responseBody as any).data
+          cy.hasUrl(`${baseUrl}/${data.id}`)
+        })
       })
     })
   })
