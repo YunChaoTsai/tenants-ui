@@ -22,7 +22,7 @@ describe("Reset passsword", () => {
       .type(password)
       .should("have.value", password)
     cy.server()
-    cy.route("POST", "/passwords/reset").as("password_reset")
+    cy.route("POST", /api\/passwords\/reset/).as("password_reset")
     cy.get("[type='submit']").click()
     cy.wait("@password_reset").then(response => {
       expect(response.status).to.eq(400)

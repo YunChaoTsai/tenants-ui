@@ -1,5 +1,3 @@
-import * as faker from "faker"
-
 describe("Change Password", () => {
   const baseUrl = "/settings/change-password"
   it("should require authetication", () => {
@@ -8,8 +6,6 @@ describe("Change Password", () => {
   describe("After authentication", () => {
     beforeEach(() => {
       cy.login(baseUrl)
-      cy.server()
-      cy.route("POST", "/passwords").as("update_password")
     })
     it("should have a form to update the password", () => {
       cy.get("form").should("exist")
@@ -23,6 +19,8 @@ describe("Change Password", () => {
       cy.get("#password_confirmation")
         .type(currentPassword)
         .should("have.value", currentPassword)
+      cy.server()
+      cy.route("POST", /api\/passwords/).as("update_password")
       cy.get("[type='submit']").click()
       cy.wait("@update_password")
       cy.hasUrl("/")

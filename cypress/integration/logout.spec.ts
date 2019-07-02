@@ -7,7 +7,7 @@ describe("Logout", () => {
     beforeEach(() => {
       cy.login()
       cy.server()
-      cy.route("POST", /logout/).as("logout_request")
+      cy.route("POST", /api\/logout/).as("logout_request")
     })
     it("should logout the user", () => {
       cy.visit(baseUrl)

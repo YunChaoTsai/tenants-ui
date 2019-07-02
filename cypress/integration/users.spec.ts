@@ -9,7 +9,7 @@ describe("Users", () => {
     describe("After authetication", () => {
       beforeEach(() => {
         cy.server()
-        cy.route("GET", "/users*").as("get_users")
+        cy.route("GET", /api\/users/).as("get_users")
         cy.login(baseUrl)
       })
       it("should get a list of users", () => {
@@ -27,7 +27,7 @@ describe("Users", () => {
     describe("After authentication", () => {
       beforeEach(() => {
         cy.server()
-        cy.route("POST", "/users*").as("create_user")
+        cy.route("POST", /api\/users/).as("create_user")
         cy.login(`${baseUrl}/new`)
       })
       it("should allow to register a new user", () => {

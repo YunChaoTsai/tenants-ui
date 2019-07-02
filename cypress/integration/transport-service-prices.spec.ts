@@ -10,7 +10,7 @@ describe("Transport Service Prices", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/cab-prices*").as("fetch_transport_service_prices")
+        cy.route("GET", /api\/cab-prices/).as("fetch_transport_service_prices")
       })
       beforeEach(() => {
         cy.login(baseUrl)

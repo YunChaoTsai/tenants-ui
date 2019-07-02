@@ -10,7 +10,7 @@ describe("Room Types", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/room-types*").as("fetch_room_types")
+        cy.route("GET", /api\/room-types/).as("fetch_room_types")
       })
       beforeEach(() => {
         cy.login(baseUrl)
@@ -34,7 +34,7 @@ describe("Room Types", () => {
       })
       it("Should have a form to create the room type", () => {
         cy.server()
-        cy.route("POST", "/room-types*").as("save_room_types")
+        cy.route("POST", /api\/room-types/).as("save_room_types")
         const name = faker.random.word()
         const description = faker.random.words(10)
         cy.get("#name")
