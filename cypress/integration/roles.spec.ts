@@ -9,7 +9,7 @@ describe("Roles", () => {
     describe("After authetication", () => {
       beforeEach(() => {
         cy.server()
-        cy.route("GET", "/roles*").as("get_roles")
+        cy.route("GET", /api\/roles/).as("get_roles")
         cy.login(baseUrl)
       })
       it("should get a list of roles", () => {
@@ -27,7 +27,7 @@ describe("Roles", () => {
     describe("After authentication", () => {
       beforeEach(() => {
         cy.server()
-        cy.route("POST", "/roles*").as("create_role")
+        cy.route("POST", /api\/roles/).as("create_role")
         cy.login(`${baseUrl}/new`)
       })
       it("should allow to register a new role", () => {
@@ -51,7 +51,7 @@ describe("Roles", () => {
     describe("After authentication", () => {
       beforeEach(() => {
         cy.server()
-        cy.route("GET", `/roles/${roleId}`).as("get_role")
+        cy.route("GET", `/api/roles/${roleId}`).as("get_role")
         cy.login(`${baseUrl}/${roleId}`)
       })
       it("should fetch data from api", () => {

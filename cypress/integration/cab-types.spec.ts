@@ -10,7 +10,7 @@ describe("Cab Types", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/cab-types*").as("fetch_cab_types")
+        cy.route("GET", /api\/cab-types/).as("fetch_cab_types")
       })
       beforeEach(() => {
         cy.login(baseUrl)
@@ -35,8 +35,8 @@ describe("Cab Types", () => {
       })
       it("Should have a form to create the cab type", () => {
         cy.server()
-        cy.route("POST", "/cab-types*").as("save_cab_types")
-        cy.route("GET", /locations/).as("fetch_locations")
+        cy.route("POST", /api\/cab-types/).as("save_cab_types")
+        cy.route("GET", /api\/locations/).as("fetch_locations")
         const name = faker.company.companyName()
         const capacity = faker.random.number(10).toString()
         cy.get("#name")

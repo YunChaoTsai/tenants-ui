@@ -10,7 +10,9 @@ describe("Transport Services", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/transport-services*").as("fetch_transport_services")
+        cy.route("GET", /api\/transport-services/).as(
+          "fetch_transport_services"
+        )
       })
       beforeEach(() => {
         cy.login(baseUrl)
@@ -35,8 +37,10 @@ describe("Transport Services", () => {
       })
       it("Should have a form to create the transport service", () => {
         cy.server()
-        cy.route("POST", "/transport-services*").as("save_transport_services")
-        cy.route("GET", /locations/).as("fetch_locations")
+        cy.route("POST", /api\/transport-services/).as(
+          "save_transport_services"
+        )
+        cy.route("GET", /api\/locations/).as("fetch_locations")
         const distance = Math.max(100, faker.random.number(1000)).toString()
         const includeSigtseeing = faker.random.boolean()
         cy.get("#via\\.0")

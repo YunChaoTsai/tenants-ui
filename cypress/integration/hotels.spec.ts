@@ -9,7 +9,7 @@ describe("Hotels", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/hotels*").as("fetch_hotels")
+        cy.route("GET", /api\/hotels/).as("fetch_hotels")
       })
       beforeEach(() => {
         cy.login(baseUrl)
@@ -33,8 +33,8 @@ describe("Hotels", () => {
       beforeEach(() => {
         cy.login(`${baseUrl}/new`)
         cy.server()
-        cy.route("GET", /locations/).as("fetch_locations")
-        cy.route("POST", /hotels/).as("store_hotel")
+        cy.route("GET", /api\/locations/).as("fetch_locations")
+        cy.route("POST", /api\/hotels/).as("store_hotel")
       })
       it("Should allow use to save a hotel", () => {
         cy.get("form").should("exist")

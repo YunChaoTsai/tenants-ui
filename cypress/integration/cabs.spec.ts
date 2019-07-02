@@ -9,7 +9,7 @@ describe("Cabs", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/cabs*").as("fetch_cabs")
+        cy.route("GET", /api\/cabs/).as("fetch_cabs")
       })
       beforeEach(() => {
         cy.login(baseUrl)
@@ -34,7 +34,7 @@ describe("Cabs", () => {
       })
       it("Should have a form to create the cab", () => {
         cy.server()
-        cy.route("POST", "/cabs*").as("save_cabs")
+        cy.route("POST", /api\/cabs/).as("save_cabs")
         const name = faker.random.words(2)
         const numberPlate =
           faker.address.stateAbbr() +

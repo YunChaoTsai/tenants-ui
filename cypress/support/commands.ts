@@ -6,7 +6,7 @@ function login(
   password = "welcome@tpdev"
 ) {
   cy.server()
-  cy.route("GET", "/me").as("fetch_me")
+  cy.route("GET", "/api/me").as("fetch_me")
   cy.request({
     method: "POST",
     url: Cypress.config("apiBaseUrl") + "/login",

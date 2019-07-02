@@ -10,7 +10,7 @@ describe("Hotel Booking Stages", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/hotel-booking-stages*").as(
+        cy.route("GET", /api\/hotel-booking-stages/).as(
           "fetch_hotel_booking_stages"
         )
       })
@@ -38,7 +38,7 @@ describe("Hotel Booking Stages", () => {
       })
       it("Should have a form to create the hotel booking stage", () => {
         cy.server()
-        cy.route("POST", "/hotel-booking-stages*").as(
+        cy.route("POST", /api\/hotel-booking-stages/).as(
           "save_hotel_booking_stages"
         )
         const name = faker.random.word()

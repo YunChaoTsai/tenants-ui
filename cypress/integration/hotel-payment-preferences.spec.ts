@@ -10,7 +10,7 @@ describe("Hotel Payment Preferences", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/hotel-payment-preferences*").as(
+        cy.route("GET", /api\/hotel-payment-preferences/).as(
           "fetch_payment_preferences"
         )
       })
@@ -33,12 +33,16 @@ describe("Hotel Payment Preferences", () => {
     describe("After authentication", () => {
       beforeEach(() => {
         cy.login(`${baseUrl}/new`)
-      })
-      it("Should have a form to create the payment preference", () => {
         cy.server()
-        cy.route("POST", "/hotel-payment-preferences*").as(
+        cy.route("POST", /api\/hotel-payment-preferences/).as(
           "save_payment_preferences"
         )
+        cy.route("GET", /api\/hotel-payment-preferences\/references/).as(
+          "fetch_payment_references"
+        )
+      })
+      it("Should have a form to create the payment preference", () => {
+        cy.wait("@fetch_payment_references")
         cy.selectOption("#breakdowns\\.0\\.reference")
         const dayOffset = faker.random.number({ min: -10, max: 100 }).toString()
         cy.get("#breakdowns\\.0\\.day_offset")

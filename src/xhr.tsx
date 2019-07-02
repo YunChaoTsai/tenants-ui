@@ -96,7 +96,7 @@ function accessTokenInterceptor(response: AxiosResponse): AxiosResponse {
  * Default error reponse is a long chain for accessing the error response data
  */
 function errorTransformInterceptor(error: AxiosError): any {
-  const e = error.response && error.response.data && error.response.data.error
+  const e = error.response && error.response.data
   if (!e) {
     return Promise.reject(error)
   }
@@ -119,7 +119,7 @@ function errorTransformInterceptor(error: AxiosError): any {
 function maintainceErrorInterceptor(error: AxiosError): any {
   const response = error.response
   if (response) {
-    const e = response.data && response.data.error
+    const e = response.data && response.data
     if (e.status_code === 503) {
       if (response.headers && response.headers["retry-after"]) {
         const retryAfter = response.headers["retry-after"]
@@ -139,7 +139,7 @@ function maintainceErrorInterceptor(error: AxiosError): any {
 function rateLimitErrorInterceptor(error: AxiosError): any {
   const response = error.response
   if (response) {
-    const e = response.data && response.data.error
+    const e = response.data && response.data
     if (e.status_code === 429) {
       if (response.headers && response.headers["retry-after"]) {
         const retryAfter = response.headers["retry-after"]

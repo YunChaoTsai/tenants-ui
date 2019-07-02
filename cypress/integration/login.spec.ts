@@ -3,8 +3,8 @@ describe("login flow", () => {
 
   beforeEach(() => {
     cy.server()
-    cy.route("GET", "/me").as("check_auth")
-    cy.route("POST", "/login").as("login")
+    cy.route("GET", "/api/me").as("check_auth")
+    cy.route("POST", /api\/login/).as("login")
   })
 
   it("Should redirect to `/login` with `?next=url` when not authenticated", () => {

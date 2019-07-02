@@ -9,7 +9,7 @@ describe("Meal Plans", () => {
     describe("After authentication", () => {
       before(() => {
         cy.server()
-        cy.route("GET", "/meal-plans*").as("fetch_meal_plans")
+        cy.route("GET", /api\/meal-plans/).as("fetch_meal_plans")
       })
       beforeEach(() => {
         cy.login(baseUrl)
@@ -34,7 +34,7 @@ describe("Meal Plans", () => {
       })
       it("Should have a form to create the meal plan", () => {
         cy.server()
-        cy.route("POST", "/meal-plans*").as("save_meal_plans")
+        cy.route("POST", /api\/meal-plans/).as("save_meal_plans")
         const name = faker.random.word()
         const description = faker.random.words(10)
         cy.get("#name")

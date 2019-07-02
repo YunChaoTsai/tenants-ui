@@ -3,8 +3,8 @@ describe("Forgot password fow", () => {
 
   beforeEach(() => {
     cy.server()
-    cy.route("GET", "/me").as("check_auth")
-    cy.route("POST", "/passwords/reset").as("forgot_password")
+    cy.route("GET", /api\/me/).as("check_auth")
+    cy.route("POST", /api\/passwords\/reset/).as("forgot_password")
   })
 
   describe("Success", () => {
@@ -45,7 +45,7 @@ describe("Forgot password fow", () => {
   it("Should redirect to dashboard if the user is logged in", () => {
     cy.login()
     cy.visit(baseUrl)
-    cy.wait(1000)
+    cy.wait(1)
     cy.url().should("not.contains", baseUrl)
     cy.url().should("not.contains", "/login")
     cy.hasUrl("/")

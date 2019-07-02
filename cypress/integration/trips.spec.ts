@@ -7,7 +7,7 @@ describe("Trips", () => {
   describe("After authentication", () => {
     before(() => {
       cy.server()
-      cy.route("GET", "/trips*").as("fetch_trips")
+      cy.route("GET", /api\/trips/).as("fetch_trips")
     })
     beforeEach(() => {
       cy.login(baseUrl)
