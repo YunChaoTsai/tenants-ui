@@ -1,11 +1,11 @@
-import React, { useEffect, Fragment } from "react"
+import React, { useEffect, Fragment, useCallback } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
-import { connect } from "react-redux"
+import { useSelector } from "react-redux"
 import moment from "moment"
 import { Table, Paginate } from "@tourepedia/ui"
 
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import {
   IPrice,
   IHotel,
@@ -17,10 +17,11 @@ import List from "../Shared/List"
 import Search, { useSearch } from "../Shared/Search"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getPrices(
+    async getPrices(
       hotelId: number | string,
       params?: any
     ): Promise<{ data: IPrice[]; meta: any }> {
@@ -31,10 +32,10 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getPrices = (
+export const getPricesAction = (
   hotelId: number,
   params?: any
-): ThunkAction<Promise<IPrice[]>> => (dispatch, getState, { xhr }) => {
+): ThunkAction<Promise<IPrice[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getPrices(hotelId, params)
@@ -48,39 +49,47 @@ export const getPrices = (
     })
 }
 
-interface StateProps extends IPaginate {
-  prices: IPrice[]
-  isFetching: boolean
-}
-interface DispatchProps {
-  getPrices: (hotelId: number, params?: any) => Promise<IPrice[]>
+export function useHotelPrices(hotelId: number | string) {
+  interface StateProps extends IPaginate {
+    prices: IPrice[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
+    const pricesSelector = selectors(state)
+    const id = parseInt(hotelId.toString(), 10)
+    return {
+      ...pricesSelector.prices.meta,
+      isFetching: pricesSelector.prices.isFetching,
+      prices: pricesSelector.getHotelPrices(id),
+    }
+  })
 }
 
-interface OwnProps extends RouteComponentProps<{ hotelId: string }> {
+interface PricesProps extends RouteComponentProps<{ hotelId: string }> {
   hotel: IHotel
 }
 
-interface PricesProps extends StateProps, DispatchProps, OwnProps {}
-
-function Prices({
-  getPrices,
-  prices,
-  hotelId,
-  hotel,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: PricesProps) {
+export default function Prices({ hotelId }: PricesProps) {
   const [params, setParams] = useSearch()
   let id: number = parseInt(hotelId || "", 10)
+  const dispatch = useThunkDispatch()
+  const getPrices = useCallback(
+    (hotelId: number, params?: any) =>
+      dispatch(getPricesAction(hotelId, params)),
+    [dispatch, hotelId]
+  )
   useEffect(() => {
-    if (id) {
-      getPrices(id, { page: currentPage })
-    }
-  }, [id])
+    id && getPrices(id, { page: currentPage })
+  }, [id, getPrices])
+  const {
+    prices,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+  } = useHotelPrices(id)
   if (isNaN(id)) {
     return null
   }
@@ -165,19 +174,3 @@ function Prices({
     </Fragment>
   )
 }
-
-export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
-  (state, { hotelId = "" }) => {
-    const pricesSelector = selectors(state)
-    const id = parseInt(hotelId, 10)
-    return {
-      ...pricesSelector.prices.meta,
-      isFetching: pricesSelector.prices.isFetching,
-      prices: pricesSelector.getHotelPrices(id),
-    }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getPrices: (hotelId: number, params?: any) =>
-      dispatch(getPrices(hotelId, params)),
-  })
-)(Prices)

@@ -116,5 +116,8 @@ export function selectors<IAppState extends IStateWithKey>(state: IAppState) {
         this.status === AuthUserStatus.CHECKING
       )
     },
+    get wait(): boolean {
+      return this.isAuthenticating || this.noRequestYet
+    },
   }
 }

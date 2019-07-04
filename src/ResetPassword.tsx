@@ -2,7 +2,6 @@ import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { Button } from "@tourepedia/ui"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import {
   Formik,
@@ -15,8 +14,8 @@ import {
 import * as Validator from "yup"
 
 import { searchToQuery } from "./utils"
-import { ThunkDispatch, ThunkAction } from "./types"
 import { InputField } from "./Shared/InputField"
+import { withXHR, XHRProps } from "./xhr"
 
 // schemas
 export interface IResetPasswordCredentials {
@@ -41,28 +40,14 @@ export const resetPasswordSchema = Validator.object().shape({
 // actions
 function XHR(xhr: AxiosInstance) {
   return {
-    resetPassword(data: IResetPasswordCredentials): Promise<any> {
+    async resetPassword(data: IResetPasswordCredentials): Promise<any> {
       return xhr.delete("/passwords/reset", { data })
     },
   }
 }
 
-export const resetPassword = (
-  data: IResetPasswordCredentials
-): ThunkAction<Promise<any>> => (dispatch, getState, { xhr }) =>
-  XHR(xhr).resetPassword(data)
-
-// component
-interface OwnProps extends RouteComponentProps {}
-interface DispatchProps {
-  resetPassword: (data: IResetPasswordCredentials) => Promise<any>
-}
-interface IResetPasswordProps extends OwnProps, DispatchProps {}
-function ResetPassword({
-  navigate,
-  location,
-  resetPassword,
-}: IResetPasswordProps) {
+interface IResetPasswordProps extends XHRProps, RouteComponentProps {}
+function ResetPassword({ navigate, location, xhr }: IResetPasswordProps) {
   const query = searchToQuery(location && location.search)
   const email = query["email"]
   const token = query["token"]
@@ -95,7 +80,8 @@ function ResetPassword({
             actions: FormikActions<IResetPasswordCredentials>
           ) => {
             actions.setStatus()
-            return resetPassword(values)
+            XHR(xhr)
+              .resetPassword(values)
               .then(() => {
                 alert(
                   "Your passwords updated successfully. You can now log in with the new password"
@@ -183,10 +169,4 @@ function ResetPassword({
     </div>
   )
 }
-export default connect<{}, DispatchProps, OwnProps>(
-  null,
-  (dispatch: ThunkDispatch) => ({
-    resetPassword: (data: IResetPasswordCredentials) =>
-      dispatch(resetPassword(data)),
-  })
-)(ResetPassword)
+export default withXHR(ResetPassword)

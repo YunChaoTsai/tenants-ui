@@ -5,7 +5,7 @@ import { RedirectUnlessAuthenticated } from "./../Auth"
 import List from "./List"
 import NewItem from "./NewItem"
 
-export default function RoomTypesModule(props: RouteComponentProps) {
+export default function RoomTypesModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Link to="new" className="btn float-right">

@@ -1,17 +1,16 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
 import { Button } from "@tourepedia/ui"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { Formik, FormikActions, FormikProps, Form } from "formik"
 import * as Validator from "yup"
 
 import { RedirectIfAuthenticated } from "./User"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { actions, IUser } from "./store"
-import { getUser } from "./User"
-import { searchToQuery } from "./../utils"
+import { getUserAction } from "./User"
+import { searchToQuery, useThunkDispatch } from "./../utils"
 import { InputField } from "./../Shared/InputField"
 
 // schemas
@@ -37,28 +36,26 @@ const initialValues: ILoginCredentials = {
 // actions
 function XHR(xhr: AxiosInstance) {
   return {
-    login(data: ILoginCredentials): Promise<IAuthToken> {
+    async login(data: ILoginCredentials): Promise<IAuthToken> {
       return xhr
         .post("/login", data)
         .then(({ data }: { data: IAuthToken }) => data)
     },
-    refresh(): Promise<IAuthToken> {
+    async refresh(): Promise<IAuthToken> {
       return xhr
         .patch("/refresh")
         .then(({ data }: { data: IAuthToken }) => data)
     },
   }
 }
-export const login = (data: ILoginCredentials): ThunkAction<Promise<IUser>> => (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+export const loginAction = (
+  data: ILoginCredentials
+): ThunkAction<Promise<IUser>> => async (dispatch, _, { xhr }) => {
   actions.login.request()
   return XHR(xhr)
     .login(data)
     .then(() => {
-      return dispatch(getUser())
+      return dispatch(getUserAction())
     })
     .catch(error => {
       actions.login.failure(error)
@@ -66,15 +63,19 @@ export const login = (data: ILoginCredentials): ThunkAction<Promise<IUser>> => (
     })
 }
 
-// component
-interface OwnProps extends RouteComponentProps {}
-interface DispatchProps {
-  login: (data: ILoginCredentials) => Promise<IUser>
+interface LoginProps extends RouteComponentProps {}
+
+function useLogin() {
+  const dispatch = useThunkDispatch()
+  return useCallback((data: ILoginCredentials) => dispatch(loginAction(data)), [
+    dispatch,
+  ])
 }
-interface LoginProps extends OwnProps, DispatchProps {}
-function Login({ login, location }: LoginProps) {
+
+export default function Login({ location }: LoginProps) {
   const query = searchToQuery(location && location.search)
   const next = query["next"]
+  const login = useLogin()
   return (
     <RedirectIfAuthenticated to={next}>
       <Helmet>
@@ -159,9 +160,3 @@ function Login({ login, location }: LoginProps) {
     </RedirectIfAuthenticated>
   )
 }
-export default connect<{}, DispatchProps, OwnProps>(
-  null,
-  (dispatch: ThunkDispatch) => ({
-    login: (data: ILoginCredentials) => dispatch(login(data)),
-  })
-)(Login)

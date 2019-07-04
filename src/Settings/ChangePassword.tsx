@@ -1,15 +1,14 @@
 import React from "react"
 import { RouteComponentProps } from "@reach/router"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { Formik, FormikProps, FormikActions, Form } from "formik"
 import { Button } from "@tourepedia/ui"
 import * as Validator from "yup"
 
-import { RedirectUnlessAuthenticated, AuthUserProvider } from "./../Auth"
-import { ThunkDispatch, ThunkAction } from "./../types"
+import { RedirectUnlessAuthenticated, useAuthUser } from "./../Auth"
 import Helmet from "react-helmet-async"
 import { InputField } from "../Shared/InputField"
+import { withXHR, XHRProps } from "../xhr"
 
 // schemas
 export interface IChangePasswordCredentials {
@@ -28,28 +27,22 @@ export const changePasswordSchema = Validator.object().shape({
 // actions
 function XHR(xhr: AxiosInstance) {
   return {
-    changePassword(data: IChangePasswordCredentials): Promise<any> {
+    async changePassword(data: IChangePasswordCredentials): Promise<any> {
       return xhr.patch("/passwords", data)
     },
   }
 }
-export const changePassword = (
-  data: IChangePasswordCredentials
-): ThunkAction<Promise<any>> => (dispatch, getState, { xhr }) =>
-  XHR(xhr).changePassword(data)
+
 const changePasswordInitialValues: IChangePasswordCredentials = {
   current: "",
   password: "",
   password_confirmation: "",
 }
 
-// component
-interface DispatchProps {
-  changePassword: (data: IChangePasswordCredentials) => Promise<any>
-}
-interface OwnProps extends RouteComponentProps {}
-interface ChangePasswordProps extends OwnProps, DispatchProps {}
-function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
+interface ChangePasswordProps extends XHRProps, RouteComponentProps {}
+
+function ChangePassword({ xhr, navigate }: ChangePasswordProps) {
+  const { user } = useAuthUser()
   return (
     <RedirectUnlessAuthenticated>
       <Helmet>
@@ -63,7 +56,8 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
           actions: FormikActions<IChangePasswordCredentials>
         ) => {
           actions.setStatus()
-          changePassword(values)
+          XHR(xhr)
+            .changePassword(values)
             .then(() => {
               alert("Password updated successfully")
               navigate && navigate("/")
@@ -76,24 +70,20 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
               actions.setSubmitting(false)
             })
         }}
-        render={(form: FormikProps<IChangePasswordCredentials>) => (
+        render={({ isSubmitting }: FormikProps<IChangePasswordCredentials>) => (
           <Form noValidate>
             <fieldset>
               <legend>Change Password</legend>
-              <AuthUserProvider>
-                {({ user }) =>
-                  user ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={user.email}
-                      hidden
-                      readOnly
-                      autoComplete="username"
-                    />
-                  ) : null
-                }
-              </AuthUserProvider>
+              {user ? (
+                <input
+                  type="email"
+                  name="email"
+                  value={user.email}
+                  hidden
+                  readOnly
+                  autoComplete="username"
+                />
+              ) : null}
               <InputField
                 label="Current Password"
                 name="current"
@@ -119,7 +109,7 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
                 autoComplete="new-password"
               />
               <footer>
-                <Button primary type="submit">
+                <Button primary type="submit" disabled={isSubmitting}>
                   Update
                 </Button>
               </footer>
@@ -130,10 +120,4 @@ function ChangePassword({ changePassword, navigate }: ChangePasswordProps) {
     </RedirectUnlessAuthenticated>
   )
 }
-export default connect<{}, DispatchProps, {}>(
-  null,
-  (dispatch: ThunkDispatch) => ({
-    changePassword: (data: IChangePasswordCredentials) =>
-      dispatch(changePassword(data)),
-  })
-)(ChangePassword)
+export default withXHR(ChangePassword)

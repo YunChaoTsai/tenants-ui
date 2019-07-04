@@ -20,13 +20,13 @@ type ITransactions = { amount: number; date: string; is_credited: boolean }[]
 
 function XHR(xhr: AxiosInstance) {
   return {
-    getConvertedTripAnalytics(): Promise<IConvertedTripAnalytics> {
+    async getConvertedTripAnalytics(): Promise<IConvertedTripAnalytics> {
       return xhr.get("/converted-trips").then(resp => resp.data.data)
     },
-    getDuePayments(): Promise<IDuePayments> {
+    async getDuePayments(): Promise<IDuePayments> {
       return xhr.get("/instalments").then(resp => resp.data.data)
     },
-    getTransactions(): Promise<{
+    async getTransactions(): Promise<{
       data: ITransactions
       meta: { debited: number; credited: number }
     }> {

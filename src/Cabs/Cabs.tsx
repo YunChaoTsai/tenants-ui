@@ -6,7 +6,7 @@ import Item from "./Item"
 import List from "./List"
 import NewItem from "./New"
 
-export default function CabsModule(props: RouteComponentProps) {
+export default function CabsModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Link to="new" className="btn float-right">

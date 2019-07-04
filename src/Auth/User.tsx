@@ -1,23 +1,24 @@
-import React, { useEffect, Fragment } from "react"
-import { connect } from "react-redux"
+import React, { useEffect, Fragment, useCallback } from "react"
+import { useSelector } from "react-redux"
 import { Redirect, Location } from "@reach/router"
 import { AxiosInstance } from "axios"
 
 import { selectors, actions, IUser, IStateWithKey } from "./store"
-import { ThunkDispatch, ThunkAction } from "./../types"
+import { ThunkAction } from "./../types"
+import { useThunkDispatch } from "../utils"
 
 function XHR(xhr: AxiosInstance) {
   return {
-    getUser(): Promise<IUser> {
+    async getUser(): Promise<IUser> {
       return xhr.get("/me").then(({ data }: { data: { data: IUser } }) => {
         return data.data
       })
     },
   }
 }
-export const getUser = (): ThunkAction<Promise<IUser>> => (
+export const getUserAction = (): ThunkAction<Promise<IUser>> => async (
   dispatch,
-  getState,
+  _,
   { xhr }
 ) => {
   dispatch(actions.checkAuth.request())
@@ -33,95 +34,102 @@ export const getUser = (): ThunkAction<Promise<IUser>> => (
     })
 }
 
-interface StateProps {
-  user?: IUser
-  isAuthenticating: boolean
-  isAuthenticated: boolean
-  noRequestYet: boolean
-}
-interface DispatchProps {
-  getUser: () => Promise<IUser>
-}
-interface OwnProps {}
-export interface AuthProps extends StateProps, DispatchProps, OwnProps {}
-export const connectWithAuth = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+export function useAuthUserState() {
+  interface StateProps {
+    user?: IUser
+    wait: boolean
+    isAuthenticating: boolean
+    isAuthenticated: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const userSelector = selectors(state)
     return {
       user: userSelector.user,
+      wait: userSelector.wait,
       isAuthenticating: userSelector.isAuthenticating,
       isAuthenticated: userSelector.isAuthenticated,
-      noRequestYet: userSelector.noRequestYet,
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getUser: () => dispatch(getUser()),
   })
-)
-
-// get the authenticated user's data
-interface AuthUserProviderProps extends AuthProps {
-  children: (props: { wait: boolean; user?: IUser }) => React.ReactNode
 }
-function _AuthUserProvider({
-  getUser,
-  user,
-  isAuthenticating,
-  noRequestYet,
-  children,
-}: AuthUserProviderProps) {
+
+export function useAuthUserFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback(() => dispatch(getUserAction()), [dispatch])
+}
+
+export function useAuthUser() {
+  return {
+    ...useAuthUserState(),
+    fetchUser: useAuthUserFetch(),
+  }
+}
+
+export function AuthUserProvider({
+  children = null,
+}: {
+  children:
+    | React.ReactNode
+    | ((props: { wait: boolean; user?: IUser }) => React.ReactNode)
+}) {
+  const { user, wait, isAuthenticating, fetchUser: getUser } = useAuthUser()
   useEffect(() => {
     if (!user && !isAuthenticating) {
       getUser()
     }
-  }, [])
+  }, [getUser])
   return (
     <Fragment>
-      {children({ wait: isAuthenticating || noRequestYet, user })}
+      {typeof children === "function" ? children({ wait, user }) : children}
     </Fragment>
   )
 }
-export const AuthUserProvider = connectWithAuth(_AuthUserProvider)
 
+/**
+ * Redirects the user if the user is not authenticated
+ *
+ * Use this component to redirect the user to login from protected routes
+ */
 export function RedirectUnlessAuthenticated({
-  children,
+  children = null,
 }: {
   children?: React.ReactNode
 }) {
-  return (
-    <AuthUserProvider>
-      {({ wait, user }) =>
-        wait ? null : !user ? (
-          <Location>
-            {({ location }) => (
-              <Redirect to={`/login?next=${location.pathname}`} noThrow />
-            )}
-          </Location>
-        ) : (
-          children || null
-        )
-      }
-    </AuthUserProvider>
-  )
+  const { wait, user } = useAuthUser()
+  if (wait) {
+    return null
+  }
+  if (!user) {
+    return (
+      <Location>
+        {({ location }) => (
+          <Redirect to={`/login?next=${location.pathname}`} noThrow />
+        )}
+      </Location>
+    )
+  }
+  return <Fragment>{children}</Fragment>
 }
 
+/**
+ * Redirects the user if the user is authenticated
+ *
+ * This is used to prevent users from navigate to routes that
+ * should not be accessed when user is logged in e.g.
+ * login, forgot password etc
+ */
 export function RedirectIfAuthenticated({
-  children,
+  children = null,
   to = "/",
 }: {
   children?: React.ReactNode
   to?: string
 }) {
-  return (
-    <AuthUserProvider>
-      {({ wait, user }) =>
-        wait ? null : user ? <Redirect to={to} noThrow /> : children || null
-      }
-    </AuthUserProvider>
-  )
+  const { wait, user } = useAuthUser()
+  if (wait) {
+    return null
+  }
+  if (user) {
+    return <Redirect to={to} noThrow />
+  }
+  return <Fragment>{children}</Fragment>
 }

@@ -8,7 +8,7 @@ describe("Forgot password fow", () => {
   })
 
   describe("Success", () => {
-    before(() => {
+    beforeEach(() => {
       cy.visit(baseUrl)
     })
     it("Should check for login status", () => {

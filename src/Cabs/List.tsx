@@ -1,8 +1,8 @@
-import React, { useEffect, Fragment } from "react"
+import React, { useEffect, Fragment, useCallback } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
-import { connect } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import { Omit } from "utility-types"
 
 import { ThunkAction, ThunkDispatch } from "./../types"
@@ -17,17 +17,15 @@ import { IPaginate } from "./../model"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getCabs(params?: any): Promise<{ data: ICab[]; meta: any }> {
+    async getCabs(params?: any): Promise<{ data: ICab[]; meta: any }> {
       return xhr.get("/cabs", { params }).then(resp => resp.data)
     },
   }
 }
 
-export const getCabs = (params?: any): ThunkAction<Promise<ICab[]>> => (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+export const getCabsAction = (
+  params?: any
+): ThunkAction<Promise<ICab[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getCabs(params)
@@ -41,29 +39,50 @@ export const getCabs = (params?: any): ThunkAction<Promise<ICab[]>> => (
     })
 }
 
-interface StateProps extends IPaginate {
-  cabs: ICab[]
-  isFetching: boolean
+function useCabsState() {
+  interface StateProps extends IPaginate {
+    cabs: ICab[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
+    const cabsSelector = selectors(state)
+    return {
+      ...cabsSelector.meta,
+      isFetching: cabsSelector.isFetching,
+      cabs: cabsSelector.get(),
+    }
+  })
 }
-interface DispatchProps {
-  getCabs: (params?: any) => Promise<any>
+
+function useCabsFetch() {
+  const dispatch = useDispatch<ThunkDispatch>()
+  return useCallback((params?: any) => dispatch(getCabsAction(params)), [
+    dispatch,
+  ])
 }
-interface OwnProps extends RouteComponentProps {}
-interface CabsProps extends OwnProps, StateProps, DispatchProps {}
-export function Cabs({
-  getCabs,
-  cabs,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: CabsProps) {
+
+export function useCabs() {
+  return {
+    ...useCabsState(),
+    fetchCabs: useCabsFetch(),
+  }
+}
+
+export default function Cabs(_: RouteComponentProps) {
+  const {
+    cabs,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+    fetchCabs: getCabs,
+  } = useCabs()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getCabs({ page: currentPage })
-  }, [])
+  }, [getCabs])
   return (
     <Fragment>
       <Helmet>
@@ -104,20 +123,6 @@ export function Cabs({
     </Fragment>
   )
 }
-
-export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
-  state => {
-    const cabsSelector = selectors(state)
-    return {
-      ...cabsSelector.meta,
-      isFetching: cabsSelector.isFetching,
-      cabs: cabsSelector.get(),
-    }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getCabs: (params?: any) => dispatch(getCabs(params)),
-  })
-)(Cabs)
 
 interface SelectCabsProps extends XHRProps, Omit<AsyncProps, "fetch"> {
   value?: ICab[]

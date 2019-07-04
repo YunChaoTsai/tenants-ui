@@ -5,12 +5,11 @@ import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
 import { Formik, FormikProps, Form, FormikActions } from "formik"
 import * as Validator from "yup"
-import { connect } from "react-redux"
 
 import { RedirectIfAuthenticated } from "./Auth"
-import { ThunkDispatch, ThunkAction } from "./types"
 import { searchToQuery } from "./utils"
 import { InputField } from "./Shared/InputField"
+import { withXHR, XHRProps } from "./xhr"
 
 // schemas
 export interface IForgotPasswordCredentials {
@@ -26,27 +25,13 @@ export const forgotPasswordSchema = Validator.object().shape({
 // actions
 function XHR(xhr: AxiosInstance) {
   return {
-    forgotPassword(data: IForgotPasswordCredentials): Promise<any> {
+    async forgotPassword(data: IForgotPasswordCredentials): Promise<any> {
       return xhr.post("/passwords/reset", data)
     },
   }
 }
-export const forgotPassword = (
-  data: IForgotPasswordCredentials
-): ThunkAction<Promise<any>> => (dispatch, getState, { xhr }) =>
-  XHR(xhr).forgotPassword(data)
-
-// component
-interface DispatchProps {
-  forgotPassword: (data: IForgotPasswordCredentials) => Promise<any>
-}
-interface OwnProps extends RouteComponentProps {}
-interface ForgotPasswordProps extends DispatchProps, OwnProps {}
-function ForgotPassword({
-  forgotPassword,
-  navigate,
-  location,
-}: ForgotPasswordProps) {
+interface ForgotPasswordProps extends XHRProps, RouteComponentProps {}
+function ForgotPassword({ xhr, navigate, location }: ForgotPasswordProps) {
   const query = searchToQuery(location && location.search)
   const email = query["email"] || ""
   return (
@@ -79,7 +64,8 @@ function ForgotPassword({
             actions: FormikActions<IForgotPasswordCredentials>
           ) => {
             actions.setStatus()
-            forgotPassword(values)
+            XHR(xhr)
+              .forgotPassword(values)
               .then(() => {
                 alert(
                   `Please check your inbox for password reset instructions.`
@@ -139,10 +125,4 @@ function ForgotPassword({
     </RedirectIfAuthenticated>
   )
 }
-export default connect<{}, DispatchProps, OwnProps>(
-  null,
-  (dispatch: ThunkDispatch) => ({
-    forgotPassword: (data: IForgotPasswordCredentials) =>
-      dispatch(forgotPassword(data)),
-  })
-)(ForgotPassword)
+export default withXHR(ForgotPassword)

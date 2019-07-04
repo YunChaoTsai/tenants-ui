@@ -1,31 +1,34 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { IRoomType, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getRoomTypes(params?: any): Promise<{ data: IRoomType[]; meta: any }> {
+    async getRoomTypes(
+      params?: any
+    ): Promise<{ data: IRoomType[]; meta: any }> {
       return xhr.get("/room-types", { params }).then(resp => resp.data)
     },
   }
 }
 
-export const getRoomTypes = (
+export const getRoomTypesActions = (
   params?: any
-): ThunkAction<Promise<IRoomType[]>> => (dispatch, getState, { xhr }) => {
+): ThunkAction<Promise<IRoomType[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getRoomTypes(params)
@@ -39,52 +42,51 @@ export const getRoomTypes = (
     })
 }
 
-interface StateProps extends IPaginate {
-  roomTypes: IRoomType[]
-}
-interface DispatchProps {
-  getRoomTypes: (params?: any) => Promise<IRoomType[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+export function useRoomTypesState() {
+  interface StateProps extends IPaginate {
+    roomTypes: IRoomType[]
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const roomTypesSelector = selectors(state)
     return {
       ...roomTypesSelector.meta,
       isFetching: roomTypesSelector.isFetching,
       roomTypes: roomTypesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getRoomTypes: (params?: any) => dispatch(getRoomTypes(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getRoomTypes,
-  roomTypes,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: ListProps) {
+export function useRoomTypesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getRoomTypesActions(params)), [
+    dispatch,
+  ])
+}
+
+function useRoomTypes() {
+  const state = useRoomTypesState()
+  const fetchRoomTypes = useRoomTypesFetch()
+  return {
+    ...state,
+    fetchRoomTypes,
+  }
+}
+
+export default function List(_: RouteComponentProps) {
   const [params, setParams] = useSearch()
+  const {
+    fetchRoomTypes,
+    roomTypes,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+  } = useRoomTypes()
   useEffect(() => {
-    getRoomTypes({ page: currentPage })
-  }, [])
+    fetchRoomTypes({ page: currentPage })
+  }, [fetchRoomTypes])
   return (
     <Fragment>
       <Helmet>
@@ -95,7 +97,7 @@ function List({
           <Search
             onSearch={params => {
               setParams(params)
-              getRoomTypes({ ...params, page: 1 })
+              fetchRoomTypes({ ...params, page: 1 })
             }}
           />
         </Col>
@@ -107,7 +109,7 @@ function List({
             isFetching={isFetching}
             currentPage={currentPage}
             lastPage={lastPage}
-            onChange={page => getRoomTypes({ ...params, page })}
+            onChange={page => fetchRoomTypes({ ...params, page })}
           />
         </Col>
       </Grid>
@@ -125,8 +127,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectRoomTypesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 

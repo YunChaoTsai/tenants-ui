@@ -6,7 +6,7 @@ import List from "./List"
 import NewItem from "./NewItem"
 import { Grid, Col } from "../Shared/Layout"
 
-export default function MealPlansModule(props: RouteComponentProps) {
+export default function MealPlansModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Grid>

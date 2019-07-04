@@ -7,7 +7,7 @@ import Item from "./Item"
 import NewItem from "./NewItem"
 import CalculatePrice from "./CalculatePrice"
 
-export default function HotelsModule(props: RouteComponentProps) {
+export default function HotelsModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <div className="float-right button-group">

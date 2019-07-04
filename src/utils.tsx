@@ -1,6 +1,8 @@
 import qs from "qs"
 import React, { Context } from "react"
 import { Subtract, Diff } from "utility-types"
+import { useDispatch } from "react-redux"
+import { ThunkDispatch } from "./types"
 
 export function searchToQuery(
   search: string = "?",
@@ -120,4 +122,8 @@ export function numberToLocalString(n: number): string {
   const parts = str.split(".")
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   return parts.join(".")
+}
+
+export function useThunkDispatch() {
+  return useDispatch<ThunkDispatch>()
 }

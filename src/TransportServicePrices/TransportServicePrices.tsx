@@ -7,7 +7,7 @@ import NewItem from "./NewItem"
 import CalculatePrice from "./CalculatePrice"
 import { Grid, Col } from "../Shared/Layout"
 
-export default function CabTypesModule(props: RouteComponentProps) {
+export default function CabTypesModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Grid>

@@ -1,31 +1,34 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { IMealPlan, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getMealPlans(params?: any): Promise<{ data: IMealPlan[]; meta: any }> {
+    async getMealPlans(
+      params?: any
+    ): Promise<{ data: IMealPlan[]; meta: any }> {
       return xhr.get("/meal-plans", { params }).then(resp => resp.data)
     },
   }
 }
 
-export const getMealPlans = (
+export const getMealPlansAction = (
   params?: any
-): ThunkAction<Promise<IMealPlan[]>> => (dispatch, getState, { xhr }) => {
+): ThunkAction<Promise<IMealPlan[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getMealPlans(params)
@@ -39,53 +42,50 @@ export const getMealPlans = (
     })
 }
 
-interface StateProps extends IPaginate {
-  mealPlans: IMealPlan[]
-  isFetching: boolean
-}
-interface DispatchProps {
-  getMealPlans: (params?: any) => Promise<any>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useMealPlansState() {
+  interface StateProps extends IPaginate {
+    mealPlans: IMealPlan[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const mealPlansSelector = selectors(state)
     return {
       ...mealPlansSelector.meta,
       isFetching: mealPlansSelector.isFetching,
       mealPlans: mealPlansSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getMealPlans: (params?: any) => dispatch(getMealPlans(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getMealPlans,
-  mealPlans,
-  total,
-  from,
-  to,
-  isFetching,
-  currentPage,
-  lastPage,
-}: ListProps) {
+function useMealPlansFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getMealPlansAction(params)), [
+    dispatch,
+  ])
+}
+
+export function useMealPlans() {
+  return {
+    ...useMealPlansState(),
+    fetchMealPlans: useMealPlansFetch(),
+  }
+}
+
+export default function List({  }: RouteComponentProps) {
+  const {
+    mealPlans,
+    total,
+    from,
+    to,
+    isFetching,
+    currentPage,
+    lastPage,
+    fetchMealPlans: getMealPlans,
+  } = useMealPlans()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getMealPlans({ page: currentPage })
-  }, [])
+  }, [getMealPlans])
   return (
     <Fragment>
       <Helmet>
@@ -126,8 +126,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectMealPlanProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 

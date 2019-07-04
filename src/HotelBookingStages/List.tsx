@@ -1,23 +1,24 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
+import { useSelector } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { IHotelBookingStage, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getHotelBookingStages(
+    async getHotelBookingStages(
       params?: any
     ): Promise<{ data: IHotelBookingStage[]; meta: any }> {
       return xhr
@@ -27,11 +28,11 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getHotelBookingStages = (
+export const getHotelBookingStagesAction = (
   params?: any
-): ThunkAction<Promise<IHotelBookingStage[]>> => (
+): ThunkAction<Promise<IHotelBookingStage[]>> => async (
   dispatch,
-  getState,
+  _,
   { xhr }
 ) => {
   dispatch(actions.list.request())
@@ -47,54 +48,51 @@ export const getHotelBookingStages = (
     })
 }
 
-interface StateProps extends IPaginate {
-  hotelBookingStages: IHotelBookingStage[]
-  isFetching: boolean
-}
-interface DispatchProps {
-  getHotelBookingStages: (params?: any) => Promise<any>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useHotelBookingStagesState() {
+  interface StateProps extends IPaginate {
+    hotelBookingStages: IHotelBookingStage[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const hotelBookingStagesSelector = selectors(state)
     return {
       ...hotelBookingStagesSelector.meta,
       isFetching: hotelBookingStagesSelector.isFetching,
       hotelBookingStages: hotelBookingStagesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getHotelBookingStages: (params?: any) =>
-      dispatch(getHotelBookingStages(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getHotelBookingStages,
-  hotelBookingStages,
-  total,
-  from,
-  to,
-  isFetching,
-  currentPage,
-  lastPage,
-}: ListProps) {
+function useHotelBookingStagesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback(
+    (params?: any) => dispatch(getHotelBookingStagesAction(params)),
+    [dispatch]
+  )
+}
+
+export function useHotelBookingStages() {
+  return {
+    ...useHotelBookingStagesState(),
+    fetchHotelBookingStages: useHotelBookingStagesFetch(),
+  }
+}
+
+export default function List(_: RouteComponentProps) {
+  const {
+    hotelBookingStages,
+    total,
+    from,
+    to,
+    isFetching,
+    currentPage,
+    lastPage,
+    fetchHotelBookingStages: getHotelBookingStages,
+  } = useHotelBookingStages()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getHotelBookingStages({ page: currentPage })
-  }, [])
+  }, [getHotelBookingStages])
   return (
     <Fragment>
       <Helmet>
@@ -135,8 +133,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectHotelBookingStageProps
   extends XHRProps,

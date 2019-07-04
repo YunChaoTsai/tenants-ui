@@ -1,31 +1,30 @@
-import React, { useEffect, Fragment } from "react"
+import React, { useEffect, Fragment, useCallback } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
-import { connect } from "react-redux"
 import moment from "moment"
 import { Table, Paginate } from "@tourepedia/ui"
 
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { IUser, actions, IStateWithKey, selectors } from "./store"
 import { List } from "./../Shared/List"
 import { Search, useSearch } from "./../Shared/Search"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getUsers(params?: any): Promise<{ data: IUser[]; meta: any }> {
+    async getUsers(params?: any): Promise<{ data: IUser[]; meta: any }> {
       return xhr.get("/users", { params }).then(resp => resp.data)
     },
   }
 }
 
-export const getUsers = (params?: any): ThunkAction<Promise<IUser[]>> => (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+export const getUsersAction = (
+  params?: any
+): ThunkAction<Promise<IUser[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getUsers(params)
@@ -39,28 +38,49 @@ export const getUsers = (params?: any): ThunkAction<Promise<IUser[]>> => (
     })
 }
 
-interface StateProps extends IPaginate {
-  users: IUser[]
+function useUsersState() {
+  interface StateProps extends IPaginate {
+    users: IUser[]
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
+    const usersSelector = selectors(state)
+    return {
+      ...usersSelector.meta,
+      isFetching: usersSelector.isFetching,
+      users: usersSelector.get(),
+    }
+  })
 }
-interface DispatchProps {
-  getUsers: (params?: any) => Promise<any>
+
+function useUsersFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getUsersAction(params)), [
+    dispatch,
+  ])
 }
-interface OwnProps extends RouteComponentProps {}
-interface UsersProps extends OwnProps, StateProps, DispatchProps {}
-export function Users({
-  getUsers,
-  users,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: UsersProps) {
+
+function useUsers() {
+  return {
+    ...useUsersState(),
+    fetchUsers: useUsersFetch(),
+  }
+}
+
+export default function Users({  }: RouteComponentProps) {
   const [params, setParams] = useSearch()
+  const {
+    fetchUsers: getUsers,
+    users,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+  } = useUsers()
   useEffect(() => {
     getUsers({ page: currentPage })
-  }, [])
+  }, [getUsers])
   return (
     <Fragment>
       <Helmet>
@@ -111,17 +131,3 @@ export function Users({
     </Fragment>
   )
 }
-
-export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
-  state => {
-    const usersSelector = selectors(state)
-    return {
-      ...usersSelector.meta,
-      isFetching: usersSelector.isFetching,
-      users: usersSelector.get(),
-    }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getUsers: (params?: any) => dispatch(getUsers(params)),
-  })
-)(Users)

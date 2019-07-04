@@ -1,23 +1,24 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { ITransportService, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getTransportServices(
+    async getTransportServices(
       params?: any
     ): Promise<{ data: ITransportService[]; meta: any }> {
       return xhr.get("/transport-services", { params }).then(resp => resp.data)
@@ -25,11 +26,11 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getTransportServices = (
+export const getTransportServicesAction = (
   params?: any
-): ThunkAction<Promise<ITransportService[]>> => (
+): ThunkAction<Promise<ITransportService[]>> => async (
   dispatch,
-  getState,
+  _,
   { xhr }
 ) => {
   dispatch(actions.list.request())
@@ -45,53 +46,52 @@ export const getTransportServices = (
     })
 }
 
-interface StateProps extends IPaginate {
-  transportServices: ITransportService[]
-}
-interface DispatchProps {
-  getTransportServices: (params?: any) => Promise<ITransportService[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useTransportServicesState() {
+  interface StateProps extends IPaginate {
+    transportServices: ITransportService[]
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const transportServicesSelector = selectors(state)
     return {
       ...transportServicesSelector.meta,
       isFetching: transportServicesSelector.isFetching,
       transportServices: transportServicesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getTransportServices: (params?: any) =>
-      dispatch(getTransportServices(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getTransportServices,
-  transportServices,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: ListProps) {
+function useTransportServicesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback(
+    (params?: any) => dispatch(getTransportServicesAction(params)),
+    [dispatch]
+  )
+}
+
+function useTransportServices() {
+  const state = useTransportServicesState()
+  const fetchTransportServices = useTransportServicesFetch()
+  return {
+    ...state,
+    fetchTransportServices,
+  }
+}
+
+export default function List({  }: RouteComponentProps) {
+  const {
+    fetchTransportServices: getTransportServices,
+    transportServices,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+  } = useTransportServices()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getTransportServices({ page: currentPage })
-  }, [])
+  }, [getTransportServices])
   return (
     <Fragment>
       <Helmet>
@@ -134,8 +134,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectTransportServicesProps
   extends XHRProps,

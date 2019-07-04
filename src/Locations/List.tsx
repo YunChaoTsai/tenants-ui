@@ -1,6 +1,5 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
@@ -15,30 +14,34 @@ import {
   IStateWithKey,
   selectors,
 } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { Async, AsyncProps } from "@tourepedia/select"
 import { withXHR, XHRProps } from "./../xhr"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getLocations(params?: any): Promise<{ data: ILocation[]; meta: any }> {
+    async getLocations(
+      params?: any
+    ): Promise<{ data: ILocation[]; meta: any }> {
       return xhr.get("/locations", { params }).then(resp => resp.data)
     },
-    getCountries(params?: any): Promise<ICountry[]> {
+    async getCountries(params?: any): Promise<ICountry[]> {
       return xhr
         .get("/locations/countries", { params })
         .then(({ data }) => data.data)
     },
-    getStates(params?: any): Promise<ICountryState[]> {
+    async getStates(params?: any): Promise<ICountryState[]> {
       return xhr
         .get("/locations/states", { params })
         .then(({ data }) => data.data)
     },
-    getCities(params?: any): Promise<ICity[]> {
+    async getCities(params?: any): Promise<ICity[]> {
       return xhr
         .get("/locations/cities", { params })
         .then(({ data }) => data.data)
@@ -46,9 +49,9 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getLocations = (
+export const getLocationsAction = (
   params?: any
-): ThunkAction<Promise<ILocation[]>> => (dispatch, getState, { xhr }) => {
+): ThunkAction<Promise<ILocation[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getLocations(params)
@@ -62,53 +65,50 @@ export const getLocations = (
     })
 }
 
-interface StateProps extends IPaginate {
-  locations: ILocation[]
-  isFetching: boolean
-}
-interface DispatchProps {
-  getLocations: (params?: any) => Promise<ILocation[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useLocationsState() {
+  interface StateProps extends IPaginate {
+    locations: ILocation[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const locationsSelector = selectors(state)
     return {
       ...locationsSelector.meta,
       isFetching: locationsSelector.isFetching,
       locations: locationsSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getLocations: (params?: any) => dispatch(getLocations(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getLocations,
-  locations,
-  total,
-  from,
-  to,
-  isFetching,
-  currentPage,
-  lastPage,
-}: ListProps) {
+function useLocationsFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getLocationsAction(params)), [
+    dispatch,
+  ])
+}
+
+function useLocations() {
+  return {
+    ...useLocationsState(),
+    fetchLocations: useLocationsFetch(),
+  }
+}
+
+export default function List(_: RouteComponentProps) {
+  const {
+    locations,
+    total,
+    from,
+    to,
+    isFetching,
+    currentPage,
+    lastPage,
+    fetchLocations: getLocations,
+  } = useLocations()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getLocations({ page: currentPage })
-  }, [])
+  }, [getLocations])
   return (
     <Fragment>
       <Helmet>
@@ -151,8 +151,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 

@@ -6,7 +6,7 @@ import List from "./List"
 import NewItem from "./NewItem"
 import { Grid, Col } from "../Shared/Layout"
 
-export default function TripStagesModule(props: RouteComponentProps) {
+export default function TripStagesModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Grid>

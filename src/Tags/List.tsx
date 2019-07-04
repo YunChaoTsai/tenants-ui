@@ -7,10 +7,10 @@ import { ITag } from "./store"
 
 export function XHR(xhr: AxiosInstance, type: string) {
   return {
-    getTags(params?: any): Promise<{ data: Array<ITag> }> {
+    async getTags(params?: any): Promise<{ data: Array<ITag> }> {
       return xhr.get(`/${type}-tags`, { params }).then(resp => resp.data)
     },
-    storeTags(
+    async storeTags(
       items: Array<number>,
       tags: Array<string>
     ): Promise<{ data: Array<any> }> {

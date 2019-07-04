@@ -1,33 +1,32 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
+import { useSelector } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { ICabType, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "./../model"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getCabTypes(params?: any): Promise<{ data: ICabType[]; meta: any }> {
+    async getCabTypes(params?: any): Promise<{ data: ICabType[]; meta: any }> {
       return xhr.get("/cab-types", { params }).then(({ data }) => data)
     },
   }
 }
 
-export const getCabTypes = (params?: any): ThunkAction<Promise<ICabType[]>> => (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+export const getCabTypesAction = (
+  params?: any
+): ThunkAction<Promise<ICabType[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getCabTypes(params)
@@ -41,53 +40,50 @@ export const getCabTypes = (params?: any): ThunkAction<Promise<ICabType[]>> => (
     })
 }
 
-interface StateProps extends IPaginate {
-  cabTypes: ICabType[]
-  isFetching: boolean
-}
-interface DispatchProps {
-  getCabTypes: (params?: any) => Promise<ICabType[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useCabTypesState() {
+  interface State extends IPaginate {
+    cabTypes: ICabType[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, State>(state => {
     const cabTypesSelector = selectors(state)
     return {
       ...cabTypesSelector.meta,
       isFetching: cabTypesSelector.isFetching,
       cabTypes: cabTypesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getCabTypes: (params?: any) => dispatch(getCabTypes(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getCabTypes,
-  cabTypes,
-  isFetching,
-  total,
-  currentPage,
-  lastPage,
-  from,
-  to,
-}: ListProps) {
+function useCabTypesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getCabTypesAction(params)), [
+    dispatch,
+  ])
+}
+
+export function useCabTypes() {
+  return {
+    ...useCabTypesState(),
+    fetchCabTypes: useCabTypesFetch(),
+  }
+}
+
+export default function List(_: RouteComponentProps) {
+  const {
+    cabTypes,
+    isFetching,
+    total,
+    currentPage,
+    lastPage,
+    from,
+    to,
+    fetchCabTypes: getCabTypes,
+  } = useCabTypes()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getCabTypes({ page: currentPage })
-  }, [])
+  }, [getCabTypes])
   return (
     <Fragment>
       <Helmet>
@@ -126,8 +122,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectCabTypeProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 

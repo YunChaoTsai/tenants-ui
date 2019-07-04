@@ -36,7 +36,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           actions.setStatus()
           xhr
             .post("/hotel-booking-stages", values)
-            .then(({ data }) => {
+            .then(() => {
               navigate && navigate(`..`)
               actions.setSubmitting(false)
             })

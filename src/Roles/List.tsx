@@ -1,12 +1,11 @@
-import React, { useEffect, Fragment } from "react"
+import React, { useEffect, Fragment, useCallback } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { AxiosInstance } from "axios"
-import { connect } from "react-redux"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { IRole, IPermission, actions, IStateWithKey, selectors } from "./store"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
@@ -14,23 +13,23 @@ import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getRoles(params?: any): Promise<{ data: IRole[]; meta: any }> {
+    async getRoles(params?: any): Promise<{ data: IRole[]; meta: any }> {
       return xhr.get("/roles", { params }).then(resp => resp.data)
     },
-    getPermissions(params?: any): Promise<IPermission[]> {
+    async getPermissions(params?: any): Promise<IPermission[]> {
       return xhr.get("/permissions", { params }).then(({ data }) => data.data)
     },
   }
 }
 
-export const getRoles = (params?: any): ThunkAction<Promise<IRole[]>> => (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+export const getRolesAction = (
+  params?: any
+): ThunkAction<Promise<IRole[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getRoles(params)
@@ -44,29 +43,47 @@ export const getRoles = (params?: any): ThunkAction<Promise<IRole[]>> => (
     })
 }
 
-interface StateProps extends IPaginate {
-  roles: IRole[]
-  isFetching: boolean
+function useRolesState() {
+  interface StateProps extends IPaginate {
+    roles: IRole[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
+    const rolesSelector = selectors(state)
+    return {
+      ...rolesSelector.meta,
+      isFetching: rolesSelector.isFetching,
+      roles: rolesSelector.get(),
+    }
+  })
 }
-interface DispatchProps {
-  getRoles: (params?: any) => Promise<IRole[]>
+function useRolesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getRolesAction(params)), [
+    dispatch,
+  ])
 }
-interface OwnProps extends RouteComponentProps {}
-interface RolesProps extends OwnProps, StateProps, DispatchProps {}
-export function Roles({
-  getRoles,
-  roles,
-  total,
-  from,
-  to,
-  isFetching,
-  currentPage,
-  lastPage,
-}: RolesProps) {
+function useRoles() {
+  return {
+    ...useRolesState(),
+    fetchRoles: useRolesFetch(),
+  }
+}
+export default function Roles({  }: RouteComponentProps) {
+  const {
+    roles,
+    total,
+    from,
+    to,
+    isFetching,
+    currentPage,
+    lastPage,
+    fetchRoles: getRoles,
+  } = useRoles()
   const [params, setParams] = useSearch()
   useEffect(() => {
     getRoles({ page: currentPage })
-  }, [])
+  }, [getRoles])
   return (
     <Fragment>
       <Helmet>
@@ -107,20 +124,6 @@ export function Roles({
     </Fragment>
   )
 }
-
-export default connect<StateProps, DispatchProps, OwnProps, IStateWithKey>(
-  state => {
-    const rolesSelector = selectors(state)
-    return {
-      ...rolesSelector.meta,
-      isFetching: rolesSelector.isFetching,
-      roles: rolesSelector.get(),
-    }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getRoles: (params?: any) => dispatch(getRoles(params)),
-  })
-)(Roles)
 
 interface SelectRolesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 

@@ -95,7 +95,8 @@ describe("Hotels", () => {
       let hotelId = 1
       beforeEach(() => {
         cy.server()
-        cy.route("GET", /hotels\/1/).as("fetch_hotel")
+        cy.route("GET", /api\/hotels\/1/).as("fetch_hotel")
+        cy.route("GET", /api\/hotel-prices/).as("fetch_prices")
         cy.login(`${baseUrl}/1`)
       })
       it("Should fetch data for hotel", () => {
@@ -107,7 +108,6 @@ describe("Hotels", () => {
       describe("After fetching", () => {
         beforeEach(() => {
           cy.wait("@fetch_hotel")
-          cy.route("GET", /hotel-prices/).as("fetch_prices")
         })
         it("should a link to listing page", () => {
           cy.get(`[href="${baseUrl}"]`).should("exist")

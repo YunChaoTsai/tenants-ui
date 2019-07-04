@@ -1,7 +1,6 @@
-import React, { useEffect, Fragment } from "react"
+import React, { useEffect, Fragment, useCallback } from "react"
 import { RouteComponentProps, Router } from "@reach/router"
 import { AxiosInstance } from "axios"
-import { connect } from "react-redux"
 import moment from "moment"
 import Helmet from "react-helmet-async"
 import {
@@ -29,7 +28,7 @@ import classNames from "classnames"
 
 import { InputField, Input, FormGroup } from "./../Shared/InputField"
 import { ITrip, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import Quotes, { Quote } from "./Quotes"
 import GivenQuotes, {
   GivenQuote,
@@ -41,10 +40,11 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import Spinner from "../Shared/Spinner"
 import { store as paymentStore } from "./../Payments"
-import { numberToLocalString } from "./../utils"
+import { numberToLocalString, useThunkDispatch } from "./../utils"
 import NavLink from "../Shared/NavLink"
 import Component from "../Shared/Component"
 import EditTags from "../Tags/EditTags"
+import { useSelector } from "react-redux"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -62,11 +62,9 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getTrip = (tripId: string): ThunkAction<Promise<ITrip>> => (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+export const getTripAction = (
+  tripId: string
+): ThunkAction<Promise<ITrip>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.item.request())
   return XHR(xhr)
     .getTrip(tripId)
@@ -586,35 +584,6 @@ const LatestGivenQuote = withXHR(function LatestGivenQuote({
   ) : null
 })
 
-interface StateProps {
-  isFetching: boolean
-  trip?: ITrip
-}
-interface DispatchProps {
-  getTrip: (tripId: string) => Promise<ITrip>
-}
-interface OwnProps extends RouteComponentProps<{ tripId: string }> {}
-
-interface ItemProps extends StateProps, DispatchProps, OwnProps {}
-
-const connectWithItem = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  (state, ownProps) => {
-    const tripSelector = selectors(state)
-    return {
-      isFetching: tripSelector.isFetching,
-      trip: tripSelector.getItem(ownProps.tripId),
-    }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getTrip: (tripId: string) => dispatch(getTrip(tripId)),
-  })
-)
-
 function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
   const {
     id,
@@ -644,17 +613,57 @@ function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
   )
 }
 
-function Item({ tripId, isFetching, getTrip, navigate, trip }: ItemProps) {
+function useTripState(tripId?: string | number) {
+  interface StateProps {
+    isFetching: boolean
+    trip?: ITrip
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
+    const tripSelector = selectors(state)
+    return {
+      isFetching: tripSelector.isFetching,
+      trip: tripSelector.getItem(tripId),
+    }
+  })
+}
+
+function useTripFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((tripId: string) => dispatch(getTripAction(tripId)), [
+    dispatch,
+  ])
+}
+
+function useTrip(tripId?: string, shouldFetch: boolean = false) {
+  const state = useTripState(tripId)
+  const fetchTrip = useTripFetch()
   useEffect(() => {
-    tripId && getTrip(tripId)
-  }, [])
+    if (shouldFetch) {
+      tripId && fetchTrip(tripId)
+    }
+  }, [shouldFetch, tripId, fetchTrip])
+  return {
+    ...state,
+    fetchTrip,
+  }
+}
+
+export default function Item({
+  tripId,
+  navigate,
+}: RouteComponentProps<{ tripId: string }>) {
+  const { trip, isFetching } = useTrip(tripId, true)
   if (!tripId) {
     navigate && navigate("..")
     return null
   }
-  if (isFetching) return <span>Loading...</span>
+  if (isFetching)
+    return (
+      <div className="text-center">
+        <Spinner />
+      </div>
+    )
   if (!trip) {
-    navigate && navigate("..")
     return null
   }
   return (
@@ -685,8 +694,6 @@ function Item({ tripId, isFetching, getTrip, navigate, trip }: ItemProps) {
     </div>
   )
 }
-
-export default connectWithItem(Item)
 
 const tripConversionValidationSchema = Validator.object()
   .shape({
@@ -744,7 +751,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
     fetchInstalments,
     { isFetching: isFetchingInstalments },
   ] = useFetchState<IInstalment[]>(
-    () => {
+    async () => {
       if (!latest_given_quote) {
         return Promise.reject("No given quote for the trip")
       }

@@ -1,16 +1,15 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useCallback } from "react"
 import { RouteComponentProps } from "@reach/router"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { actions } from "./store"
-import { searchToQuery } from "./../utils"
+import { searchToQuery, useThunkDispatch } from "./../utils"
 
 // actions
 function XHR(xhr: AxiosInstance) {
   return {
-    logout(): Promise<any> {
+    async logout(): Promise<any> {
       return xhr.delete("/logout").then(resp => {
         localStorage.removeItem("access_token")
         return resp
@@ -18,9 +17,9 @@ function XHR(xhr: AxiosInstance) {
     },
   }
 }
-export const logout = (): ThunkAction<Promise<any>> => (
+export const logoutAction = (): ThunkAction<Promise<any>> => async (
   dispatch,
-  getState,
+  _,
   { xhr }
 ) =>
   XHR(xhr)
@@ -29,18 +28,17 @@ export const logout = (): ThunkAction<Promise<any>> => (
       dispatch(actions.logout.success())
     })
 
-// component
-interface OwnProps extends RouteComponentProps {}
-interface DispatchProps {
-  logout: () => Promise<any>
+function useLogout() {
+  const dispatch = useThunkDispatch()
+  return useCallback(() => dispatch(logoutAction()), [dispatch])
 }
-interface LogoutProps extends OwnProps, DispatchProps {}
 
-function Logout({ logout, navigate, location }: LogoutProps) {
+function Logout({ navigate, location }: RouteComponentProps) {
   // get the `from` query parameter from the logout props
   // and redirect back to `from` if present
   const query = searchToQuery(location && location.search)
   const from = query["from"]
+  const logout = useLogout()
   useEffect(() => {
     logout().then(() => {
       navigate && navigate(from || "/")
@@ -48,9 +46,4 @@ function Logout({ logout, navigate, location }: LogoutProps) {
   }, [])
   return <div>Logging out</div>
 }
-export default connect<{}, DispatchProps, OwnProps>(
-  null,
-  (dispatch: ThunkDispatch) => ({
-    logout: () => dispatch(logout()),
-  })
-)(Logout)
+export default Logout

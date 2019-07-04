@@ -7,7 +7,7 @@ import { HelmetProvider } from "react-helmet-async"
 import App from "./App"
 import * as serviceWorker from "./serviceWorker"
 import configureStore from "./configureStore"
-import { store as authStore } from "./Auth"
+import { store as authStore, AuthUserProvider } from "./Auth"
 import { store as roleStore } from "./Roles"
 import { store as userStore } from "./Users"
 import { store as mealPlanStore } from "./MealPlans"
@@ -53,7 +53,9 @@ const app = (
   <Provider store={store}>
     <HelmetProvider>
       <XHRContext.Provider value={xhr}>
-        <App />
+        <AuthUserProvider>
+          <App />
+        </AuthUserProvider>
       </XHRContext.Provider>
     </HelmetProvider>
   </Provider>

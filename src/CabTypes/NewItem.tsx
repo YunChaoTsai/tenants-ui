@@ -37,9 +37,9 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           actions: FormikActions<NewItemCredentials>
         ) => {
           actions.setStatus()
-          return xhr
+          xhr
             .post("/cab-types", values)
-            .then(({ data }) => {
+            .then(() => {
               navigate && navigate(`..`)
               actions.setSubmitting(false)
             })

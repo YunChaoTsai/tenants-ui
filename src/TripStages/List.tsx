@@ -1,31 +1,34 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { ITripStage, actions, IStateWithKey, selectors } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getTripStages(params?: any): Promise<{ data: ITripStage[]; meta: any }> {
+    async getTripStages(
+      params?: any
+    ): Promise<{ data: ITripStage[]; meta: any }> {
       return xhr.get("/trip-stages", { params }).then(resp => resp.data)
     },
   }
 }
 
-export const getTripStages = (
+export const getTripStagesAction = (
   params?: any
-): ThunkAction<Promise<ITripStage[]>> => (dispatch, getState, { xhr }) => {
+): ThunkAction<Promise<ITripStage[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getTripStages(params)
@@ -39,52 +42,49 @@ export const getTripStages = (
     })
 }
 
-interface StateProps extends IPaginate {
-  tripStages: ITripStage[]
-}
-interface DispatchProps {
-  getTripStages: (params?: any) => Promise<ITripStage[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useTripStagesState() {
+  interface StateProps extends IPaginate {
+    tripStages: ITripStage[]
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const tripStagesSelector = selectors(state)
     return {
       ...tripStagesSelector.meta,
       isFetching: tripStagesSelector.isFetching,
       tripStages: tripStagesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getTripStages: (params?: any) => dispatch(getTripStages(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getTripStages,
-  tripStages,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: ListProps) {
+function useTripStagesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback((params?: any) => dispatch(getTripStagesAction(params)), [
+    dispatch,
+  ])
+}
+
+function useTripStages() {
+  return {
+    ...useTripStagesState(),
+    fetchTripStages: useTripStagesFetch(),
+  }
+}
+
+export default function List({  }: RouteComponentProps) {
   const [params, setParams] = useSearch()
+  const {
+    fetchTripStages: getTripStages,
+    tripStages,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+  } = useTripStages()
   useEffect(() => {
     getTripStages({ page: currentPage })
-  }, [])
+  }, [getTripStages])
   return (
     <Fragment>
       <Helmet>
@@ -125,8 +125,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectTripStagesProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
 

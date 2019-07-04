@@ -4,8 +4,7 @@ import Helmet from "react-helmet-async"
 import { Icons } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
 
-import { Login, Logout, connectWithAuth } from "./Auth"
-import { AuthProps } from "./Auth/User"
+import { Login, Logout, useAuthUser } from "./Auth"
 import { NavLink } from "./Shared/NavLink"
 import Dashboard from "./Dashboard"
 import NotFound from "./NotFound"
@@ -34,9 +33,8 @@ import Dropdown from "./Shared/Dropdown"
 import "./main.css"
 import "./typography.css"
 
-interface HeaderProps extends AuthProps {}
-
-export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
+export const Header = function Header() {
+  const { user } = useAuthUser()
   if (!user) return null
   const { name } = user
   return (
@@ -117,7 +115,7 @@ export const Header = connectWithAuth(function Header({ user }: HeaderProps) {
       </nav>
     </header>
   )
-})
+}
 
 export default function App() {
   return (

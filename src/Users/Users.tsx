@@ -8,7 +8,7 @@ import NewItem from "./New"
 import EditItem from "./Edit"
 import EditRoles from "./EditRoles"
 
-export default function UsersModule(props: RouteComponentProps) {
+export default function UsersModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Link to="new" className="btn float-right">

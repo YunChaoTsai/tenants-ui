@@ -1,8 +1,7 @@
-import React, { useEffect, Fragment } from "react"
+import React, { useEffect, Fragment, useCallback } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
 import moment from "moment"
-import { connect } from "react-redux"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import {
@@ -11,16 +10,18 @@ import {
   selectors,
   IStateWithKey,
 } from "./store"
-import { ThunkAction, ThunkDispatch } from "../types"
+import { ThunkAction } from "../types"
 import Helmet from "react-helmet-async"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
+import { useSelector } from "react-redux"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getTransportServicePrices(
+    async getTransportServicePrices(
       params?: any
     ): Promise<{ data: ITransportServicePrice[]; meta: any }> {
       return xhr.get("/cab-prices", { params }).then(resp => resp.data)
@@ -28,11 +29,11 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getTransportServicePrices = (
+export const getTransportServicePricesAction = (
   params?: any
-): ThunkAction<Promise<ITransportServicePrice[]>> => (
+): ThunkAction<Promise<ITransportServicePrice[]>> => async (
   dispatch,
-  getState,
+  _,
   { xhr }
 ) => {
   dispatch(actions.list.request())
@@ -48,54 +49,50 @@ export const getTransportServicePrices = (
     })
 }
 
-interface StateProps extends IPaginate {
-  transportServicePrices: ITransportServicePrice[]
-}
-interface DispatchProps {
-  getTransportServicePrices: (params?: any) => Promise<ITransportServicePrice[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+function useTransportServicePricesState() {
+  interface StateProps extends IPaginate {
+    transportServicePrices: ITransportServicePrice[]
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const transportServicePricesSelector = selectors(state)
     return {
       ...transportServicePricesSelector.meta,
       isFetching: transportServicePricesSelector.isFetching,
       transportServicePrices: transportServicePricesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getTransportServicePrices: (params?: any) =>
-      dispatch(getTransportServicePrices(params)),
   })
-)
+}
+function useTransportServicePricesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback(
+    (params?: any) => dispatch(getTransportServicePricesAction(params)),
+    [dispatch]
+  )
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-
-function List({
-  getTransportServicePrices,
-  transportServicePrices,
-  total,
-  from,
-  to,
-  currentPage,
-  lastPage,
-  isFetching,
-}: ListProps) {
+function useTransportServicePrices() {
+  const state = useTransportServicePricesState()
+  const fetchTransportServicePrices = useTransportServicePricesFetch()
+  return {
+    ...state,
+    fetchTransportServicePrices,
+  }
+}
+export default function List(_: RouteComponentProps) {
+  const {
+    fetchTransportServicePrices,
+    transportServicePrices,
+    total,
+    from,
+    to,
+    currentPage,
+    lastPage,
+    isFetching,
+  } = useTransportServicePrices()
   const [params, setParams] = useSearch()
   useEffect(() => {
-    getTransportServicePrices({ page: currentPage })
-  }, [])
+    fetchTransportServicePrices({ page: currentPage })
+  }, [fetchTransportServicePrices])
   return (
     <Fragment>
       <Helmet>
@@ -106,7 +103,7 @@ function List({
           <Search
             onSearch={params => {
               setParams(params)
-              getTransportServicePrices({ ...params, page: 1 })
+              fetchTransportServicePrices({ ...params, page: 1 })
             }}
           />
         </Col>
@@ -119,7 +116,7 @@ function List({
             lastPage={lastPage}
             isFetching={isFetching}
             onChange={page => {
-              getTransportServicePrices({ ...params, page })
+              fetchTransportServicePrices({ ...params, page })
             }}
           />
         </Col>
@@ -185,5 +182,3 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)

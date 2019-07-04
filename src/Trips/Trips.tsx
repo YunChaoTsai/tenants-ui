@@ -6,7 +6,7 @@ import List from "./List"
 import Item from "./Item"
 import NewItem from "./NewItem"
 
-export default function Trips(props: RouteComponentProps) {
+export default function Trips(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <Link to="new" className="float-right btn">

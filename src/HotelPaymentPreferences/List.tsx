@@ -1,6 +1,6 @@
-import React, { Fragment, useEffect } from "react"
+import React, { Fragment, useEffect, useCallback } from "react"
 import Helmet from "react-helmet-async"
-import { connect } from "react-redux"
+import { useSelector } from "react-redux"
 import { AxiosInstance } from "axios"
 import { RouteComponentProps } from "@reach/router"
 import { Omit } from "utility-types"
@@ -12,24 +12,25 @@ import {
   IStateWithKey,
   selectors,
 } from "./store"
-import { ThunkAction, ThunkDispatch } from "./../types"
+import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
 import Search, { useSearch } from "../Shared/Search"
 import Listable from "../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "./../model"
+import { useThunkDispatch } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getHotelPaymentPreferences(
+    async getHotelPaymentPreferences(
       params?: any
     ): Promise<{ data: IHotelPaymentPreference[]; meta: any }> {
       return xhr
         .get("/hotel-payment-preferences", { params })
         .then(resp => resp.data)
     },
-    getHotelPaymentReferences(
+    async getHotelPaymentReferences(
       params?: any
     ): Promise<{ data: { id: number; name: string }[]; meta: any }> {
       return xhr
@@ -39,11 +40,11 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const getHotelPaymentPreferences = (
+export const getHotelPaymentPreferencesAction = (
   params?: any
-): ThunkAction<Promise<IHotelPaymentPreference[]>> => (
+): ThunkAction<Promise<IHotelPaymentPreference[]>> => async (
   dispatch,
-  getState,
+  _,
   { xhr }
 ) => {
   dispatch(actions.list.request())
@@ -59,56 +60,51 @@ export const getHotelPaymentPreferences = (
     })
 }
 
-interface StateProps extends IPaginate {
-  hotelPaymentPreferences: IHotelPaymentPreference[]
-  isFetching: boolean
-}
-interface DispatchProps {
-  getHotelPaymentPreferences: (
-    params?: any
-  ) => Promise<IHotelPaymentPreference[]>
-}
-interface OwnProps {}
-
-export const connectWithList = connect<
-  StateProps,
-  DispatchProps,
-  OwnProps,
-  IStateWithKey
->(
-  state => {
+export function useHotelPaymentPreferencesState() {
+  interface StateProps extends IPaginate {
+    hotelPaymentPreferences: IHotelPaymentPreference[]
+    isFetching: boolean
+  }
+  return useSelector<IStateWithKey, StateProps>(state => {
     const hotelPaymentPreferencesSelector = selectors(state)
     return {
       ...hotelPaymentPreferencesSelector.meta,
       isFetching: hotelPaymentPreferencesSelector.isFetching,
       hotelPaymentPreferences: hotelPaymentPreferencesSelector.get(),
     }
-  },
-  (dispatch: ThunkDispatch) => ({
-    getHotelPaymentPreferences: (params?: any) =>
-      dispatch(getHotelPaymentPreferences(params)),
   })
-)
+}
 
-interface ListProps
-  extends OwnProps,
-    StateProps,
-    DispatchProps,
-    RouteComponentProps {}
-function List({
-  getHotelPaymentPreferences,
-  hotelPaymentPreferences,
-  total,
-  from,
-  to,
-  isFetching,
-  currentPage,
-  lastPage,
-}: ListProps) {
+function useHotelPaymentPreferencesFetch() {
+  const dispatch = useThunkDispatch()
+  return useCallback(
+    (params?: any) => dispatch(getHotelPaymentPreferencesAction(params)),
+    [dispatch]
+  )
+}
+
+function useHotelPaymentPreferences() {
+  return {
+    ...useHotelPaymentPreferencesState(),
+    fetchHotelPaymentPreferences: useHotelPaymentPreferencesFetch(),
+  }
+}
+
+export default function List(_: RouteComponentProps) {
   const [params, setParams] = useSearch()
+  const {
+    hotelPaymentPreferences,
+    fetchHotelPaymentPreferences: getHotelPaymentPreferences,
+    total,
+    from,
+    to,
+    isFetching,
+    currentPage,
+    lastPage,
+  } = useHotelPaymentPreferences()
   useEffect(() => {
     getHotelPaymentPreferences({ page: currentPage })
-  }, [])
+  }, [getHotelPaymentPreferences])
   return (
     <Fragment>
       <Helmet>
@@ -148,8 +144,6 @@ function List({
     </Fragment>
   )
 }
-
-export default connectWithList(List)
 
 interface SelectHotelPaymentPreferencesProps
   extends XHRProps,
