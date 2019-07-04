@@ -3,6 +3,7 @@ import React, { Context } from "react"
 import { Subtract, Diff } from "utility-types"
 import { useDispatch } from "react-redux"
 import { ThunkDispatch } from "./types"
+import * as Yup from "yup"
 
 export function searchToQuery(
   search: string = "?",
@@ -126,4 +127,22 @@ export function numberToLocalString(n: number): string {
 
 export function useThunkDispatch() {
   return useDispatch<ThunkDispatch>()
+}
+
+/**
+ * Helper to validate the numbers that can be empty string
+ */
+export function EmptyNumberValidator(
+  message: string = "Please enter a valid number"
+) {
+  return Yup.number()
+    .transform(function(value, originalValue) {
+      if (this.isType(value)) return value
+      if (!originalValue || !originalValue.trim()) {
+        return null
+      }
+      return originalValue
+    })
+    .nullable(true)
+    .typeError(message)
 }

@@ -22,11 +22,12 @@ import { SelectTripSources, store as tripSourceStore } from "./../TripSources"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
+import { EmptyNumberValidator } from "../utils"
 
 const validationSchema = Validator.object().shape({
   trip_id: Validator.string(),
   start_date: Validator.string().required("Start date is required"),
-  no_of_nights: Validator.number()
+  no_of_nights: EmptyNumberValidator()
     .positive("Number of nights should be a positive integer")
     .integer("Number of nights should be a positive integer")
     .required("Number of nights is required"),
@@ -34,17 +35,17 @@ const validationSchema = Validator.object().shape({
     1,
     "Please select atleast one destination"
   ),
-  no_of_adults: Validator.number()
+  no_of_adults: EmptyNumberValidator()
     .positive("Number of adults should be a positive integer")
     .integer("Number of adults should be a positive integer")
     .required("Number of adults field is required"),
   children: Validator.array().of(
     Validator.object().shape({
-      count: Validator.number()
+      count: EmptyNumberValidator()
         .positive("Number of children should be positive integer")
         .integer("Number of children should be positive integer")
         .required("Number of children field is required"),
-      age: Validator.number()
+      age: EmptyNumberValidator()
         .positive("Child age should a positive number")
         .required("Child age is required"),
     })
@@ -54,10 +55,9 @@ const validationSchema = Validator.object().shape({
     .shape({
       name: Validator.string().required("Contact name is required."),
       email: Validator.string().email("Contact email address in invalid"),
-      phone_number: Validator.number()
+      phone_number: EmptyNumberValidator()
         .typeError("Phone number is invalid")
-        .positive("Phone number should be an positive integer")
-        .required("Phone number is required"),
+        .positive("Phone number should be an positive integer"),
     })
     .required(),
 })
@@ -120,8 +120,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
           no_of_nights &&
           no_of_adults &&
           destinations &&
-          destinations.length &&
-          contact.phone_number
+          destinations.length
         ) {
           const data = {
             start_date: moment(start_date)
@@ -146,8 +145,8 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             trip_source_id: trip_source ? trip_source.id : undefined,
             contact: {
               name: contact.name,
-              email: contact.email,
-              phone_number: contact.phone_number,
+              email: contact.email || undefined,
+              phone_number: contact.phone_number || undefined,
               country_id: contact.country ? contact.country.id : undefined,
             },
           }
@@ -179,7 +178,7 @@ function NewItem({ xhr, navigate }: NewItemProps) {
         <Form noValidate>
           <fieldset>
             <legend>Add New Trip</legend>
-            {status ? <div>{status}</div> : null}
+            {status ? <p className="text-red-700">{status}</p> : null}
             <Grid>
               <Col>
                 <FormikFormGroup

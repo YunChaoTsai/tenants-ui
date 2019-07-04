@@ -46,7 +46,7 @@
     "cypress": "cypress open",
     "cypress:all": "cypress run",
     "commit": "git-cz",
-    "release": "env-cmd semantic-release",
+    "release": "env-cmd -f .env semantic-release",
     "build": "react-scripts build",
     "deploy": "gh-pages-clean && gh-pages -d build -t",
     "predeploy:testing": "env-cmd -f ./.env.test npm run build",
