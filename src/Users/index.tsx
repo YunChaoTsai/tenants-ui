@@ -1,5 +1,5 @@
 import Users from "./Users"
 import * as store from "./store"
-import { XHR as listXHR } from "./List"
+import { XHR as listXHR, SelectUsers } from "./List"
 
-export { Users, store, listXHR }
+export { Users, store, listXHR, SelectUsers }

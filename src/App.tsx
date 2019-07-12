@@ -26,6 +26,7 @@ import { TransportServices } from "./TransportServices"
 import { TransportServicePrices } from "./TransportServicePrices"
 import { HotelPaymentPreferences } from "./HotelPaymentPreferences"
 import { HotelBookingStages } from "./HotelBookingStages"
+import { TripPlanRequests } from "./TripPlanRequests"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
@@ -58,6 +59,7 @@ export const Header = function Header() {
               Trips
             </Link>
             <ul>
+              <NavLink to="/trip-plan-requests">Trip Plan Requests</NavLink>
               <NavLink to="/trip-sources">Trip Sources</NavLink>
               <NavLink to="/trip-stages">Trip Stages</NavLink>
             </ul>
@@ -145,6 +147,7 @@ export default function App() {
           <TransportServicePrices path="/transport-service-prices/*" />
           <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
           <HotelBookingStages path="/hotel-booking-stages/*" />
+          <TripPlanRequests path="/trip-plan-requests/*" />
           <EmailVerified path="email-verified" />
           <NotFound default />
         </Router>

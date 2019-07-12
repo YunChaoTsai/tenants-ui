@@ -13,6 +13,8 @@ import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
 import { useSelector } from "react-redux"
 import { useThunkDispatch } from "../utils"
+import { withXHR, XHRProps } from "./../xhr"
+import { Async, AsyncProps } from "@tourepedia/select"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -131,3 +133,22 @@ export default function Users({  }: RouteComponentProps) {
     </Fragment>
   )
 }
+
+interface SelectUsersProps extends XHRProps, Omit<AsyncProps, "fetch"> {}
+
+export const SelectUsers = withXHR<SelectUsersProps>(function SelectUsers({
+  xhr,
+  ...otherProps
+}: SelectUsersProps) {
+  return (
+    <Async
+      multiple
+      {...otherProps}
+      fetch={q =>
+        XHR(xhr)
+          .getUsers({ q })
+          .then(resp => resp.data)
+      }
+    />
+  )
+})

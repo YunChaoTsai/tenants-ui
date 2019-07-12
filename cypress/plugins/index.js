@@ -1,5 +1,13 @@
 const wp = require("@cypress/webpack-preprocessor")
-require("dotenv").config()
+const path = require("path")
+const fs = require("fs")
+
+const appDirectory = fs.realpathSync(process.cwd())
+const resolveApp = relativePath => path.resolve(appDirectory, relativePath)
+
+require("dotenv").config({
+  path: resolveApp(".env.development"),
+})
 
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
