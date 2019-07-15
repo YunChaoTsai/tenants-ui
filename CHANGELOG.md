@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/tourepedia/tp-admin-ui/compare/v1.8.0...v1.8.1) (2019-07-15)
+
+
+### Bug Fixes
+
+* **service-worker:** remove service workder ([e446b7d](https://github.com/tourepedia/tp-admin-ui/commit/e446b7d))
+
 # [1.8.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.7.0...v1.8.0) (2019-07-15)
 
 
