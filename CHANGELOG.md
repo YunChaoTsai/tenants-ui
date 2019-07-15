@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/tourepedia/tp-admin-ui/compare/v1.8.1...v1.8.2) (2019-07-15)
+
+
+### Bug Fixes
+
+* **release:** github release not working ([6633522](https://github.com/tourepedia/tp-admin-ui/commit/6633522))
+
 ## [1.8.1](https://github.com/tourepedia/tp-admin-ui/compare/v1.8.0...v1.8.1) (2019-07-15)
 
 
