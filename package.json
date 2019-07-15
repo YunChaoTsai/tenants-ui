@@ -129,7 +129,8 @@
         {
           "message": "chore(release): ${nextRelease.version} :tada: :rocket:\n\n${nextRelease.notes}"
         }
-      ]
+      ],
+      "@semantic-release/github"
     ],
     "ci": false
   }
