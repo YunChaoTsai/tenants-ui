@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.8.2...v1.9.0) (2019-07-19)
+
+
+### Features
+
+* **version:** add application version ([f685298](https://github.com/tourepedia/tp-admin-ui/commit/f685298)), closes [#93](https://github.com/tourepedia/tp-admin-ui/issues/93)
+
 ## [1.8.2](https://github.com/tourepedia/tp-admin-ui/compare/v1.8.1...v1.8.2) (2019-07-15)
 
 
