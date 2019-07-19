@@ -10,7 +10,7 @@ export function Container({
   as: Component = "div",
   ...props
 }: Omit<React.HTMLProps<HTMLDivElement>, "as"> & {
-  fluid: boolean
+  fluid?: boolean
   as?: React.ReactType
 }) {
   return (

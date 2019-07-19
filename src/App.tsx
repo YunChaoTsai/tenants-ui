@@ -156,6 +156,21 @@ export default function App() {
           <NotFound default />
         </Router>
       </Container>
+      <Footer />
     </Fragment>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="border-t mt-8">
+      <Container fluid>
+        <div className="py-4">
+          <span>&copy; 2019 Tourepedia. All rights reserved</span>
+          {" • "}
+          <span>v{process.env.REACT_APP_VERSION}</span>
+        </div>
+      </Container>
+    </footer>
   )
 }
