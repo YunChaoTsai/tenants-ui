@@ -59,6 +59,7 @@ export const Header = function Header() {
               Trips
             </Link>
             <ul>
+              <NavLink to="/trips">Trips</NavLink>
               <NavLink to="/trip-plan-requests">Trip Plan Requests</NavLink>
               <NavLink to="/trip-sources">Trip Sources</NavLink>
               <NavLink to="/trip-stages">Trip Stages</NavLink>
@@ -67,6 +68,7 @@ export const Header = function Header() {
           <Dropdown as="li" className="inline-block">
             <Link to="/hotels">Hotels</Link>
             <ul>
+              <NavLink to="/hotels">Hotels</NavLink>
               <NavLink to="/meal-plans">Meal Plans</NavLink>
               <NavLink to="/room-types">Room Types</NavLink>
               <NavLink to="/hotel-payment-preferences">
@@ -80,6 +82,7 @@ export const Header = function Header() {
               <Icons.BusIcon title="Transport Services" />
             </Link>
             <ul>
+              <NavLink to="/transport-services">Transport Services</NavLink>
               <NavLink to="/cab-types">Cab Types</NavLink>
               <NavLink to="/transport-service-prices">
                 Transport Service Prices
@@ -93,6 +96,7 @@ export const Header = function Header() {
               <Icons.UsersIcon title="Users" />
             </Link>
             <ul className="menu">
+              <NavLink to="/users">Users</NavLink>
               <NavLink to="/roles">Roles</NavLink>
             </ul>
           </Dropdown>
