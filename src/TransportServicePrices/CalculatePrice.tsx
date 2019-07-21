@@ -27,6 +27,7 @@ import {
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
+import { EmptyNumberValidator } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -40,13 +41,13 @@ const validationSchema = Validator.object().shape({
   cabs: Validator.array().of(
     Validator.object().shape({
       start_date: Validator.string().required("Start date field is required"),
-      no_of_days: Validator.number()
+      no_of_days: EmptyNumberValidator()
         .positive("Number of days should be a positive integer")
         .integer("Number of days should be a positive integer")
         .required("Number of days is required."),
       cab_type: Validator.object().required("Cab type field is required"),
       transport_service: Validator.object().required("Service is required"),
-      no_of_cabs: Validator.number()
+      no_of_cabs: EmptyNumberValidator()
         .positive("Number of cabs should be a positive integer")
         .integer("Number of cabs should be a positive integer.")
         .required("Number of cabs is required"),
@@ -425,14 +426,12 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       >
                         + Duplicate
                       </Button>
-                      {values.cabs.length > 1 ? (
-                        <Button
-                          className="btn--secondary"
-                          onClick={() => remove(index)}
-                        >
-                          &times; Remove
-                        </Button>
-                      ) : null}
+                      <Button
+                        className="btn--secondary"
+                        onClick={() => remove(index)}
+                      >
+                        &times; Remove
+                      </Button>
                     </div>
                   </fieldset>
                 ))}

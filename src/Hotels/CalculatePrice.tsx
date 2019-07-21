@@ -26,6 +26,7 @@ import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
+import { EmptyNumberValidator } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -59,7 +60,7 @@ export const validationSchema = Validator.object().shape({
   hotels: Validator.array().of(
     Validator.object().shape({
       start_date: Validator.string().required("Start Date field is required."),
-      no_of_nights: Validator.number()
+      no_of_nights: EmptyNumberValidator()
         .required("Number of nights field is required")
         .integer("Number of nights should be an integer")
         .positive("Number of nights should be a positive number"),
@@ -71,16 +72,16 @@ export const validationSchema = Validator.object().shape({
             room_type: Validator.object().required(
               "Room type field is required"
             ),
-            adults_with_extra_bed: Validator.number()
+            adults_with_extra_bed: EmptyNumberValidator()
               .integer("Adult with extra bed should be an interger")
               .required("Adult with extra bed is required"),
-            children_with_extra_bed: Validator.number()
+            children_with_extra_bed: EmptyNumberValidator()
               .integer("Child with extra bed should be an integer")
               .required("Child with extra bed is required"),
-            children_without_extra_bed: Validator.number()
+            children_without_extra_bed: EmptyNumberValidator()
               .integer("Child without extra bed should be an integer")
               .required("Child without extra bed is required"),
-            no_of_rooms: Validator.number()
+            no_of_rooms: EmptyNumberValidator()
               .positive("Number of rooms should be a positive number")
               .integer("Number of room should be an integer")
               .required("Number of rooms is required"),
@@ -614,14 +615,12 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                         >
                           + Duplicate This Query
                         </Button>
-                        {values.hotels.length > 1 ? (
-                          <Button
-                            className="btn--secondary"
-                            onClick={() => remove(index)}
-                          >
-                            &times; Remove This Query
-                          </Button>
-                        ) : null}
+                        <Button
+                          className="btn--secondary"
+                          onClick={() => remove(index)}
+                        >
+                          &times; Remove This Query
+                        </Button>
                       </div>
                     </fieldset>
                   ))}

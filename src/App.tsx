@@ -128,34 +128,36 @@ export default function App() {
     <Fragment>
       <Helmet titleTemplate="%s | Tourepedia" defaultTitle="Tourepedia" />
       <Header />
-      <Container fluid>
-        <Router>
-          <Login path="/login" />
-          <ForgotPassword path="/forgot-password" />
-          <ResetPassword path="/reset-password" />
-          <Dashboard path="/" />
-          <Logout path="/logout" />
-          <Settings path="/settings/*" />
-          <Users path="/users/*" />
-          <Roles path="/roles/*" />
-          <Hotels path="/hotels/*" />
-          <MealPlans path="/meal-plans/*" />
-          <RoomTypes path="/room-types/*" />
-          <Locations path="/locations/*" />
-          <CabTypes path="/cab-types/*" />
-          <Cabs path="/cabs/*" />
-          <Trips path="/trips/*" />
-          <TripSources path="/trip-sources/*" />
-          <TripStages path="/trip-stages/*" />
-          <TransportServices path="/transport-services/*" />
-          <TransportServicePrices path="/transport-service-prices/*" />
-          <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
-          <HotelBookingStages path="/hotel-booking-stages/*" />
-          <TripPlanRequests path="/trip-plan-requests/*" />
-          <EmailVerified path="email-verified" />
-          <NotFound default />
-        </Router>
-      </Container>
+      <main style={{ minHeight: "80vh" }}>
+        <Container fluid>
+          <Router>
+            <Login path="/login" />
+            <ForgotPassword path="/forgot-password" />
+            <ResetPassword path="/reset-password" />
+            <Dashboard path="/" />
+            <Logout path="/logout" />
+            <Settings path="/settings/*" />
+            <Users path="/users/*" />
+            <Roles path="/roles/*" />
+            <Hotels path="/hotels/*" />
+            <MealPlans path="/meal-plans/*" />
+            <RoomTypes path="/room-types/*" />
+            <Locations path="/locations/*" />
+            <CabTypes path="/cab-types/*" />
+            <Cabs path="/cabs/*" />
+            <Trips path="/trips/*" />
+            <TripSources path="/trip-sources/*" />
+            <TripStages path="/trip-stages/*" />
+            <TransportServices path="/transport-services/*" />
+            <TransportServicePrices path="/transport-service-prices/*" />
+            <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
+            <HotelBookingStages path="/hotel-booking-stages/*" />
+            <TripPlanRequests path="/trip-plan-requests/*" />
+            <EmailVerified path="email-verified" />
+            <NotFound default />
+          </Router>
+        </Container>
+      </main>
       <Footer />
     </Fragment>
   )

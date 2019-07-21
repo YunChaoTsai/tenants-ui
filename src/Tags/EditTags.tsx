@@ -8,7 +8,7 @@ import { FormikFormGroup } from "../Shared/InputField"
 
 export interface EditTagsProps {
   tags?: Array<ITag>
-  type: string
+  type: "trip"
   itemId: number
   onCancel: () => void
   onSuccess: () => void
@@ -51,6 +51,7 @@ export default withXHR(function EditTags({
               render={({ field }) => (
                 <SelectTags
                   {...field}
+                  label="Select existing or create new tags"
                   type={type}
                   onChange={(value, name) => {
                     setFieldValue(name, value)

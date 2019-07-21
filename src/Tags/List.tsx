@@ -20,7 +20,7 @@ export function XHR(xhr: AxiosInstance, type: string) {
 }
 
 interface SelectTagsProps extends XHRProps, Omit<AsyncProps, "fetch"> {
-  type: string
+  type: "trip"
 }
 
 export const SelectTags = withXHR(function SelectRoomTypes({
