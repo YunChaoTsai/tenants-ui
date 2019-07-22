@@ -16,7 +16,7 @@ import { useThunkDispatch } from "../utils"
 import { SelectTripStages, store as tripStageStore } from "../TripStages"
 import { SelectTags, store as tagStore } from "../Tags"
 import { Formik, Form } from "formik"
-import { FormikFormGroup } from "../Shared/InputField"
+import { FormikFormGroup, OnFormChange } from "../Shared/InputField"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -243,6 +243,11 @@ function Filters({ label = "Filters", onChange }: FilterProps) {
                 onChange={(value, name) => setFieldValue(name, value)}
               />
             )}
+          />
+          <OnFormChange
+            onChange={({ values }) => {
+              onChange(values)
+            }}
           />
           <Button type="submit">Filter</Button>
         </Form>
