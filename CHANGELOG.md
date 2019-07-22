@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.9.1...v1.10.0) (2019-07-22)
+
+
+### Features
+
+* **onchange-filter:** trigger filter with onchange in trips ([#99](https://github.com/tourepedia/tp-admin-ui/issues/99)) ([cb96b1e](https://github.com/tourepedia/tp-admin-ui/commit/cb96b1e))
+
 ## [1.9.1](https://github.com/tourepedia/tp-admin-ui/compare/v1.9.0...v1.9.1) (2019-07-22)
 
 
