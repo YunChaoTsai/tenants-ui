@@ -1,10 +1,12 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useEffect, useRef } from "react"
 import {
   ErrorMessage as FormikErrorMessage,
   FieldProps,
   Field,
   ErrorMessageProps,
   getIn,
+  connect,
+  FormikProps,
 } from "formik"
 import { Omit } from "utility-types"
 import { ErrorMessage as ErrorM, FormGroup } from "@tourepedia/ui"
@@ -109,3 +111,31 @@ export function InputField({
   }
   return <FormikFormGroup name={name} className={className} render={render} />
 }
+
+export interface OnFormChangeProps {
+  onChange: (formik: FormikProps<any>) => any
+  debounce?: number
+}
+
+function OnFormChangeImpl({
+  onChange,
+  formik,
+  debounce = 300,
+}: OnFormChangeProps & { formik: FormikProps<any> }) {
+  const { values } = formik
+  const debounceHandler = useRef(-1)
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return
+    }
+    debounceHandler.current = window.setTimeout(() => {
+      onChange(formik)
+    }, debounce)
+    return function clearDebounce() {
+      debounceHandler.current && window.clearTimeout(debounceHandler.current)
+    }
+  }, [values])
+  return null
+}
+
+export const OnFormChange = connect<OnFormChangeProps, any>(OnFormChangeImpl)

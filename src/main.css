@@ -109,7 +109,7 @@ footer .btn + .btn {
 }
 
 .btn--secondary {
-  border-color: transparent;
+  background: none !important;
 }
 
 blockquote {
@@ -226,4 +226,8 @@ nav a {
 .tabs li.active {
   background: #667eea;
   color: white;
+}
+
+.form-group .select [role="group"] label {
+  font-size: 0.875rem;
 }

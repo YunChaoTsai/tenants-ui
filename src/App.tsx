@@ -40,8 +40,8 @@ export const Header = function Header() {
   const { name } = user
   return (
     <header className="mb-4 border-b text-base">
-      <nav className="flex h-16 items-stretch md:justify-between">
-        <Link to="/" className="inline-flex px-2 mr-4 sm:mr-auto">
+      <nav className="sm:flex items-stretch md:justify-between">
+        <Link to="/" className="inline-flex h-16 px-2 mr-4 sm:mr-auto">
           <div className="flex items-center">
             <img
               alt="Tourepedia Logo"
@@ -53,7 +53,7 @@ export const Header = function Header() {
             </h1>
           </div>
         </Link>
-        <ul className="flex w-full md:w-auto md:px-4 items-center justify-between md:justify-end">
+        <ul className="flex w-full md:w-auto md:px-4 h-16 items-center justify-between md:justify-end">
           <Dropdown as="li" className="inline-block">
             <Link to="/trips" className="inline-block">
               Trips
@@ -78,9 +78,7 @@ export const Header = function Header() {
             </ul>
           </Dropdown>
           <Dropdown as="li" className="inline-block" alignRight>
-            <Link to="/transport-services">
-              <Icons.BusIcon title="Transport Services" />
-            </Link>
+            <Link to="/transport-services">Transportation</Link>
             <ul>
               <NavLink to="/transport-services">Transport Services</NavLink>
               <NavLink to="/cab-types">Cab Types</NavLink>
@@ -92,9 +90,7 @@ export const Header = function Header() {
             </ul>
           </Dropdown>
           <Dropdown as="li" className="inline-block" alignRight>
-            <Link to="/users">
-              <Icons.UsersIcon title="Users" />
-            </Link>
+            <Link to="/users">Users</Link>
             <ul className="menu">
               <NavLink to="/users">Users</NavLink>
               <NavLink to="/roles">Roles</NavLink>

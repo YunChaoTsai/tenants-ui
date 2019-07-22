@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useCallback, useRef } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import {
   Formik,
@@ -18,6 +18,7 @@ import {
   Input,
   FormikFormGroup,
   FormGroup,
+  OnFormChange,
 } from "./../Shared/InputField"
 import { SelectHotels } from "./List"
 import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
@@ -30,7 +31,7 @@ import { EmptyNumberValidator } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getPrice(hotels: any) {
+    async getPrice(hotels: any) {
       return xhr.get("/prices", { params: { hotels } }).then(resp => resp.data)
     },
   }
@@ -51,6 +52,7 @@ export interface CalculatePriceParams {
     }[]
     calculated_price?: number
     given_price?: number
+    edited_given_price?: boolean
     no_price_for_dates?: Array<string>
     comments?: string
   }[]
@@ -110,6 +112,7 @@ export const INITIAL_VALUES: CalculatePriceParams = {
       ],
       calculated_price: undefined,
       given_price: 0,
+      edited_given_price: false,
       comments: "",
     },
   ],
@@ -128,53 +131,58 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
   bookingFrom,
   bookingTo,
 }: CalculatePriceFormProps) {
-  function notifyOnChange(flattenValues: CalculatePriceParams) {
-    onChange &&
-      onChange(
-        flattenValues.hotels.reduce(
-          (price: number, hotel) =>
-            price +
-            parseFloat((hotel.given_price ? hotel.given_price : 0).toString()),
-          0
-        ),
-        flattenValues.hotels.map(
-          ({
-            start_date,
-            no_of_nights,
-            room_details,
-            hotel,
-            meal_plan,
-            ...otherData
-          }) => {
-            const room =
-              room_details && room_details.length > 0
-                ? room_details[0]
-                : { room_type: undefined }
-            const { room_type, ...otherRoomDetails } = room
-            return {
-              ...otherData,
-              checkin: moment(start_date)
-                .hours(0)
-                .minutes(0)
-                .seconds(0)
-                .utc()
-                .format("YYYY-MM-DD HH:mm:ss"),
-              checkout: moment(start_date)
-                .add(no_of_nights - 1, "days")
-                .hours(23)
-                .minutes(59)
-                .seconds(59)
-                .utc()
-                .format("YYYY-MM-DD HH:mm:ss"),
-              hotel_id: hotel && hotel.id,
-              meal_plan_id: meal_plan && meal_plan.id,
-              ...otherRoomDetails,
-              room_type_id: room_type && room_type.id,
+  const notifyOnChange = useCallback(
+    (flattenValues: CalculatePriceParams) => {
+      onChange &&
+        onChange(
+          flattenValues.hotels.reduce(
+            (price: number, hotel) =>
+              price +
+              parseFloat(
+                (hotel.given_price ? hotel.given_price : 0).toString()
+              ),
+            0
+          ),
+          flattenValues.hotels.map(
+            ({
+              start_date,
+              no_of_nights,
+              room_details,
+              hotel,
+              meal_plan,
+              ...otherData
+            }) => {
+              const room =
+                room_details && room_details.length > 0
+                  ? room_details[0]
+                  : { room_type: undefined }
+              const { room_type, ...otherRoomDetails } = room
+              return {
+                ...otherData,
+                checkin: moment(start_date)
+                  .hours(0)
+                  .minutes(0)
+                  .seconds(0)
+                  .utc()
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                checkout: moment(start_date)
+                  .add(no_of_nights - 1, "days")
+                  .hours(23)
+                  .minutes(59)
+                  .seconds(59)
+                  .utc()
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                hotel_id: hotel && hotel.id,
+                meal_plan_id: meal_plan && meal_plan.id,
+                ...otherRoomDetails,
+                room_type_id: room_type && room_type.id,
+              }
             }
-          }
+          )
         )
-      )
-  }
+    },
+    [onChange]
+  )
   useDidMount(() => {
     notifyOnChange(initialValues)
   })
@@ -191,99 +199,110 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
     }
     return dates
   }, [bookingFrom, bookingTo])
+  const onSubmit = useCallback(
+    async (
+      values: CalculatePriceParams,
+      actions: FormikActions<CalculatePriceParams>
+    ) => {
+      actions.setStatus()
+      const hotels: any[] = []
+      // flatten values so that we can show the prices for each row
+      const flattenValues: CalculatePriceParams = {
+        hotels: [],
+      }
+      values.hotels.forEach(values => {
+        const {
+          start_date,
+          no_of_nights,
+          hotel,
+          meal_plan,
+          room_details,
+        } = values
+        if (
+          hotel &&
+          start_date &&
+          no_of_nights &&
+          meal_plan &&
+          room_details &&
+          room_details.length > 0
+        ) {
+          room_details.forEach(room_detail => {
+            if (room_detail.room_type) {
+              const {
+                room_type,
+                adults_with_extra_bed,
+                children_with_extra_bed,
+                children_without_extra_bed,
+                no_of_rooms,
+              } = room_detail
+              flattenValues.hotels.push({
+                ...values,
+                start_date: moment(start_date).format("YYYY-MM-DD"),
+                no_of_nights,
+                room_details: [room_detail],
+              })
+              hotels.push({
+                checkin: moment(start_date)
+                  .hours(0)
+                  .minutes(0)
+                  .seconds(0)
+                  .utc()
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                checkout: moment(start_date)
+                  .add(no_of_nights - 1, "days")
+                  .hours(23)
+                  .minutes(59)
+                  .seconds(59)
+                  .utc()
+                  .format("YYYY-MM-DD HH:mm:ss"),
+                hotel_id: hotel.id,
+                meal_plan_id: meal_plan.id,
+                room_type_id: room_type.id,
+                adults_with_extra_bed,
+                children_with_extra_bed,
+                children_without_extra_bed,
+                no_of_rooms,
+              })
+            }
+          })
+        }
+      })
+      return XHR(xhr)
+        .getPrice(hotels)
+        .then(data => {
+          flattenValues.hotels = flattenValues.hotels.map((hotel, i) => ({
+            ...hotel,
+            calculated_price: data.hotels[i].price,
+            given_price: hotel.edited_given_price
+              ? hotel.given_price
+              : data.hotels[i].price,
+            no_price_for_dates: data.hotels[i].no_price_for_dates,
+          }))
+          actions.setValues(flattenValues)
+          notifyOnChange(flattenValues)
+        })
+        .catch(error => {
+          actions.setStatus(error.message)
+          if (error.formikErrors) {
+            actions.setErrors(error.formikErrors)
+          }
+        })
+    },
+    [xhr, notifyOnChange]
+  )
+  // this will help us identify if we should fetch the price for onChange or not
+  // we need this because, changing the given price also triggers the fetch prices
+  // and which onResolve, changes the given price back to calculated price
+  const shouldFetchPricesOnChange = useRef(true)
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(
-        values: CalculatePriceParams,
-        actions: FormikActions<CalculatePriceParams>
-      ) => {
-        actions.setStatus()
-        const hotels: any[] = []
-        // flatten values so that we can show the prices for each row
-        const flattenValues: CalculatePriceParams = {
-          hotels: [],
-        }
-        values.hotels.forEach(values => {
-          const {
-            start_date,
-            no_of_nights,
-            hotel,
-            meal_plan,
-            room_details,
-          } = values
-          if (
-            hotel &&
-            start_date &&
-            no_of_nights &&
-            meal_plan &&
-            room_details &&
-            room_details.length > 0
-          ) {
-            room_details.forEach(room_detail => {
-              if (room_detail.room_type) {
-                const {
-                  room_type,
-                  adults_with_extra_bed,
-                  children_with_extra_bed,
-                  children_without_extra_bed,
-                  no_of_rooms,
-                } = room_detail
-                flattenValues.hotels.push({
-                  ...values,
-                  start_date: moment(start_date).format("YYYY-MM-DD"),
-                  no_of_nights,
-                  room_details: [room_detail],
-                })
-                hotels.push({
-                  checkin: moment(start_date)
-                    .hours(0)
-                    .minutes(0)
-                    .seconds(0)
-                    .utc()
-                    .format("YYYY-MM-DD HH:mm:ss"),
-                  checkout: moment(start_date)
-                    .add(no_of_nights - 1, "days")
-                    .hours(23)
-                    .minutes(59)
-                    .seconds(59)
-                    .utc()
-                    .format("YYYY-MM-DD HH:mm:ss"),
-                  hotel_id: hotel.id,
-                  meal_plan_id: meal_plan.id,
-                  room_type_id: room_type.id,
-                  adults_with_extra_bed,
-                  children_with_extra_bed,
-                  children_without_extra_bed,
-                  no_of_rooms,
-                })
-              }
-            })
-          }
+      onSubmit={(value, actions) =>
+        onSubmit(value, actions).then(() => {
+          actions.setSubmitting(false)
         })
-        XHR(xhr)
-          .getPrice(hotels)
-          .then(data => {
-            flattenValues.hotels = flattenValues.hotels.map((hotel, i) => ({
-              ...hotel,
-              calculated_price: data.hotels[i].price,
-              given_price: data.hotels[i].price,
-              no_price_for_dates: data.hotels[i].no_price_for_dates,
-            }))
-            actions.setValues(flattenValues)
-            // we get the prices
-            actions.setSubmitting(false)
-            notifyOnChange(flattenValues)
-          })
-          .catch(error => {
-            actions.setStatus(error.message)
-            if (error.formikErrors) {
-              actions.setErrors(error.formikErrors)
-            }
-            actions.setSubmitting(false)
-          })
-      }}
+      }
       render={({
         isSubmitting,
         values,
@@ -384,13 +403,13 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           render={({ name, push, remove }) => (
                             <fieldset>
                               <legend>Room Details</legend>
-                              <ol className="list">
+                              <ol>
                                 {hotel.room_details.map((roomDetail, index) => (
-                                  <li key={index}>
-                                    <Grid
-                                      key={index}
-                                      style={{ marginTop: "15px" }}
-                                    >
+                                  <li
+                                    key={index}
+                                    className="border-b pb-2 mb-2"
+                                  >
+                                    <Grid key={index}>
                                       <Col md="auto" sm={6}>
                                         <FormikFormGroup
                                           name={`${name}.${index}.room_type`}
@@ -428,10 +447,10 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                           )}
                                         />
                                       </Col>
-                                      <Col md="auto" sm={6}>
+                                      <Col md sm={6}>
                                         <InputField
                                           name={`${name}.${index}.no_of_rooms`}
-                                          label="Number of rooms"
+                                          label="No. of rooms"
                                           type="number"
                                           min={1}
                                           max={1000}
@@ -440,7 +459,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                       <Col>
                                         <InputField
                                           name={`${name}.${index}.adults_with_extra_bed`}
-                                          label="Adults with extra bed"
+                                          label="Adults w/ eb"
                                           type="number"
                                           min={0}
                                           max={10}
@@ -454,7 +473,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                       <Col>
                                         <InputField
                                           name={`${name}.${index}.children_with_extra_bed`}
-                                          label="Children with extra bed"
+                                          label="Children w/ eb"
                                           type="number"
                                           min={0}
                                           max={10}
@@ -468,7 +487,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                       <Col>
                                         <InputField
                                           name={`${name}.${index}.children_without_extra_bed`}
-                                          label="Children without extra bed"
+                                          label="Children w/o eb"
                                           min={0}
                                           max={10}
                                           type="number"
@@ -497,7 +516,6 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                     </Grid>
                                   </li>
                                 ))}
-                                <hr />
                                 <Button
                                   className="btn--secondary"
                                   onClick={_ =>
@@ -513,37 +531,38 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           )}
                         />
                       </div>
-                      <FormGroup>
-                        <b>Get the price for the above hotel query</b>
-                        <br />
-                        <br />
-                        <div className="button-group">
-                          <Button disabled={isSubmitting} type="submit">
-                            Get Price
-                          </Button>{" "}
-                          {hotel.calculated_price !== undefined ? (
-                            <span className="btn">
-                              {hotel.calculated_price}
-                            </span>
-                          ) : null}
-                        </div>
-                        {hotel.no_price_for_dates &&
-                        hotel.no_price_for_dates.length ? (
-                          <p className="text-yellow-800">
-                            No prices available for{" "}
-                            {hotel.no_price_for_dates
-                              .map(date =>
-                                moment
-                                  .utc(date)
-                                  .local()
-                                  .format("Do MMM")
-                              )
-                              .join(", ")}
-                          </p>
-                        ) : null}
-                      </FormGroup>
                       <Grid>
-                        <Col sm="auto">
+                        <Col>
+                          <FormGroup>
+                            <div className="mb-1 white-space-pre">
+                              Calculated Price
+                            </div>
+                            {hotel.calculated_price !== undefined ? (
+                              <mark className="inline-block mb-2 text-lg font-semibold">
+                                {hotel.calculated_price}
+                              </mark>
+                            ) : (
+                              <Button type="submit" disabled={isSubmitting}>
+                                Get Price
+                              </Button>
+                            )}
+                            {hotel.no_price_for_dates &&
+                            hotel.no_price_for_dates.length ? (
+                              <p className="text-yellow-800">
+                                No prices available for{" "}
+                                {hotel.no_price_for_dates
+                                  .map(date =>
+                                    moment
+                                      .utc(date)
+                                      .local()
+                                      .format("Do MMM")
+                                  )
+                                  .join(", ")}
+                              </p>
+                            ) : null}
+                          </FormGroup>
+                        </Col>
+                        <Col>
                           <FormGroup>
                             <label>Given Price</label>
                             <Input
@@ -560,17 +579,11 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 if (isNaN(value)) {
                                   value = undefined
                                 }
-                                const flattenValues = {
-                                  hotels: values.hotels.map((hotel, i) =>
-                                    i !== index
-                                      ? hotel
-                                      : {
-                                          ...hotel,
-                                          given_price: value,
-                                        }
-                                  ),
-                                }
-                                notifyOnChange(flattenValues)
+                                shouldFetchPricesOnChange.current = false
+                                setFieldValue(
+                                  `${name}.${index}.edited_given_price`,
+                                  true
+                                )
                                 setFieldValue(e.target.name, value)
                               }}
                               min={0}
@@ -590,17 +603,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 e: React.ChangeEvent<HTMLInputElement>
                               ) => {
                                 const value = e.target.value
-                                const flattenValues = {
-                                  hotels: values.hotels.map((hotel, i) =>
-                                    i !== index
-                                      ? hotel
-                                      : {
-                                          ...hotel,
-                                          comments: value,
-                                        }
-                                  ),
-                                }
-                                notifyOnChange(flattenValues)
+                                shouldFetchPricesOnChange.current = false
                                 setFieldValue(e.target.name, value)
                               }}
                             />
@@ -631,6 +634,26 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                   </div>
                 </div>
               )}
+            />
+            <OnFormChange
+              onChange={(formik: FormikProps<CalculatePriceParams>) => {
+                notifyOnChange(formik.values)
+                if (!shouldFetchPricesOnChange.current) {
+                  shouldFetchPricesOnChange.current = true
+                  return
+                }
+                if (formik.isSubmitting) return
+                validationSchema
+                  .validate(formik.values)
+                  .then(async () => {
+                    if (formik.isSubmitting) return
+                    formik.setSubmitting(true)
+                    return onSubmit(formik.values, formik).then(() => {
+                      formik.setSubmitting(false)
+                    })
+                  })
+                  .catch(() => {})
+              }}
             />
           </Form>
         )

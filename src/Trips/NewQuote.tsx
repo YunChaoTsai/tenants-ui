@@ -1,7 +1,7 @@
-import React, { useState } from "react"
+import React, { useState, useCallback, useMemo, useRef } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
-import { Button } from "@tourepedia/ui"
+import { Button, ownerDocument } from "@tourepedia/ui"
 import moment from "moment"
 
 import { withXHR, XHRProps } from "./../xhr"
@@ -14,7 +14,7 @@ import { numberToLocalString } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    saveQuote(tripId: string | number, data: any): Promise<IQuote> {
+    async saveQuote(tripId: string | number, data: any): Promise<IQuote> {
       return xhr
         .post(`/trips/${tripId}/quotes`, data)
         .then(resp => resp.data.quote)
@@ -25,6 +25,7 @@ export function XHR(xhr: AxiosInstance) {
 interface NewQuoteProps extends RouteComponentProps, XHRProps {
   trip: ITrip
 }
+
 function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
   const quote: IQuote | undefined =
     location && location.state && location.state.quote
@@ -33,7 +34,10 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
   const [hotels, setHotels] = useState<any>([])
   const [cabs, setCabs] = useState<any>([])
   const [comments, setComments] = useState<string>(quote ? quote.comments : "")
-  function saveQuote() {
+  const [errors, setErrors] = useState<any>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const saveQuote = useCallback(() => {
+    setErrors(null)
     XHR(xhr)
       .saveQuote(trip.id, {
         total_price: hotelPrice + cabPrice,
@@ -44,7 +48,84 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
       .then(() => {
         navigate && navigate("../quotes")
       })
-  }
+      .catch(e => {
+        setErrors(e)
+        const document = containerRef.current
+        if (document) {
+          const buttons: NodeListOf<
+            HTMLButtonElement
+          > = document.querySelectorAll("[type='submit']")
+          buttons.forEach(btn =>
+            typeof btn.click === "function" ? btn.click() : null
+          )
+        }
+      })
+  }, [xhr, trip, hotelPrice, cabPrice, hotels, cabs, comments, navigate])
+  const handleHotelChange = useCallback(
+    (hotelPrice, hotels) => {
+      setErrors(null)
+      setHotelPrice(hotelPrice)
+      setHotels(hotels)
+    },
+    [setHotelPrice, setHotels]
+  )
+  const handleCabChange = useCallback(
+    (cabPrice, cabs) => {
+      setErrors(null)
+      setCabPrice(cabPrice)
+      setCabs(cabs)
+    },
+    [setCabPrice, setCabs]
+  )
+  const initialQuote = useMemo(() => {
+    const hotels = quote
+      ? {
+          hotels: quote.hotels.map(
+            ({
+              checkin,
+              checkout,
+              room_type,
+              adults_with_extra_bed,
+              children_with_extra_bed,
+              children_without_extra_bed,
+              no_of_rooms,
+              ...hotel
+            }) => ({
+              ...hotel,
+              start_date: moment
+                .utc(checkin)
+                .local()
+                .format("YYYY-MM-DD"),
+              no_of_nights:
+                moment.utc(checkout).diff(moment.utc(checkin), "days") + 1,
+              room_details: [
+                {
+                  room_type,
+                  adults_with_extra_bed,
+                  children_with_extra_bed,
+                  children_without_extra_bed,
+                  no_of_rooms,
+                },
+              ],
+            })
+          ),
+        }
+      : undefined
+    const cabs = quote
+      ? {
+          cabs: quote.cabs.map(({ from_date, to_date, ...cab }) => ({
+            start_date: moment
+              .utc(from_date)
+              .local()
+              .format("YYYY-MM-DD"),
+            no_of_days:
+              moment.utc(to_date).diff(moment.utc(from_date), "days") + 1,
+            ...cab,
+          })),
+        }
+      : undefined
+    return { hotels, cabs }
+  }, [quote])
   const bookingFrom = moment
     .utc(trip.start_date)
     .local()
@@ -54,7 +135,7 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
     .local()
     .format("YYYY-MM-DD HH:mm:ss")
   return (
-    <div className="pb-8">
+    <div className="pb-8" ref={containerRef}>
       <h3 className="mb-8">Create a new quote</h3>
       <section className="mb-16">
         <Grid>
@@ -69,47 +150,8 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
             <CalculateHotelPrice
               bookingFrom={bookingFrom}
               bookingTo={bookingTo}
-              initialValues={
-                quote
-                  ? {
-                      hotels: quote.hotels.map(
-                        ({
-                          checkin,
-                          checkout,
-                          room_type,
-                          adults_with_extra_bed,
-                          children_with_extra_bed,
-                          children_without_extra_bed,
-                          no_of_rooms,
-                          ...hotel
-                        }) => ({
-                          ...hotel,
-                          start_date: moment
-                            .utc(checkin)
-                            .local()
-                            .format("YYYY-MM-DD"),
-                          no_of_nights:
-                            moment
-                              .utc(checkout)
-                              .diff(moment.utc(checkin), "days") + 1,
-                          room_details: [
-                            {
-                              room_type,
-                              adults_with_extra_bed,
-                              children_with_extra_bed,
-                              children_without_extra_bed,
-                              no_of_rooms,
-                            },
-                          ],
-                        })
-                      ),
-                    }
-                  : undefined
-              }
-              onChange={(hotelPrice, hotels) => {
-                setHotelPrice(hotelPrice)
-                setHotels(hotels)
-              }}
+              initialValues={initialQuote.hotels}
+              onChange={handleHotelChange}
             />
             <footer className="mt-4">
               <mark>
@@ -132,29 +174,8 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
             <CalculateCabPrice
               bookingFrom={bookingFrom}
               bookingTo={bookingTo}
-              initialValues={
-                quote
-                  ? {
-                      cabs: quote.cabs.map(
-                        ({ from_date, to_date, ...cab }) => ({
-                          start_date: moment
-                            .utc(from_date)
-                            .local()
-                            .format("YYYY-MM-DD"),
-                          no_of_days:
-                            moment
-                              .utc(to_date)
-                              .diff(moment.utc(from_date), "days") + 1,
-                          ...cab,
-                        })
-                      ),
-                    }
-                  : undefined
-              }
-              onChange={(cabPrice, cabs) => {
-                setCabPrice(cabPrice)
-                setCabs(cabs)
-              }}
+              initialValues={initialQuote.cabs}
+              onChange={handleCabChange}
             />
             <footer className="mt-4">
               <mark>
@@ -186,6 +207,7 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
       <Button primary onClick={saveQuote}>
         Save Quote
       </Button>
+      {errors ? <p className="text-red-700 my-2">{errors.message}</p> : null}
     </div>
   )
 }

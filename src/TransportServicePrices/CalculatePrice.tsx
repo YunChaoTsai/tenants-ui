@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useCallback, useRef } from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import {
   Formik,
@@ -8,7 +8,7 @@ import {
   FieldArray,
   FieldProps,
 } from "formik"
-import { Button, Icons, useDidMount, Select } from "@tourepedia/ui"
+import { Button, Icons, useDidMount, Select, ButtonGroup } from "@tourepedia/ui"
 import * as Validator from "yup"
 import moment from "moment"
 import { AxiosInstance } from "axios"
@@ -23,6 +23,7 @@ import {
   Input,
   FormikFormGroup,
   FormGroup,
+  OnFormChange,
 } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
@@ -31,7 +32,7 @@ import { EmptyNumberValidator } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getPrice(cabs: any) {
+    async getPrice(cabs: any) {
       return xhr.get("/prices", { params: { cabs } }).then(resp => resp.data)
     },
   }
@@ -64,6 +65,7 @@ interface CalculatePriceSchema {
     no_of_cabs: number
     calculated_price?: number
     given_price?: number
+    edited_given_price?: boolean
     comments?: string
     no_price_for_dates?: Array<string>
   }[]
@@ -78,6 +80,7 @@ const InitialValues: CalculatePriceSchema = {
       transport_service: undefined,
       no_of_cabs: 1,
       calculated_price: undefined,
+      edited_given_price: false,
       given_price: 0,
       comments: "",
     },
@@ -97,43 +100,46 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
   bookingFrom,
   bookingTo,
 }: CalculatePriceFormProps) {
-  function notifyOnChange(flattenValues: CalculatePriceSchema) {
-    onChange &&
-      onChange(
-        flattenValues.cabs.reduce(
-          (price: number, cab) =>
-            price +
-            parseFloat((cab.given_price ? cab.given_price : 0).toString()),
-          0
-        ),
-        flattenValues.cabs.map(
-          ({
-            start_date,
-            no_of_days,
-            cab_type,
-            transport_service,
-            ...cab
-          }) => ({
-            ...cab,
-            from_date: moment(start_date)
-              .hours(0)
-              .minutes(0)
-              .seconds(0)
-              .utc()
-              .format("YYYY-MM-DD HH:mm:ss"),
-            to_date: moment(start_date)
-              .add(no_of_days - 1, "days")
-              .hours(23)
-              .minutes(59)
-              .seconds(59)
-              .utc()
-              .format("YYYY-MM-DD HH:mm:ss"),
-            cab_type_id: cab_type && cab_type.id,
-            transport_service_id: transport_service && transport_service.id,
-          })
+  const notifyOnChange = useCallback(
+    (flattenValues: CalculatePriceSchema) => {
+      onChange &&
+        onChange(
+          flattenValues.cabs.reduce(
+            (price: number, cab) =>
+              price +
+              parseFloat((cab.given_price ? cab.given_price : 0).toString()),
+            0
+          ),
+          flattenValues.cabs.map(
+            ({
+              start_date,
+              no_of_days,
+              cab_type,
+              transport_service,
+              ...cab
+            }) => ({
+              ...cab,
+              from_date: moment(start_date)
+                .hours(0)
+                .minutes(0)
+                .seconds(0)
+                .utc()
+                .format("YYYY-MM-DD HH:mm:ss"),
+              to_date: moment(start_date)
+                .add(no_of_days - 1, "days")
+                .hours(23)
+                .minutes(59)
+                .seconds(59)
+                .utc()
+                .format("YYYY-MM-DD HH:mm:ss"),
+              cab_type_id: cab_type && cab_type.id,
+              transport_service_id: transport_service && transport_service.id,
+            })
+          )
         )
-      )
-  }
+    },
+    [onChange]
+  )
   useDidMount(() => {
     notifyOnChange(initialValues)
   })
@@ -150,81 +156,93 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
     }
     return dates
   }, [bookingFrom, bookingTo])
+  const onSubmit = useCallback(
+    async (
+      values: CalculatePriceSchema,
+      actions: FormikActions<CalculatePriceSchema>
+    ) => {
+      actions.setStatus()
+      const cabs: any[] = []
+      // flatten values so that we cab show the prices for each row
+      const flattenValues: CalculatePriceSchema = {
+        cabs: [],
+      }
+      values.cabs.forEach(values => {
+        const {
+          start_date,
+          no_of_days,
+          cab_type,
+          transport_service,
+          no_of_cabs,
+        } = values
+        if (
+          start_date &&
+          no_of_days &&
+          cab_type &&
+          transport_service &&
+          no_of_cabs
+        ) {
+          flattenValues.cabs.push({
+            ...values,
+            start_date: moment(start_date).format("YYYY-MM-DD"),
+            no_of_days,
+          })
+          cabs.push({
+            from_date: moment(start_date)
+              .hours(0)
+              .minutes(0)
+              .seconds(0)
+              .utc()
+              .format("YYYY-MM-DD HH:mm:ss"),
+            to_date: moment(start_date)
+              .add(no_of_days - 1, "days")
+              .hours(23)
+              .minutes(59)
+              .seconds(59)
+              .utc()
+              .format("YYYY-MM-DD HH:mm:ss"),
+            cab_type_id: cab_type.id,
+            transport_service_id: transport_service.id,
+            no_of_cabs,
+          })
+        }
+      })
+      return XHR(xhr)
+        .getPrice(cabs)
+        .then(data => {
+          flattenValues.cabs = flattenValues.cabs.map((cab, i) => ({
+            ...cab,
+            calculated_price: data.cabs[i].price,
+            given_price: cab.edited_given_price
+              ? cab.given_price
+              : data.cabs[i].price,
+            no_price_for_dates: data.cabs[i].no_price_for_dates,
+          }))
+          actions.setValues(flattenValues)
+          notifyOnChange(flattenValues)
+        })
+        .catch(error => {
+          actions.setStatus(error.message)
+          if (error.formikErrors) {
+            actions.setErrors(error.formikErrors)
+          }
+        })
+    },
+    [xhr, notifyOnChange]
+  )
+  // this will help us identify if we should fetch the price for onChange or not
+  // we need this because, changing the given price also triggers the fetch prices
+  // and which onResolve, changes the given price back to calculated price
+  const shouldFetchPricesOnChange = useRef(true)
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(
-        values: CalculatePriceSchema,
-        actions: FormikActions<CalculatePriceSchema>
-      ) => {
-        actions.setStatus()
-        const cabs: any[] = []
-        // flatten values so that we cab show the prices for each row
-        const flattenValues: CalculatePriceSchema = {
-          cabs: [],
-        }
-        values.cabs.forEach(values => {
-          const {
-            start_date,
-            no_of_days,
-            cab_type,
-            transport_service,
-            no_of_cabs,
-          } = values
-          if (
-            start_date &&
-            no_of_days &&
-            cab_type &&
-            transport_service &&
-            no_of_cabs
-          ) {
-            flattenValues.cabs.push({
-              ...values,
-              start_date: moment(start_date).format("YYYY-MM-DD"),
-              no_of_days,
-            })
-            cabs.push({
-              from_date: moment(start_date)
-                .hours(0)
-                .minutes(0)
-                .seconds(0)
-                .utc()
-                .format("YYYY-MM-DD HH:mm:ss"),
-              to_date: moment(start_date)
-                .add(no_of_days - 1, "days")
-                .hours(23)
-                .minutes(59)
-                .seconds(59)
-                .utc()
-                .format("YYYY-MM-DD HH:mm:ss"),
-              cab_type_id: cab_type.id,
-              transport_service_id: transport_service.id,
-              no_of_cabs,
-            })
-          }
+      onSubmit={(values, actions) =>
+        onSubmit(values, actions).then(() => {
+          actions.setSubmitting(false)
         })
-        XHR(xhr)
-          .getPrice(cabs)
-          .then(data => {
-            flattenValues.cabs = flattenValues.cabs.map((cab, i) => ({
-              ...cab,
-              calculated_price: data.cabs[i].price,
-              given_price: data.cabs[i].price,
-              no_price_for_dates: data.cabs[i].no_price_for_dates,
-            }))
-            actions.setValues(flattenValues)
-            actions.setSubmitting(false)
-            notifyOnChange(flattenValues)
-          })
-          .catch(error => {
-            actions.setStatus(error.message)
-            if (error.formikErrors) {
-              actions.setErrors(error.formikErrors)
-            }
-            actions.setSubmitting(false)
-          })
-      }}
+      }
       render={({
         isSubmitting,
         values,
@@ -232,7 +250,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
         setFieldValue,
       }: FormikProps<CalculatePriceSchema>) => (
         <Form noValidate>
-          {status ? <div>{status}</div> : null}
+          {status ? <p className="text-red-700 mb-2">{status}</p> : null}
           <FieldArray
             name="cabs"
             render={({ name, push, remove }) => (
@@ -326,37 +344,40 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                         />
                       </Col>
                     </Grid>
-                    <FormGroup>
-                      <p>
-                        <b>Get the price for this query</b>
-                      </p>
-                      <div className="button-group">
-                        <Button type="submit" disabled={isSubmitting}>
-                          Get Prices
-                        </Button>
-                        {cab.calculated_price !== undefined ? (
-                          <span className="btn">{cab.calculated_price}</span>
-                        ) : null}
-                      </div>
-                      {cab.no_price_for_dates &&
-                      cab.no_price_for_dates.length ? (
-                        <p className="text-yellow-800">
-                          No prices available for{" "}
-                          {cab.no_price_for_dates
-                            .map(date =>
-                              moment
-                                .utc(date)
-                                .local()
-                                .format("Do MMM")
-                            )
-                            .join(", ")}
-                        </p>
-                      ) : null}
-                    </FormGroup>
                     <Grid>
-                      <Col sm="auto">
+                      <Col>
                         <FormGroup>
-                          <label>Give Price</label>
+                          <div className="mb-1 white-space-pre">
+                            Calculated Price
+                          </div>
+                          {cab.calculated_price !== undefined ? (
+                            <mark className="inline-block mb-2 text-lg font-semibold">
+                              {cab.calculated_price}
+                            </mark>
+                          ) : (
+                            <Button type="submit" disabled={isSubmitting}>
+                              Get Prices
+                            </Button>
+                          )}
+                          {cab.no_price_for_dates &&
+                          cab.no_price_for_dates.length ? (
+                            <p className="text-yellow-800">
+                              No prices available for{" "}
+                              {cab.no_price_for_dates
+                                .map(date =>
+                                  moment
+                                    .utc(date)
+                                    .local()
+                                    .format("Do MMM")
+                                )
+                                .join(", ")}
+                            </p>
+                          ) : null}
+                        </FormGroup>
+                      </Col>
+                      <Col>
+                        <FormGroup>
+                          <label>Given Price</label>
                           <Input
                             name={`${name}.${index}.given_price`}
                             type="number"
@@ -368,21 +389,12 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 e.target.value,
                                 10
                               )
-                              if (isNaN(value)) {
-                                value = undefined
-                              }
-                              const flattenValues = {
-                                cabs: values.cabs.map((cab, i) =>
-                                  i !== index
-                                    ? cab
-                                    : {
-                                        ...cab,
-                                        given_price: value,
-                                      }
-                                ),
-                              }
-                              notifyOnChange(flattenValues)
+                              shouldFetchPricesOnChange.current = false
                               setFieldValue(e.target.name, value)
+                              setFieldValue(
+                                `${name}.${index}.edited_given_price`,
+                                true
+                              )
                             }}
                             min={0}
                           />
@@ -401,17 +413,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                               e: React.ChangeEvent<HTMLInputElement>
                             ) => {
                               const value = e.target.value
-                              const flattenValues = {
-                                cabs: values.cabs.map((cab, i) =>
-                                  i !== index
-                                    ? cab
-                                    : {
-                                        ...cab,
-                                        comments: value,
-                                      }
-                                ),
-                              }
-                              notifyOnChange(flattenValues)
+                              shouldFetchPricesOnChange.current = false
                               setFieldValue(e.target.name, value)
                             }}
                           />
@@ -419,7 +421,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       </Col>
                     </Grid>
                     <hr />
-                    <div>
+                    <ButtonGroup>
                       <Button
                         className="btn--secondary"
                         onClick={() => push(cab)}
@@ -432,7 +434,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       >
                         &times; Remove
                       </Button>
-                    </div>
+                    </ButtonGroup>
                   </fieldset>
                 ))}
                 <div>
@@ -444,6 +446,26 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                 </div>
               </div>
             )}
+          />
+          <OnFormChange
+            onChange={(formik: FormikProps<CalculatePriceSchema>) => {
+              notifyOnChange(formik.values)
+              if (!shouldFetchPricesOnChange.current) {
+                shouldFetchPricesOnChange.current = true
+                return
+              }
+              if (formik.isSubmitting) return
+              validationSchema
+                .validate(formik.values)
+                .then(async () => {
+                  if (formik.isSubmitting) return
+                  formik.setSubmitting(true)
+                  return onSubmit(formik.values, formik).then(() => {
+                    formik.setSubmitting(false)
+                  })
+                })
+                .catch(() => {})
+            }}
           />
         </Form>
       )}
