@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/tourepedia/tp-admin-ui/compare/v1.9.0...v1.9.1) (2019-07-22)
+
+
+### Bug Fixes
+
+* **price-calculation:** Fixes in quote price calculation ([#98](https://github.com/tourepedia/tp-admin-ui/issues/98)) ([dc7af6a](https://github.com/tourepedia/tp-admin-ui/commit/dc7af6a)), closes [#95](https://github.com/tourepedia/tp-admin-ui/issues/95)
+
 # [1.9.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.8.2...v1.9.0) (2019-07-19)
 
 
