@@ -10,8 +10,6 @@ import { withXHR, XHRProps } from "./../xhr"
 export interface NewUserCredentials {
   name: string
   email: string
-  password: string
-  password_confirmation: string
   email_verified_link: string
 }
 const newUserSchema = Validator.object().shape({
@@ -22,18 +20,10 @@ const newUserSchema = Validator.object().shape({
   email: Validator.string()
     .email("Email must be a valid email address")
     .required("Email field is required"),
-  password: Validator.string()
-    .required("Password is required")
-    .min(8, "Password must be of a length greater than 8"),
-  password_confirmation: Validator.string()
-    .required("Password confirmation is required")
-    .min(8, "Password must be of a length greater than 8"),
 })
 const initialValues: NewUserCredentials = {
   name: "",
   email: "",
-  password: "",
-  password_confirmation: "",
   email_verified_link: "",
 }
 
@@ -90,20 +80,6 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
                 name="email"
                 autoComplete="username"
                 placeholder="username@tourepedia.com"
-                required
-              />
-              <InputField
-                label="Password"
-                type="password"
-                name="password"
-                autoComplete="new-password"
-                required
-              />
-              <InputField
-                label="Retype Password"
-                type="password"
-                name="password_confirmation"
-                autoComplete="new-password"
                 required
               />
               <input
