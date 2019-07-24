@@ -9,6 +9,7 @@ import {
   createReducer,
   IMeta,
 } from "./../model"
+import { store as userStore } from "./../Users"
 
 export const key = "TENANT_LIST_STATE"
 
@@ -17,6 +18,7 @@ export interface ITenant extends IBaseItem {
   name: string
   description: string
   invited_at?: string
+  users?: Array<userStore.IUser>
 }
 
 export interface ITenants extends IBaseState<ITenant> {}

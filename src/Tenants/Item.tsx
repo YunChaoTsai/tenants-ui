@@ -88,20 +88,32 @@ export default function Tenant({
         "Loading..."
       ) : tenant ? (
         <div>
-          {tenant.name} - {tenant.description}
-          <br />
-          {tenant.invited_at ? (
-            <span>
-              Invited at:{" "}
-              {moment
-                .utc(tenant.invited_at)
-                .local()
-                .toLocaleString()}
-            </span>
-          ) : (
-            "Not invited yet"
-          )}
-          <br />
+          <h3>{tenant.name}</h3>
+          <p>{tenant.description}</p>
+          <div className="float-right">
+            {tenant.invited_at ? (
+              <b>
+                Invited at:{" "}
+                {moment
+                  .utc(tenant.invited_at)
+                  .local()
+                  .toLocaleString()}
+              </b>
+            ) : (
+              "Not invited yet"
+            )}
+          </div>
+          <h4>Users</h4>
+          <ul>
+            {tenant.users
+              ? tenant.users.map(user => (
+                  <li key={user.id}>
+                    <Link to={`/users/${user.id}`}>{user.name}</Link> -{" "}
+                    {user.email} - {user.email_verified_at}
+                  </li>
+                ))
+              : null}
+          </ul>
         </div>
       ) : (
         <Redirect noThrow to="/tenants" />
