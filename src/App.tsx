@@ -4,7 +4,7 @@ import Helmet from "react-helmet-async"
 import { Icons } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
 
-import { Login, Logout, useAuthUser } from "./Auth"
+import { Login, Logout, useAuthUser, InvitedSignup } from "./Auth"
 import { NavLink } from "./Shared/NavLink"
 import Dashboard from "./Dashboard"
 import NotFound from "./NotFound"
@@ -130,6 +130,7 @@ export default function App() {
         <Container fluid>
           <Router>
             <Login path="/login" />
+            <InvitedSignup path="/invited-signup" />
             <ForgotPassword path="/forgot-password" />
             <ResetPassword path="/reset-password" />
             <Dashboard path="/" />

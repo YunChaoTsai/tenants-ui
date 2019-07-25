@@ -10,7 +10,7 @@ import { withXHR, XHRProps } from "./../xhr"
 export interface NewUserCredentials {
   name: string
   email: string
-  email_verified_link: string
+  invited_signup_link: string
 }
 const newUserSchema = Validator.object().shape({
   name: Validator.string()
@@ -24,14 +24,14 @@ const newUserSchema = Validator.object().shape({
 const initialValues: NewUserCredentials = {
   name: "",
   email: "",
-  email_verified_link: "",
+  invited_signup_link: "",
 }
 
 interface NewUserProps extends RouteComponentProps, XHRProps {}
 
 export function NewUser({ xhr, navigate, location }: NewUserProps) {
-  initialValues.email_verified_link = location
-    ? `${location.origin}/email-verified`
+  initialValues.invited_signup_link = location
+    ? `${location.origin}/invited-signup`
     : ""
   return (
     <div>
@@ -44,7 +44,7 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
         ) => {
           actions.setStatus()
           xhr
-            .post("/users", values)
+            .post("/invited-users", values)
             .then(({ data }) => {
               const { data: user } = data
               navigate && navigate(`../${user.id}`)
@@ -85,8 +85,8 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
               <input
                 hidden
                 type="hidden"
-                name="email_verified_link"
-                value={values.email_verified_link}
+                name="invited_signup_link"
+                value={values.invited_signup_link}
               />
               <footer>
                 <Button primary type="submit" disabled={isSubmitting}>
