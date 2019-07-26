@@ -43,10 +43,10 @@ const initialValues: IInvitedSignupCredentials = {
 // actions
 function XHR(xhr: AxiosInstance) {
   return {
-    async signup(data: IInvitedSignupCredentials): Promise<IAuthToken> {
+    async signup(data: IInvitedSignupCredentials): Promise<any> {
       return xhr
         .patch("/invited-users", data)
-        .then(({ data }: { data: IAuthToken }) => data)
+        .then(({ data }: { data: any }) => data)
     },
   }
 }
@@ -87,9 +87,12 @@ const InvitedSignup = withXHR(function InvitedSignup({
               actions.setStatus()
               XHR(xhr)
                 .signup(values)
-                .then(() => {
-                  alert("Registered Successfully. You can now login.")
-                  navigate && navigate("..")
+                .then(data => {
+                  alert(
+                    data.message ||
+                      "Registered Successfully. You can now login."
+                  )
+                  navigate && navigate(`../login?email=${values.email}`)
                 })
                 .catch(error => {
                   actions.setStatus(error.message)
@@ -113,16 +116,15 @@ const InvitedSignup = withXHR(function InvitedSignup({
                     autoComplete="full-name"
                     required
                   />
-                  {/*
-                    <InputField
-                      label="Email"
-                      name="email"
-                      type="email"
-                      placeholder="username@domain.com"
-                      autoComplete="username email"
-                      required
-                    />
-                  */}
+                  <InputField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    placeholder="username@domain.com"
+                    autoComplete="username email"
+                    readOnly
+                    required
+                  />
                   <InputField
                     label="Password"
                     type="password"

@@ -75,6 +75,7 @@ function useLogin() {
 export default function Login({ location }: LoginProps) {
   const query = searchToQuery(location && location.search)
   const next = query["next"]
+  initialValues.email = query["email"] || ""
   const login = useLogin()
   return (
     <RedirectIfAuthenticated to={next}>
@@ -118,7 +119,7 @@ export default function Login({ location }: LoginProps) {
                     label="Email"
                     name="email"
                     type="email"
-                    autoFocus
+                    autoFocus={!initialValues.email}
                     id="email"
                     placeholder="username@domain.com"
                     autoComplete="username email"
@@ -138,6 +139,7 @@ export default function Login({ location }: LoginProps) {
                     id="password"
                     required
                     autoComplete="current-password"
+                    autoFocus={!!initialValues.email}
                     tabIndex={2}
                   />
                   <footer>
