@@ -17,7 +17,10 @@ export interface ITenant extends IBaseItem {
   id: number
   name: string
   description: string
+  address_name: string
+  address_email: string
   invited_at?: string
+  signup_at?: string
   users?: Array<userStore.IUser>
 }
 

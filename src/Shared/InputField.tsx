@@ -86,7 +86,7 @@ export interface InputFieldProps extends InputProps {
 export function InputField({
   label,
   name,
-  type,
+  type = "text",
   className,
   labelPlacement,
   noGroup,

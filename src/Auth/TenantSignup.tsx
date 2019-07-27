@@ -13,34 +13,44 @@ import { withXHR, XHRProps } from "../xhr"
 
 // schemas
 export interface ITenantSignupCredentials {
+  company_name: string
   name: string
   email: string
   password: string
   password_confirmation: string
   invite_token: string
+  address_email: string
+  email_verified_url: string
 }
 export interface IAuthToken {
   access_token: string
   expires_in: number
 }
 export const tenantSignupCredentialsSchema = Validator.object().shape({
+  company_name: Validator.string()
+    .required(" field is required")
+    .max(191, "Max 191 Characters allowed"),
   name: Validator.string()
     .required("Name field is required")
     .max(191, "Max 191 Characters allowed"),
   email: Validator.string()
     .email("Please provide a valid email address")
-    .required("Name field is required"),
+    .required("Email address is required")
+    .max(191, "Max 191 Characters allowed"),
   password: Validator.string().required("Password field is required"),
   password_confirmation: Validator.string().required(
     "Password Confirmation field is required"
   ),
 })
 const initialValues: ITenantSignupCredentials = {
+  company_name: "",
   name: "",
   email: "",
   password: "",
   password_confirmation: "",
   invite_token: "",
+  address_email: "",
+  email_verified_url: "",
 }
 
 // actions
@@ -48,7 +58,7 @@ function XHR(xhr: AxiosInstance) {
   return {
     async signup(data: ITenantSignupCredentials): Promise<any> {
       return xhr
-        .patch("/invited-users", data)
+        .post("/tenants/signup", data)
         .then(({ data }: { data: any }) => data)
     },
   }
@@ -65,28 +75,38 @@ const TenantSignup = withXHR(function TenantSignup({
   const invite_token = query["ref"] || ""
   const email = query["email"] || ""
   const name = query["name"] || ""
+  const tenantName = query["tenant-name"] || ""
+  initialValues.company_name = tenantName
   initialValues.invite_token = invite_token
-  initialValues.email = email
   initialValues.name = name
+  initialValues.email = email
+  initialValues.address_email = email
+  initialValues.email_verified_url = location
+    ? `${location.origin}/email-verified`
+    : ""
   return (
     <RedirectIfAuthenticated>
       <Helmet>
         <title>Invited on TAD</title>
       </Helmet>
       <div>
-        <div className="text-center">
+        <h1 className="flex justify-center items-center mt-4">
           <Link to="/">
             <img
               src={process.env.PUBLIC_URL + "/logo.png"}
-              className="inline-block mt-4 w-20 rounded-full shadow"
+              className="inline-blockw-20 w-8 rounded-full shadow"
             />
           </Link>
-        </div>
-        <h1 className="text-center my-4">Complete Signup for TAD</h1>
+          <div className="px-4 text-gray-400">+</div>
+          <div>{tenantName}</div>
+        </h1>
+        <p className="text-center max-w-sm mx-auto text-sm text-gray-700">
+          Please provide following details to complete your registraion for
+          Tourepedia Admin Dashboard
+        </p>
         <div className="max-w-sm mx-auto">
           <Formik
             initialValues={initialValues}
-            validationSchema={tenantSignupCredentialsSchema}
             onSubmit={(values, actions) => {
               actions.setStatus()
               XHR(xhr)
@@ -103,6 +123,7 @@ const TenantSignup = withXHR(function TenantSignup({
                   actions.setSubmitting(false)
                 })
             }}
+            validationSchema={tenantSignupCredentialsSchema}
             render={({ isSubmitting, status, values }) => (
               <Form noValidate>
                 <fieldset>
@@ -112,9 +133,14 @@ const TenantSignup = withXHR(function TenantSignup({
                     </p>
                   ) : null}
                   <InputField
-                    label="Name"
+                    label="Company Name"
+                    name="company_name"
+                    placeholder="Tourepedia Holidays"
+                    required
+                  />
+                  <InputField
+                    label="Your Name"
                     name="name"
-                    autoFocus
                     placeholder="John Ana"
                     autoComplete="full-name"
                     required
@@ -125,7 +151,6 @@ const TenantSignup = withXHR(function TenantSignup({
                     type="email"
                     placeholder="username@domain.com"
                     autoComplete="username email"
-                    readOnly
                     required
                   />
                   <InputField
@@ -148,6 +173,12 @@ const TenantSignup = withXHR(function TenantSignup({
                     name="invite_token"
                     value={values.invite_token}
                   />
+                  <input
+                    hidden
+                    type="hidden"
+                    name="address_email"
+                    value={values.address_email}
+                  />
                   <footer>
                     <Button
                       primary
@@ -156,7 +187,7 @@ const TenantSignup = withXHR(function TenantSignup({
                       className="w-full"
                       disabled={isSubmitting}
                     >
-                      Complete Signup
+                      Complete Registration
                     </Button>
                   </footer>
                 </fieldset>

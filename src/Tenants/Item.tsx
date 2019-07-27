@@ -102,6 +102,18 @@ export default function Tenant({
             ) : (
               "Not invited yet"
             )}
+            <br />
+            {tenant.signup_at ? (
+              <b>
+                Signedup at:{" "}
+                {moment
+                  .utc(tenant.signup_at)
+                  .local()
+                  .toLocaleString()}
+              </b>
+            ) : (
+              "Not invited yet"
+            )}
           </div>
           <h4>Users</h4>
           <ul>

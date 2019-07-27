@@ -11,32 +11,37 @@ import { Grid, Col } from "../Shared/Layout"
 export interface NewTenantCredentials {
   name: string
   description?: string
-  admin_name: string
-  admin_email: string
+  address_name: string
+  address_email: string
   send_invite: boolean
+  tenant_signup_link: string
 }
 const newTenantSchema = Validator.object().shape({
   name: Validator.string()
     .required("Name for the tenant is required.")
     .max(299, "Maximum 299 characters allowed"),
   description: Validator.string().max(299, "Maximum 299 characters allowed"),
-  admin_name: Validator.string().required("Admin name is required"),
-  admin_email: Validator.string()
+  address_name: Validator.string().required("Addressing name is required"),
+  address_email: Validator.string()
     .email("Invalid email address")
-    .required("Admin email is required"),
+    .required("Addressing email is required"),
   send_invite: Validator.boolean(),
 })
 const initialValues = {
   name: "",
   description: "",
-  admin_name: "",
-  admin_email: "",
-  send_invite: false,
+  address_name: "",
+  address_email: "",
+  send_invite: true,
+  tenant_signup_link: "",
 }
 
 interface NewTenantProps extends RouteComponentProps, XHRProps {}
 
-export function NewTenant({ xhr, navigate }: NewTenantProps) {
+export function NewTenant({ xhr, navigate, location }: NewTenantProps) {
+  initialValues.tenant_signup_link = location
+    ? `${location.origin}/tenant-signup`
+    : ""
   return (
     <div>
       <Formik
@@ -92,16 +97,16 @@ export function NewTenant({ xhr, navigate }: NewTenantProps) {
                 </Col>
                 <Col>
                   <InputField
-                    label="Admin Name"
-                    name="admin_name"
+                    label="Addressing Name"
+                    name="address_name"
                     placeholder="Admin Name"
                     required
                   />
                 </Col>
                 <Col>
                   <InputField
-                    label="Admin Email"
-                    name="admin_email"
+                    label="Addressing Email"
+                    name="address_email"
                     type="email"
                     placeholder="admin@domain.com"
                     required

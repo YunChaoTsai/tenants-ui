@@ -1,6 +1,7 @@
 import Login from "./Login"
 import Logout from "./Logout"
 import InvitedSignup from "./InvitedSignup"
+import TenantSignup from "./TenantSignup"
 import {
   RedirectIfAuthenticated,
   RedirectUnlessAuthenticated,
@@ -14,6 +15,7 @@ export {
   Logout,
   store,
   InvitedSignup,
+  TenantSignup,
   RedirectIfAuthenticated,
   RedirectUnlessAuthenticated,
   AuthUserProvider,

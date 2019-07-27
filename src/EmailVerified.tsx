@@ -1,8 +1,11 @@
 import React from "react"
 import { RouteComponentProps, Link } from "@reach/router"
 import { Icons } from "@tourepedia/ui"
+import { searchToQuery } from "./utils"
 
-export function EmailVerified(props: RouteComponentProps) {
+export function EmailVerified({ location }: RouteComponentProps) {
+  const query = searchToQuery(location && location.search)
+  const email = query["email"] || ""
   return (
     <div className="pt-20">
       <div className="max-w-xl mx-auto text-center text-xl border rounded-lg py-20 px-4">
@@ -15,7 +18,10 @@ export function EmailVerified(props: RouteComponentProps) {
           <h1>Your Email Verified Successfully.</h1>
           <p>
             You can now{" "}
-            <Link to="/" className="text-blue-600 hover:text-blue-800">
+            <Link
+              to={`/login?email=${email}`}
+              className="text-blue-600 hover:text-blue-800"
+            >
               login
             </Link>{" "}
             to the Tourepedia Admin Dashboard.
