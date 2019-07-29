@@ -1,4 +1,5 @@
 import { createAsyncAction, ActionType, getType } from "typesafe-actions"
+import { store as tenantStore } from "./../Tenants"
 
 export const key = "AUTHENTICATED_USER_STATE"
 
@@ -14,6 +15,7 @@ export interface IUser {
   id: number
   name: string
   email: string
+  tenant?: tenantStore.ITenant
 }
 
 export interface IState {

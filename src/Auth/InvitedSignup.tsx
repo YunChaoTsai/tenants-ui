@@ -100,6 +100,9 @@ const TenantSignup = withXHR(function TenantSignup({
                 })
                 .catch(error => {
                   actions.setStatus(error.message)
+                  if (error.formikErrors) {
+                    actions.setErrors(error.formikErrors)
+                  }
                   actions.setSubmitting(false)
                 })
             }}

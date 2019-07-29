@@ -38,7 +38,7 @@ import "./typography.css"
 export const Header = function Header() {
   const { user } = useAuthUser()
   if (!user) return null
-  const { name } = user
+  const { name, tenant } = user
   return (
     <header className="mb-4 border-b text-base">
       <nav className="sm:flex items-stretch md:justify-between">
@@ -49,8 +49,8 @@ export const Header = function Header() {
               src={process.env.PUBLIC_URL + "/logo.png"}
               className="inline-block align-middle rounded-full shadow h-8 w-8 mr-2"
             />
-            <h1 className="font-normal text-base m-0 hidden md:block">
-              Tourepedia Dashboard
+            <h1 className="font-normal text-base m-0 md:block">
+              {tenant ? tenant.name : "Tourepedia Dashboard"}
             </h1>
           </div>
         </Link>
