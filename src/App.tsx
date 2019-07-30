@@ -4,7 +4,7 @@ import Helmet from "react-helmet-async"
 import { Icons } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
 
-import { Login, Logout, useAuthUser } from "./Auth"
+import { Login, Logout, useAuthUser, InvitedSignup, TenantSignup } from "./Auth"
 import { NavLink } from "./Shared/NavLink"
 import Dashboard from "./Dashboard"
 import NotFound from "./NotFound"
@@ -27,6 +27,7 @@ import { TransportServicePrices } from "./TransportServicePrices"
 import { HotelPaymentPreferences } from "./HotelPaymentPreferences"
 import { HotelBookingStages } from "./HotelBookingStages"
 import { TripPlanRequests } from "./TripPlanRequests"
+import { Tenants } from "./Tenants"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
@@ -37,7 +38,7 @@ import "./typography.css"
 export const Header = function Header() {
   const { user } = useAuthUser()
   if (!user) return null
-  const { name } = user
+  const { name, tenant } = user
   return (
     <header className="mb-4 border-b text-base">
       <nav className="sm:flex items-stretch md:justify-between">
@@ -48,8 +49,8 @@ export const Header = function Header() {
               src={process.env.PUBLIC_URL + "/logo.png"}
               className="inline-block align-middle rounded-full shadow h-8 w-8 mr-2"
             />
-            <h1 className="font-normal text-base m-0 hidden md:block">
-              Tourepedia Dashboard
+            <h1 className="font-normal text-base m-0 md:block">
+              {tenant ? tenant.name : "Tourepedia Dashboard"}
             </h1>
           </div>
         </Link>
@@ -94,6 +95,7 @@ export const Header = function Header() {
             <ul className="menu">
               <NavLink to="/users">Users</NavLink>
               <NavLink to="/roles">Roles</NavLink>
+              <NavLink to="/tenants">Agents</NavLink>
             </ul>
           </Dropdown>
           <Dropdown as="li" className="inline-block" alignRight>
@@ -128,6 +130,8 @@ export default function App() {
         <Container fluid>
           <Router>
             <Login path="/login" />
+            <InvitedSignup path="/invited-signup" />
+            <TenantSignup path="/tenant-signup" />
             <ForgotPassword path="/forgot-password" />
             <ResetPassword path="/reset-password" />
             <Dashboard path="/" />
@@ -149,6 +153,7 @@ export default function App() {
             <HotelPaymentPreferences path="/hotel-payment-preferences/*" />
             <HotelBookingStages path="/hotel-booking-stages/*" />
             <TripPlanRequests path="/trip-plan-requests/*" />
+            <Tenants path="/tenants/*" />
             <EmailVerified path="email-verified" />
             <NotFound default />
           </Router>

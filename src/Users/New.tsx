@@ -10,9 +10,7 @@ import { withXHR, XHRProps } from "./../xhr"
 export interface NewUserCredentials {
   name: string
   email: string
-  password: string
-  password_confirmation: string
-  email_verified_link: string
+  invited_signup_link: string
 }
 const newUserSchema = Validator.object().shape({
   name: Validator.string()
@@ -22,26 +20,18 @@ const newUserSchema = Validator.object().shape({
   email: Validator.string()
     .email("Email must be a valid email address")
     .required("Email field is required"),
-  password: Validator.string()
-    .required("Password is required")
-    .min(8, "Password must be of a length greater than 8"),
-  password_confirmation: Validator.string()
-    .required("Password confirmation is required")
-    .min(8, "Password must be of a length greater than 8"),
 })
 const initialValues: NewUserCredentials = {
   name: "",
   email: "",
-  password: "",
-  password_confirmation: "",
-  email_verified_link: "",
+  invited_signup_link: "",
 }
 
 interface NewUserProps extends RouteComponentProps, XHRProps {}
 
 export function NewUser({ xhr, navigate, location }: NewUserProps) {
-  initialValues.email_verified_link = location
-    ? `${location.origin}/email-verified`
+  initialValues.invited_signup_link = location
+    ? `${location.origin}/invited-signup`
     : ""
   return (
     <div>
@@ -54,7 +44,7 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
         ) => {
           actions.setStatus()
           xhr
-            .post("/users", values)
+            .post("/invited-users", values)
             .then(({ data }) => {
               const { data: user } = data
               navigate && navigate(`../${user.id}`)
@@ -92,25 +82,11 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
                 placeholder="username@tourepedia.com"
                 required
               />
-              <InputField
-                label="Password"
-                type="password"
-                name="password"
-                autoComplete="new-password"
-                required
-              />
-              <InputField
-                label="Retype Password"
-                type="password"
-                name="password_confirmation"
-                autoComplete="new-password"
-                required
-              />
               <input
                 hidden
                 type="hidden"
-                name="email_verified_link"
-                value={values.email_verified_link}
+                name="invited_signup_link"
+                value={values.invited_signup_link}
               />
               <footer>
                 <Button primary type="submit" disabled={isSubmitting}>
