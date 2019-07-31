@@ -38,7 +38,7 @@ import "./typography.css"
 export const Header = function Header() {
   const { user } = useAuthUser()
   if (!user) return null
-  const { name, tenant } = user
+  const { name, tenant, permissions } = user
   return (
     <header className="mb-4 border-b text-base">
       <nav className="sm:flex items-stretch md:justify-between">
@@ -61,7 +61,10 @@ export const Header = function Header() {
             </Link>
             <ul>
               <NavLink to="/trips">Trips</NavLink>
-              <NavLink to="/trip-plan-requests">Trip Plan Requests</NavLink>
+              {permissions.indexOf("view_trip_plan_requests") >= 0 ||
+              permissions.indexOf("manage_trip_plan_requests") >= 0 ? (
+                <NavLink to="/trip-plan-requests">Trip Plan Requests</NavLink>
+              ) : null}
               <NavLink to="/trip-sources">Trip Sources</NavLink>
               <NavLink to="/trip-stages">Trip Stages</NavLink>
             </ul>
@@ -90,14 +93,20 @@ export const Header = function Header() {
               <NavLink to="/cabs">Cabs</NavLink>
             </ul>
           </Dropdown>
-          <Dropdown as="li" className="inline-block" alignRight>
-            <Link to="/users">Users</Link>
-            <ul className="menu">
-              <NavLink to="/users">Users</NavLink>
-              <NavLink to="/roles">Roles</NavLink>
-              <NavLink to="/tenants">Agents</NavLink>
-            </ul>
-          </Dropdown>
+          {permissions.indexOf("manage_users") >= 0 ? (
+            <Dropdown as="li" className="inline-block" alignRight>
+              <Link to="/users">Users</Link>
+              <ul className="menu">
+                <NavLink to="/users">Users</NavLink>
+                {permissions.indexOf("manage_roles") >= 0 ? (
+                  <NavLink to="/roles">Roles</NavLink>
+                ) : null}
+                {permissions.indexOf("manage_tenants") >= 0 ? (
+                  <NavLink to="/tenants">Agents</NavLink>
+                ) : null}
+              </ul>
+            </Dropdown>
+          ) : null}
           <Dropdown as="li" className="inline-block" alignRight>
             <a className="toggler" href="#profile-and-settings">
               <Icons.CogAltIcon title={`Hi ${name}`} />
