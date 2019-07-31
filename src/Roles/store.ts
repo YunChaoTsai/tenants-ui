@@ -20,6 +20,7 @@ export interface IPermission extends IBaseItem {
 export interface IRole extends IBaseItem {
   id: number
   name: string
+  internal_name: string
   created_at: string
   updated_at: string
   permissions?: IPermission[]

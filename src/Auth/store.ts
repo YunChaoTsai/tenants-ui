@@ -16,6 +16,7 @@ export interface IUser {
   name: string
   email: string
   tenant?: tenantStore.ITenant
+  permissions: Array<string>
 }
 
 export interface IState {

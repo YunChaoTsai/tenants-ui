@@ -49,8 +49,8 @@ export function EditRoles({ xhr, navigate, userId }: EditRolesProps) {
           actions.setStatus()
           xhr
             .post(`/users/${userId}/roles`, {
-              roles: values.roles.map(({ name }) => ({
-                name,
+              roles: values.roles.map(({ internal_name }) => ({
+                name: internal_name,
               })),
             })
             .then(_ => {

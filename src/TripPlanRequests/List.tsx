@@ -212,7 +212,7 @@ export default function TripPlanRequests(_: RouteComponentProps) {
       </Grid>
       <List isFetching={isFetching} total={total}>
         <Table
-          headers={["Guest", "Destination", "Pax", "Actions"]}
+          headers={["Guest", "Destination", "Pax", "Comments", "Actions"]}
           striped
           bordered
           rows={items.map(r => [
@@ -234,6 +234,15 @@ export default function TripPlanRequests(_: RouteComponentProps) {
             </span>,
             <span>
               {r.no_of_adults} Adults with {r.no_of_children} Children
+            </span>,
+            <span>
+              {r.hotel_preference ? (
+                <span>
+                  Hotel Preference: {r.hotel_preference}
+                  <br />
+                </span>
+              ) : null}
+              <blockquote>{r.comments}</blockquote>
             </span>,
             <span>
               {r.trip_id ? (

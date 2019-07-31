@@ -23,6 +23,8 @@ export interface ITripPlanRequest extends IBaseItem {
   no_of_days?: number
   no_of_adults?: number
   no_of_children?: number
+  hotel_preference?: string
+  comments?: string
   trip_id?: number
   owner_id?: number
   owner?: userStore.IUser
