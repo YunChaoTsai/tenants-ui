@@ -101,7 +101,7 @@ export function InputField({
     return (
       <Fragment>
         {labelPlacement === "before" ? renderLabel : null}
-        <Input {...otherProps} type={type} {...field} />
+        <Input type={type} {...field} {...otherProps} />
         {labelPlacement === "after" ? renderLabel : null}
       </Fragment>
     )

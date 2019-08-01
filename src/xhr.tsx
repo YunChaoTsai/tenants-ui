@@ -38,7 +38,10 @@ function contentTypeXWWWFormUrlencodedInterceptor(
 ): AxiosRequestConfig {
   const data = config.data
   const params = config.params
-  config.headers["Content-Type"] = "application/x-www-form-urlencoded"
+  const existingContentType = config.headers["Content-Type"]
+  if (existingContentType !== "multipart/form-data") {
+    config.headers["Content-Type"] = "application/x-www-form-urlencoded"
+  }
   // if it is already FormData, nothing is required
   if (data instanceof FormData) {
     return config
