@@ -1,3 +1,13 @@
+# [1.11.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.10.0...v1.11.0) (2019-08-02)
+
+
+### Features
+
+* **permissions:** add basic permission in nav ([a76efcc](https://github.com/tourepedia/tp-admin-ui/commit/a76efcc))
+* **tenants:** add tenants ui ([#100](https://github.com/tourepedia/tp-admin-ui/issues/100)) ([c0ff3d2](https://github.com/tourepedia/tp-admin-ui/commit/c0ff3d2))
+* **trip-plan-request:** add hotel preference and comments in the ui ([27727aa](https://github.com/tourepedia/tp-admin-ui/commit/27727aa))
+* **upload-prices:** allow prices to be uploaded via csv ([#103](https://github.com/tourepedia/tp-admin-ui/issues/103)) ([d403de7](https://github.com/tourepedia/tp-admin-ui/commit/d403de7)), closes [#102](https://github.com/tourepedia/tp-admin-ui/issues/102)
+
 # [1.10.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.9.1...v1.10.0) (2019-07-22)
 
 
