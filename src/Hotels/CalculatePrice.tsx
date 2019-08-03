@@ -28,6 +28,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { EmptyNumberValidator } from "../utils"
+import Spinner from "../Shared/Spinner"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -598,7 +599,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                 <div className="mb-1 white-space-pre">
                                   Calculated Price
                                 </div>
-                                {hotel.calculated_price !== undefined ? (
+                                {isSubmitting ? (
+                                  <Spinner />
+                                ) : hotel.calculated_price !== undefined ? (
                                   <Badge primary>
                                     <Icons.RupeeIcon /> {hotel.calculated_price}
                                   </Badge>
