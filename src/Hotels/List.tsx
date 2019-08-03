@@ -122,8 +122,9 @@ export default function List({  }: RouteComponentProps) {
           headers={["Name", "Meal Plans", "Room Type", "Child extra bed age"]}
           rows={hotels.map(hotel => [
             <Fragment>
-              <Link to={hotel.id.toString()}>{hotel.name}</Link>
-              <br />
+              <h4 className="text-base">
+                <Link to={hotel.id.toString()}>{hotel.name}</Link>
+              </h4>
               {hotel.location.short_name} • {hotel.stars} stars
             </Fragment>,
             hotel.meal_plans.map(mealPlan => mealPlan.name).join(" • "),

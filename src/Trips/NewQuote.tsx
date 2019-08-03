@@ -98,15 +98,13 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
                 .format("YYYY-MM-DD"),
               no_of_nights:
                 moment.utc(checkout).diff(moment.utc(checkin), "days") + 1,
-              room_details: [
-                {
-                  room_type,
-                  adults_with_extra_bed,
-                  children_with_extra_bed,
-                  children_without_extra_bed,
-                  no_of_rooms,
-                },
-              ],
+              rooms_detail: {
+                room_type,
+                adults_with_extra_bed,
+                children_with_extra_bed,
+                children_without_extra_bed,
+                no_of_rooms,
+              },
             })
           ),
         }

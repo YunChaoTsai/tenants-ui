@@ -10,6 +10,7 @@ import {
 } from "formik"
 import { Omit } from "utility-types"
 import { ErrorMessage as ErrorM, FormGroup } from "@tourepedia/ui"
+import classNames from "classnames"
 
 export function ErrorMessage({ className = "", ...props }: ErrorMessageProps) {
   return (
@@ -30,10 +31,16 @@ export function Input({
   as: Component = "input",
   id,
   name,
+  className,
   ...otherProps
 }: InputProps) {
   return (
-    <Component className="input" name={name} id={id || name} {...otherProps} />
+    <Component
+      className={classNames("input", className)}
+      name={name}
+      id={id || name}
+      {...otherProps}
+    />
   )
 }
 
