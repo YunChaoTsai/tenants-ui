@@ -1,3 +1,15 @@
+# [1.12.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.11.0...v1.12.0) (2019-08-03)
+
+
+### Bug Fixes
+
+* **prices:** show loading while fetching prices ([e541f48](https://github.com/tourepedia/tp-admin-ui/commit/e541f48))
+
+
+### Features
+
+* **prices:** css and hotel Prices ([#104](https://github.com/tourepedia/tp-admin-ui/issues/104)) ([9bc17cc](https://github.com/tourepedia/tp-admin-ui/commit/9bc17cc))
+
 # [1.11.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.10.0...v1.11.0) (2019-08-02)
 
 
