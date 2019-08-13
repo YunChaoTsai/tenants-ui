@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.12.0...v1.13.0) (2019-08-13)
+
+
+### Features
+
+* **cab-prices:** cab prices via CSV and UI changes ([#105](https://github.com/tourepedia/tp-admin-ui/issues/105)) ([01d214f](https://github.com/tourepedia/tp-admin-ui/commit/01d214f))
+
 # [1.12.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.11.0...v1.12.0) (2019-08-03)
 
 
