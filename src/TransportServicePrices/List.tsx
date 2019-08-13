@@ -17,7 +17,7 @@ import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
 import { useSelector } from "react-redux"
-import { useThunkDispatch } from "../utils"
+import { useThunkDispatch, numberToLocalString } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -131,7 +131,10 @@ export default function List(_: RouteComponentProps) {
             "End Date",
             "Cab Type",
             "Service",
-            "Price",
+            "Locality",
+            "Per Day",
+            "Per Day Parking",
+            "Fixed",
             "/km",
             "Toll",
             "Parking",
@@ -143,7 +146,10 @@ export default function List(_: RouteComponentProps) {
               start_date,
               end_date,
               cab_type,
+              cab_locality,
               transport_service,
+              per_day_charges,
+              per_day_parking_charges,
               price,
               per_km_charges,
               minimum_km_per_day,
@@ -161,12 +167,15 @@ export default function List(_: RouteComponentProps) {
                 .format("DD/MM/YYYY"),
               cab_type.name,
               transport_service.name,
-              price,
+              cab_locality ? cab_locality.short_name : "",
+              numberToLocalString(per_day_charges),
+              numberToLocalString(per_day_parking_charges),
+              numberToLocalString(price),
               per_km_charges,
               toll_charges,
               parking_charges,
               night_charges,
-              minimum_km_per_day,
+              numberToLocalString(minimum_km_per_day),
             ]
           )}
           alignCols={{

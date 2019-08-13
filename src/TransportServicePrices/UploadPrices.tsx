@@ -34,7 +34,7 @@ const UploadPrices = withXHR(function UploadPrices({
           data.set("timezone_offset", values.timezone_offset.toString())
           data.set("file", values.file)
           xhr
-            .post("/hotel-prices", data, {
+            .post("/cab-prices", data, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
@@ -55,7 +55,7 @@ const UploadPrices = withXHR(function UploadPrices({
         render={({ setFieldValue, isSubmitting, status }) => (
           <Form noValidate encType="multipart/form-data">
             <fieldset>
-              <legend>Upload file to add hotel prices</legend>
+              <legend>Upload file to add cab prices</legend>
               {status ? <p className="text-red-700">{status}</p> : null}
               <InputField
                 label="Select a csv file"

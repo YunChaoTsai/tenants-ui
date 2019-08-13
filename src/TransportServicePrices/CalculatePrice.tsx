@@ -8,7 +8,14 @@ import {
   FieldArray,
   FieldProps,
 } from "formik"
-import { Button, Icons, useDidMount, Select, ButtonGroup } from "@tourepedia/ui"
+import {
+  Button,
+  Icons,
+  useDidMount,
+  Select,
+  ButtonGroup,
+  Badge,
+} from "@tourepedia/ui"
 import * as Validator from "yup"
 import moment from "moment"
 import { AxiosInstance } from "axios"
@@ -18,6 +25,7 @@ import {
   SelectTransportServices as SelectServices,
   store as transportServiceStore,
 } from "./../TransportServices"
+import { store as locationStore, SelectLocations } from "./../Locations"
 import {
   InputField,
   Input,
@@ -29,6 +37,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { EmptyNumberValidator } from "../utils"
+import Spinner from "../Shared/Spinner"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -48,6 +57,7 @@ const validationSchema = Validator.object().shape({
         .required("Number of days is required."),
       cab_type: Validator.object().required("Cab type field is required"),
       transport_service: Validator.object().required("Service is required"),
+      cab_locality: Validator.object().nullable(true),
       no_of_cabs: EmptyNumberValidator()
         .positive("Number of cabs should be a positive integer")
         .integer("Number of cabs should be a positive integer.")
@@ -62,6 +72,7 @@ interface CalculatePriceSchema {
     no_of_days: number
     cab_type?: cabTypeStore.ICabType
     transport_service?: transportServiceStore.ITransportService
+    cab_locality?: locationStore.ILocation
     no_of_cabs: number
     calculated_price?: number
     given_price?: number
@@ -78,6 +89,7 @@ const InitialValues: CalculatePriceSchema = {
       no_of_days: 1,
       cab_type: undefined,
       transport_service: undefined,
+      cab_locality: undefined,
       no_of_cabs: 1,
       calculated_price: undefined,
       edited_given_price: false,
@@ -116,6 +128,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
               no_of_days,
               cab_type,
               transport_service,
+              cab_locality,
               ...cab
             }) => ({
               ...cab,
@@ -134,6 +147,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                 .format("YYYY-MM-DD HH:mm:ss"),
               cab_type_id: cab_type && cab_type.id,
               transport_service_id: transport_service && transport_service.id,
+              cab_locality_id: cab_locality && cab_locality.id,
             })
           )
         )
@@ -173,6 +187,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           no_of_days,
           cab_type,
           transport_service,
+          cab_locality,
           no_of_cabs,
         } = values
         if (
@@ -203,6 +218,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
               .format("YYYY-MM-DD HH:mm:ss"),
             cab_type_id: cab_type.id,
             transport_service_id: transport_service.id,
+            cab_locality_id: cab_locality ? cab_locality.id : null,
             no_of_cabs,
           })
         }
@@ -254,195 +270,217 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           <FieldArray
             name="cabs"
             render={({ name, push, remove }) => (
-              <div>
+              <div className="border-gray-300 border-t-4">
                 {values.cabs.map((cab, index) => (
-                  <fieldset key={index}>
+                  <div key={index} className="border-gray-300 border-b-4">
                     <Grid>
-                      <Col>
-                        {bookingFrom && bookingTo ? (
-                          <FormikFormGroup
-                            name={`${name}.${index}.start_date`}
-                            render={({
-                              field,
-                            }: FieldProps<CalculatePriceSchema>) => (
-                              <Select
-                                {...field}
-                                label="Start Date"
-                                options={bookingDates}
-                                searchable={false}
-                                onQuery={() => {}}
-                                value={bookingDates.find(
-                                  d => d.name === cab.start_date
+                      <Col md={7} className="py-3">
+                        <Grid>
+                          <Col>
+                            {bookingFrom && bookingTo ? (
+                              <FormikFormGroup
+                                name={`${name}.${index}.start_date`}
+                                render={({
+                                  field,
+                                }: FieldProps<CalculatePriceSchema>) => (
+                                  <Select
+                                    {...field}
+                                    label="Start Date"
+                                    options={bookingDates}
+                                    searchable={false}
+                                    onQuery={() => {}}
+                                    value={bookingDates.find(
+                                      d => d.name === cab.start_date
+                                    )}
+                                    placeholder="Select a date..."
+                                    required
+                                    onChange={(startDate, name) => {
+                                      setFieldValue(name, startDate.name)
+                                    }}
+                                  />
                                 )}
-                                placeholder="Select a date..."
+                              />
+                            ) : (
+                              <DatePicker
+                                label="Start Date"
+                                name={`${name}.${index}.start_date`}
                                 required
-                                onChange={(startDate, name) => {
-                                  setFieldValue(name, startDate.name)
-                                }}
                               />
                             )}
-                          />
-                        ) : (
-                          <DatePicker
-                            label="Start Date"
-                            name={`${name}.${index}.start_date`}
-                            required
-                          />
-                        )}
-                      </Col>
-                      <Col>
-                        <InputField
-                          label="No of days"
-                          name={`${name}.${index}.no_of_days`}
-                          type="number"
-                          required
-                          min={1}
-                          max={10000}
-                        />
-                      </Col>
-                      <Col>
-                        <FormikFormGroup
-                          name={`${name}.${index}.cab_type`}
-                          render={({
-                            field,
-                          }: FieldProps<CalculatePriceSchema>) => (
-                            <SelectCabTypes
-                              {...field}
-                              label="Cab Type"
-                              multiple={false}
-                              fetchOnMount
-                              onChange={(value, name) =>
-                                setFieldValue(name, value)
-                              }
+                          </Col>
+                          <Col>
+                            <InputField
+                              label="No of days"
+                              name={`${name}.${index}.no_of_days`}
+                              type="number"
+                              required
+                              min={1}
+                              max={10000}
                             />
-                          )}
-                        />
-                      </Col>
-                      <Col>
-                        <FormikFormGroup
-                          name={`${name}.${index}.transport_service`}
-                          render={({
-                            field,
-                          }: FieldProps<CalculatePriceSchema>) => (
-                            <SelectServices
-                              {...field}
-                              label="Transport Service"
-                              multiple={false}
-                              onChange={(value, name) =>
-                                setFieldValue(name, value)
-                              }
+                          </Col>
+                          <Col>
+                            <FormikFormGroup
+                              name={`${name}.${index}.cab_type`}
+                              render={({
+                                field,
+                              }: FieldProps<CalculatePriceSchema>) => (
+                                <SelectCabTypes
+                                  {...field}
+                                  label="Cab Type"
+                                  multiple={false}
+                                  fetchOnMount
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                />
+                              )}
                             />
-                          )}
-                        />
+                          </Col>
+                          <Col>
+                            <FormikFormGroup
+                              name={`${name}.${index}.transport_service`}
+                              render={({
+                                field,
+                              }: FieldProps<CalculatePriceSchema>) => (
+                                <SelectServices
+                                  {...field}
+                                  label="Transport Service"
+                                  multiple={false}
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                />
+                              )}
+                            />
+                          </Col>
+                          <Col>
+                            <FormikFormGroup
+                              name={`${name}.${index}.cab_locality`}
+                              render={({
+                                field,
+                              }: FieldProps<CalculatePriceSchema>) => (
+                                <SelectLocations
+                                  {...field}
+                                  label="Cab Locality"
+                                  multiple={false}
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                />
+                              )}
+                            />
+                          </Col>
+                          <Col>
+                            <InputField
+                              label="No of cabs"
+                              name={`${name}.${index}.no_of_cabs`}
+                              min={1}
+                              max={1000}
+                              type="number"
+                              required
+                            />
+                          </Col>
+                        </Grid>
                       </Col>
-                      <Col>
-                        <InputField
-                          label="No of cabs"
-                          name={`${name}.${index}.no_of_cabs`}
-                          type="number"
-                          required
-                        />
+                      <Col md={4} className="md:border-l py-3">
+                        <Grid>
+                          <Col>
+                            <FormGroup>
+                              <div className="mb-1 white-space-pre">
+                                Calculated Price
+                              </div>
+                              {isSubmitting ? (
+                                <Spinner />
+                              ) : cab.calculated_price !== undefined ? (
+                                <Badge primary>
+                                  <Icons.RupeeIcon /> {cab.calculated_price}
+                                </Badge>
+                              ) : (
+                                <Button type="submit" disabled={isSubmitting}>
+                                  Get Price
+                                </Button>
+                              )}
+                              {cab.no_price_for_dates &&
+                              cab.no_price_for_dates.length ? (
+                                <p className="text-yellow-800">
+                                  No prices available for{" "}
+                                  {cab.no_price_for_dates
+                                    .map(date =>
+                                      moment
+                                        .utc(date)
+                                        .local()
+                                        .format("Do MMM")
+                                    )
+                                    .join(", ")}
+                                </p>
+                              ) : null}
+                            </FormGroup>
+                          </Col>
+                          <Col>
+                            <FormGroup>
+                              <label>Given Price</label>
+                              <Input
+                                name={`${name}.${index}.given_price`}
+                                type="number"
+                                value={cab.given_price}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => {
+                                  let value: number | undefined = parseInt(
+                                    e.target.value,
+                                    10
+                                  )
+                                  shouldFetchPricesOnChange.current = false
+                                  setFieldValue(e.target.name, value)
+                                  setFieldValue(
+                                    `${name}.${index}.edited_given_price`,
+                                    true
+                                  )
+                                }}
+                                min={0}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col sm={12}>
+                            <InputField
+                              label="Commets"
+                              name={`${name}.${index}.comments`}
+                              maxLength={191}
+                              value={cab.comments}
+                              placeholder="Regarding pricing difference or any other"
+                              className="w-full"
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                const value = e.target.value
+                                shouldFetchPricesOnChange.current = false
+                                setFieldValue(e.target.name, value)
+                              }}
+                            />
+                          </Col>
+                        </Grid>
+                      </Col>
+                      <Col md={1} className="text-right md:border-l py-3">
+                        <Button
+                          className="btn--secondary w-full"
+                          onClick={() => push(cab)}
+                        >
+                          + Duplicate
+                        </Button>
+                        <Button
+                          className="btn--secondary w-full"
+                          onClick={() => remove(index)}
+                        >
+                          &times; Remove
+                        </Button>
                       </Col>
                     </Grid>
-                    <Grid>
-                      <Col>
-                        <FormGroup>
-                          <div className="mb-1 white-space-pre">
-                            Calculated Price
-                          </div>
-                          {cab.calculated_price !== undefined ? (
-                            <mark className="inline-block mb-2 text-lg font-semibold">
-                              {cab.calculated_price}
-                            </mark>
-                          ) : (
-                            <Button type="submit" disabled={isSubmitting}>
-                              Get Prices
-                            </Button>
-                          )}
-                          {cab.no_price_for_dates &&
-                          cab.no_price_for_dates.length ? (
-                            <p className="text-yellow-800">
-                              No prices available for{" "}
-                              {cab.no_price_for_dates
-                                .map(date =>
-                                  moment
-                                    .utc(date)
-                                    .local()
-                                    .format("Do MMM")
-                                )
-                                .join(", ")}
-                            </p>
-                          ) : null}
-                        </FormGroup>
-                      </Col>
-                      <Col>
-                        <FormGroup>
-                          <label>Given Price</label>
-                          <Input
-                            name={`${name}.${index}.given_price`}
-                            type="number"
-                            value={cab.given_price}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              let value: number | undefined = parseInt(
-                                e.target.value,
-                                10
-                              )
-                              shouldFetchPricesOnChange.current = false
-                              setFieldValue(e.target.name, value)
-                              setFieldValue(
-                                `${name}.${index}.edited_given_price`,
-                                true
-                              )
-                            }}
-                            min={0}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col>
-                        <FormGroup>
-                          <label>Comments</label>
-                          <Input
-                            name={`${name}.${index}.comments`}
-                            as="textarea"
-                            maxLength={191}
-                            value={cab.comments}
-                            placeholder="Regarding pricing difference or any other"
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              const value = e.target.value
-                              shouldFetchPricesOnChange.current = false
-                              setFieldValue(e.target.name, value)
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Grid>
-                    <hr />
-                    <ButtonGroup>
-                      <Button
-                        className="btn--secondary"
-                        onClick={() => push(cab)}
-                      >
-                        + Duplicate
-                      </Button>
-                      <Button
-                        className="btn--secondary"
-                        onClick={() => remove(index)}
-                      >
-                        &times; Remove
-                      </Button>
-                    </ButtonGroup>
-                  </fieldset>
-                ))}
-                <div>
-                  <div>
-                    <Button onClick={() => push(initialValues.cabs[0])}>
-                      + Add More Price Queries
-                    </Button>
                   </div>
+                ))}
+                <div className="mt-4">
+                  <Button onClick={() => push(initialValues.cabs[0])}>
+                    + Add More Price Queries
+                  </Button>
                 </div>
               </div>
             )}

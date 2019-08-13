@@ -117,7 +117,8 @@ export type AsProp<
 /**
  * Convert a number to local string (add commas)
  */
-export function numberToLocalString(n: number): string {
+export function numberToLocalString(n: number | null | undefined): string {
+  if (n === null || n === undefined) return ""
   const str = n.toString()
   // we dont want to add commas in the after the decimal point
   const parts = str.split(".")

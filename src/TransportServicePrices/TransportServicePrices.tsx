@@ -3,6 +3,7 @@ import { RouteComponentProps, Link, Router } from "@reach/router"
 
 import { RedirectUnlessAuthenticated } from "./../Auth"
 import List from "./List"
+import UploadPrices from "./UploadPrices"
 import NewItem from "./NewItem"
 import CalculatePrice from "./CalculatePrice"
 import { Grid, Col } from "../Shared/Layout"
@@ -16,8 +17,11 @@ export default function CabTypesModule(_: RouteComponentProps) {
         </Col>
         <Col className="text-right d-flex align-items-center justify-content-end">
           <div className="button-group">
+            <Link to="upload-prices" className="btn">
+              Upload Prices
+            </Link>
             <Link to="new" className="btn">
-              Add Price
+              Add Prices
             </Link>
             <Link to="calculate-price" className="btn">
               Calculate Price
@@ -28,6 +32,7 @@ export default function CabTypesModule(_: RouteComponentProps) {
       <hr />
       <Router>
         <NewItem path="/new" />
+        <UploadPrices path="/upload-prices" />
         <CalculatePrice path="/calculate-price" />
         <List path="/" />
       </Router>
