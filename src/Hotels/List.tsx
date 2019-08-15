@@ -5,12 +5,7 @@ import { AxiosInstance } from "axios"
 import { Omit } from "utility-types"
 import { Table, Paginate } from "@tourepedia/ui"
 
-import {
-  IHotel,
-  hotelActions as actions,
-  IStateWithKey,
-  selectors,
-} from "./store"
+import { IHotel, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction } from "./../types"
 import { withXHR, XHRProps } from "./../xhr"
 import { Async, AsyncProps } from "@tourepedia/select"
@@ -51,7 +46,7 @@ function useHotelsState() {
     isFetching: boolean
   }
   return useSelector<IStateWithKey, StateProps>(state => {
-    const hotelsSelector = selectors(state).hotels
+    const hotelsSelector = selectors(state)
     return {
       ...hotelsSelector.meta,
       isFetching: hotelsSelector.isFetching,

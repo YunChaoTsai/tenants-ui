@@ -28,6 +28,7 @@ import { HotelPaymentPreferences } from "./HotelPaymentPreferences"
 import { HotelBookingStages } from "./HotelBookingStages"
 import { TripPlanRequests } from "./TripPlanRequests"
 import { Tenants } from "./Tenants"
+import { HotelPrices } from "./HotelPrices"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
@@ -73,6 +74,7 @@ export const Header = function Header() {
             <Link to="/hotels">Hotels</Link>
             <ul>
               <NavLink to="/hotels">Hotels</NavLink>
+              <NavLink to="/hotel-prices">Hotel Prices</NavLink>
               <NavLink to="/meal-plans">Meal Plans</NavLink>
               <NavLink to="/room-types">Room Types</NavLink>
               <NavLink to="/hotel-payment-preferences">
@@ -163,6 +165,7 @@ export default function App() {
             <HotelBookingStages path="/hotel-booking-stages/*" />
             <TripPlanRequests path="/trip-plan-requests/*" />
             <Tenants path="/tenants/*" />
+            <HotelPrices path="/hotel-prices/*" />
             <EmailVerified path="email-verified" />
             <NotFound default />
           </Router>

@@ -1,5 +1,4 @@
 import { createAsyncAction, ActionType } from "typesafe-actions"
-import { combineReducers } from "redux"
 
 import {
   IBaseItem,
@@ -16,7 +15,7 @@ import { store as locationStore } from "./../Locations"
 import { store as contactStore } from "./../Contacts"
 import { store as hotelPaymentPreferenceStore } from "./../HotelPaymentPreferences"
 
-export const key = "HOTEL_LIST_STATE"
+export const key = "HOTELS_STATE"
 
 export interface IPrice {
   id: number
@@ -58,19 +57,13 @@ export interface IHotel extends IBaseItem {
 export interface IHotels extends IBaseState<IHotel> {}
 export interface IPrices extends IBaseState<IPrice> {}
 
-export interface IHotelState extends IModelState<IHotel> {}
-export interface IHotelPriceState extends IModelState<IPrice> {}
-
-export interface IState {
-  hotels: IHotelState
-  prices: IHotelPriceState
-}
+export interface IState extends IModelState<IHotel> {}
 
 export interface IStateWithKey {
   readonly [key]: IState
 }
 
-export const hotelActions = {
+export const actions = {
   list: createAsyncAction(
     "@HOTELS/LIST_FETCH_REQUEST",
     "@HOTELS/LIST_FETCH_SUCCESS",
@@ -82,64 +75,25 @@ export const hotelActions = {
     "@HOTELS/ITEM_FETCH_FAILED"
   )<undefined, IHotel, Error>(),
 }
-export const priceActions = {
-  list: createAsyncAction(
-    "@HOTEL_PRICES/LIST_FETCH_REQUEST",
-    "@HOTEL_PRICES/LIST_FETCH_SUCCESS",
-    "@HOTEL_PRICES/LIST_FETCH_FAILED"
-  )<undefined, { data: IPrice[]; meta: IMeta }, Error>(),
-}
-
-export const actions = {
-  hotels: hotelActions,
-  prices: priceActions,
-}
 
 export type TActions = ActionType<typeof actions>
 
 const INITIAL_STATE: IState = {
-  hotels: {
-    isFetching: true,
-    state: init<IHotel>(),
-  },
-  prices: {
-    isFetching: true,
-    state: init<IPrice>(),
-  },
+  isFetching: true,
+  state: init<IHotel>(),
 }
 
-export const reducer = combineReducers({
-  hotels: createReducer(INITIAL_STATE.hotels, actions.hotels as any),
-  prices: createReducer(INITIAL_STATE.prices, actions.prices as any),
-})
+export const reducer = createReducer(INITIAL_STATE, actions as any)
 
 export function selectors<State extends IStateWithKey>(state: State) {
   const myState = state[key]
-  const hotelState = myState.hotels
-  const priceState = myState.prices
   return {
-    hotels: {
-      ...model(hotelState.state),
-      get state() {
-        return hotelState
-      },
-      get isFetching(): boolean {
-        return this.state.isFetching
-      },
+    ...model<IHotel>(myState.state),
+    get state(): IState {
+      return myState
     },
-    prices: {
-      ...model(priceState.state),
-      get state() {
-        return priceState
-      },
-      get isFetching(): boolean {
-        return this.state.isFetching
-      },
-    },
-    getHotelPrices(id: number): IPrice[] {
-      return model(priceState.state)
-        .get()
-        .filter(price => price.hotel_id === id)
+    get isFetching(): boolean {
+      return this.state.isFetching
     },
   }
 }

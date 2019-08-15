@@ -20,8 +20,8 @@ import {
   FormGroup,
   OnFormChange,
 } from "./../Shared/InputField"
-import { SelectHotels } from "./List"
-import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
+
+import { SelectHotels, store as hotelStore } from "./../Hotels"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
@@ -29,6 +29,10 @@ import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { EmptyNumberValidator } from "../utils"
 import Spinner from "../Shared/Spinner"
+
+type IHotel = hotelStore.IHotel
+type IHotelMealPlan = hotelStore.IHotelMealPlan
+type IHotelRoomType = hotelStore.IHotelRoomType
 
 export function XHR(xhr: AxiosInstance) {
   return {

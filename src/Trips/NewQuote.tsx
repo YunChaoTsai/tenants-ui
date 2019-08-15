@@ -1,15 +1,14 @@
 import React, { useState, useCallback, useMemo, useRef } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
-import { Button, ownerDocument } from "@tourepedia/ui"
+import { Button } from "@tourepedia/ui"
 import moment from "moment"
 
 import { withXHR, XHRProps } from "./../xhr"
 import { ITrip, IQuote } from "./store"
-import { CalculatePriceForm as CalculateHotelPrice } from "./../Hotels"
+import { CalculatePriceForm as CalculateHotelPrice } from "./../HotelPrices"
 import { CalculatePriceForm as CalculateCabPrice } from "./../TransportServicePrices"
 import { Input, FormGroup } from "./../Shared/InputField"
-import { Grid, Col } from "../Shared/Layout"
 import { numberToLocalString } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
@@ -136,52 +135,40 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
     <div className="pb-8" ref={containerRef}>
       <h3 className="mb-8">Create a new quote</h3>
       <section className="mb-16">
-        <Grid>
-          <Col lg={2}>
-            <h5>Calculate Prices for hotels</h5>
-            <p>
-              Please fill hotel details and then click on get price to get the
-              respective prices. Update the given price if necessary.
-            </p>
-          </Col>
-          <Col>
-            <CalculateHotelPrice
-              bookingFrom={bookingFrom}
-              bookingTo={bookingTo}
-              initialValues={initialQuote.hotels}
-              onChange={handleHotelChange}
-            />
-            <footer className="mt-4">
-              <mark>
-                Total price for Accommodation: {numberToLocalString(hotelPrice)}
-              </mark>
-            </footer>
-          </Col>
-        </Grid>
+        <h4>Calculate Prices for hotels</h4>
+        <p>
+          Please fill hotel details and then click on get price to get the
+          respective prices. Update the given price if necessary.
+        </p>
+        <CalculateHotelPrice
+          bookingFrom={bookingFrom}
+          bookingTo={bookingTo}
+          initialValues={initialQuote.hotels}
+          onChange={handleHotelChange}
+        />
+        <footer className="mt-4">
+          <mark>
+            Total price for Accommodation: {numberToLocalString(hotelPrice)}
+          </mark>
+        </footer>
       </section>
       <section className="mb-16">
-        <Grid>
-          <Col lg={2}>
-            <h5>Calculate Prices for Cabs</h5>
-            <p>
-              Please fill the transportation details and click on get price to
-              get the corresponding prices. Update given prices if necessary.
-            </p>
-          </Col>
-          <Col>
-            <CalculateCabPrice
-              bookingFrom={bookingFrom}
-              bookingTo={bookingTo}
-              initialValues={initialQuote.cabs}
-              onChange={handleCabChange}
-            />
-            <footer className="mt-4">
-              <mark>
-                Total price for Transportation: {numberToLocalString(cabPrice)}
-              </mark>
-            </footer>
-          </Col>
-        </Grid>
+        <h4>Calculate Prices for Cabs</h4>
+        <p>
+          Please fill the transportation details and click on get price to get
+          the corresponding prices. Update given prices if necessary.
+        </p>
+        <CalculateCabPrice
+          bookingFrom={bookingFrom}
+          bookingTo={bookingTo}
+          initialValues={initialQuote.cabs}
+          onChange={handleCabChange}
+        />
+        <footer className="mt-4">
+          <mark>
+            Total price for Transportation: {numberToLocalString(cabPrice)}
+          </mark>
+        </footer>
       </section>
       <hr />
       <h3>

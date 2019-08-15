@@ -7,12 +7,16 @@ import * as Validator from "yup"
 import moment from "moment"
 
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
-import { IHotel, IHotelMealPlan, IHotelRoomType } from "./store"
+import { store as hotelStore, SelectHotels } from "./../Hotels"
 import { SelectMealPlans } from "./../MealPlans"
 import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
+
+type IHotel = hotelStore.IHotel
+type IHotelMealPlan = hotelStore.IHotelMealPlan
+type IHotelRoomType = hotelStore.IHotelRoomType
 
 type NewPriceCredentials = {
   prices: {
@@ -22,6 +26,7 @@ type NewPriceCredentials = {
     adult_with_extra_bed_price: number
     child_with_extra_bed_price: number
     child_without_extra_bed_price: number
+    hotel?: IHotel
     meal_plan?: IHotelMealPlan
     room_type?: IHotelRoomType
     persons: number
@@ -37,6 +42,7 @@ const initialValues: NewPriceCredentials = {
       adult_with_extra_bed_price: 0,
       child_with_extra_bed_price: 0,
       child_without_extra_bed_price: 0,
+      hotel: undefined,
       meal_plan: undefined,
       room_type: undefined,
     },
@@ -46,6 +52,7 @@ const initialValues: NewPriceCredentials = {
 const validationSchema = Validator.object().shape({
   prices: Validator.array().of(
     Validator.object().shape({
+      hotel: Validator.object().required("Hotel is required"),
       start_date: Validator.string().required("Start date field is required"),
       end_date: Validator.string().required("End date field is required"),
       base_price: Validator.number()
@@ -71,10 +78,8 @@ const validationSchema = Validator.object().shape({
   ),
 })
 
-interface AddPricesProps extends RouteComponentProps, XHRProps {
-  hotel: IHotel
-}
-function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
+interface AddPricesProps extends RouteComponentProps, XHRProps {}
+function AddPrices({ xhr, navigate }: AddPricesProps) {
   return (
     <Fragment>
       <Helmet>
@@ -83,7 +88,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(
+        onSubmit={async (
           values: NewPriceCredentials,
           actions: FormikActions<NewPriceCredentials>
         ) => {
@@ -96,6 +101,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                   {
                     meal_plan: mealPlan,
                     room_type: roomType,
+                    hotel,
                     start_date,
                     end_date,
                     ...otherValues
@@ -116,7 +122,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                       .seconds(59)
                       .utc()
                       .format("YYYY-MM-DD HH:mm:ss"),
-                    hotel_id: hotel.id,
+                    hotel_id: hotel && hotel.id,
                     meal_plan_id: mealPlan && mealPlan.id,
                     room_type_id: roomType && roomType.id,
                   })
@@ -125,7 +131,7 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                 []
               ),
             })
-            .then(resp => {
+            .then(() => {
               navigate && navigate("..")
               actions.setSubmitting(false)
             })
@@ -166,6 +172,21 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                           </Col>
                           <Col>
                             <FormikFormGroup
+                              name={`${name}.${index}.hotel`}
+                              render={({ field }) => (
+                                <SelectHotels
+                                  {...field}
+                                  multiple={false}
+                                  label="Hotel"
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                />
+                              )}
+                            />
+                          </Col>
+                          <Col>
+                            <FormikFormGroup
                               name={`prices.${index}.meal_plan`}
                               render={({ field }) => (
                                 <SelectMealPlans
@@ -173,7 +194,9 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                                   {...field}
                                   searchable={false}
                                   multiple={false}
-                                  options={hotel.meal_plans}
+                                  options={
+                                    price.hotel && price.hotel.meal_plans
+                                  }
                                   onChange={(value, name) =>
                                     setFieldValue(name, value)
                                   }
@@ -190,7 +213,9 @@ function AddPrices({ hotel, xhr, navigate }: AddPricesProps) {
                                   label="Room Type"
                                   searchable={false}
                                   multiple={false}
-                                  options={hotel.room_types}
+                                  options={
+                                    price.hotel && price.hotel.room_types
+                                  }
                                   onChange={(value: IHotelRoomType, name) => {
                                     setFieldValue(name, value)
                                     if (!value || !value.allowed_extra_beds) {
