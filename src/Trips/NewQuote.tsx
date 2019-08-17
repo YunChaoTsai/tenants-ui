@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useRef } from "react"
 import { RouteComponentProps } from "@reach/router"
 import { AxiosInstance } from "axios"
-import { Button } from "@tourepedia/ui"
+import { Button, Icons } from "@tourepedia/ui"
 import moment from "moment"
 
 import { withXHR, XHRProps } from "./../xhr"
@@ -135,11 +135,20 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
     <div className="pb-8" ref={containerRef}>
       <h3 className="mb-8">Create a new quote</h3>
       <section className="mb-16">
-        <h4>Calculate Prices for hotels</h4>
-        <p>
-          Please fill hotel details and then click on get price to get the
-          respective prices. Update the given price if necessary.
-        </p>
+        <header className="flex">
+          <div className="mr-2">
+            <span className="inline-flex w-12 h-12 align-items-center justify-content-center bg-primary-600 text-white rounded-full">
+              <Icons.BedIcon />
+            </span>
+          </div>
+          <div>
+            <h4>Calculate Prices for hotels</h4>
+            <p>
+              Please fill hotel details and then click on get price to get the
+              respective prices. Update the given price if necessary.
+            </p>
+          </div>
+        </header>
         <CalculateHotelPrice
           bookingFrom={bookingFrom}
           bookingTo={bookingTo}
@@ -153,11 +162,20 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
         </footer>
       </section>
       <section className="mb-16">
-        <h4>Calculate Prices for Cabs</h4>
-        <p>
-          Please fill the transportation details and click on get price to get
-          the corresponding prices. Update given prices if necessary.
-        </p>
+        <header className="flex">
+          <div className="mr-2">
+            <span className="inline-flex w-12 h-12 align-items-center justify-content-center bg-primary-600 text-white rounded-full">
+              <Icons.BusIcon />
+            </span>
+          </div>
+          <div>
+            <h4>Calculate Prices for Cabs</h4>
+            <p>
+              Please fill the transportation details and click on get price to
+              get the corresponding prices. Update given prices if necessary.
+            </p>
+          </div>
+        </header>
         <CalculateCabPrice
           bookingFrom={bookingFrom}
           bookingTo={bookingTo}
