@@ -9,7 +9,6 @@ html,
 body {
   height: 100%;
   overflow: auto;
-  background: white;
   box-sizing: border-box;
 }
 
@@ -132,6 +131,7 @@ svg:not(:root) {
 nav a {
   padding: 0.5em 0.75rem;
   display: inline-block;
+  color: inherit;
 }
 
 /**

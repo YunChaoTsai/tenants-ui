@@ -165,25 +165,20 @@ export default function List({  }: RouteComponentProps) {
                   locations.map(l => l.short_name).join(" • "),
                   contact ? (
                     <div>
-                      {contact.name}
-                      <br />
-                      <a
-                        href={`tel:${contact.phone_number}`}
-                        className="btn--icon"
-                      >
-                        <Icons.PhoneIcon
-                          title={`Call to ${contact.name} on ${
-                            contact.phone_number
-                          }`}
-                        />
-                      </a>
-                      <a href={`mailto:${contact.email}`} className="btn--icon">
-                        <Icons.MailIcon
-                          title={`Send Email to ${contact.name} at ${
-                            contact.email
-                          }`}
-                        />
-                      </a>
+                      <div>{contact.name}</div>
+                      <small>
+                        {contact.phone_number ? (
+                          <a href={`tel:${contact.phone_number}`}>
+                            {contact.phone_number}
+                          </a>
+                        ) : null}
+                        {contact.phone_number && contact.email ? " • " : ""}
+                        {contact.email ? (
+                          <a href={`mailto:${contact.email}`}>
+                            {contact.email}
+                          </a>
+                        ) : null}
+                      </small>
                     </div>
                   ) : null,
                   `${no_of_adults} Adults${

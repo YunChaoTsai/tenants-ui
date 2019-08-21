@@ -6,39 +6,27 @@ import moment from "moment"
 import { Table, Paginate } from "@tourepedia/ui"
 
 import { ThunkAction } from "./../types"
-import {
-  IPrice,
-  IHotel,
-  priceActions as actions,
-  selectors,
-  IStateWithKey,
-} from "./store"
+import { IHotelPrice, selectors, actions, IStateWithKey } from "./store"
 import List from "../Shared/List"
 import Search, { useSearch } from "../Shared/Search"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
-import { useThunkDispatch } from "../utils"
+import { useThunkDispatch, numberToLocalString } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    async getPrices(
-      hotelId: number | string,
-      params?: any
-    ): Promise<{ data: IPrice[]; meta: any }> {
-      return xhr
-        .get(`/hotel-prices`, { params: { ...params, hotels: [hotelId] } })
-        .then(resp => resp.data)
+    async getPrices(params?: any): Promise<{ data: IHotelPrice[]; meta: any }> {
+      return xhr.get(`/hotel-prices`, { params }).then(resp => resp.data)
     },
   }
 }
 
 export const getPricesAction = (
-  hotelId: number,
   params?: any
-): ThunkAction<Promise<IPrice[]>> => async (dispatch, _, { xhr }) => {
+): ThunkAction<Promise<IHotelPrice[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
-    .getPrices(hotelId, params)
+    .getPrices(params)
     .then(prices => {
       dispatch(actions.list.success(prices))
       return prices.data
@@ -49,38 +37,42 @@ export const getPricesAction = (
     })
 }
 
-export function useHotelPrices(hotelId: number | string) {
+export function useHotelPrices() {
   interface StateProps extends IPaginate {
-    prices: IPrice[]
+    prices: IHotelPrice[]
     isFetching: boolean
   }
   return useSelector<IStateWithKey, StateProps>(state => {
     const pricesSelector = selectors(state)
-    const id = parseInt(hotelId.toString(), 10)
     return {
-      ...pricesSelector.prices.meta,
-      isFetching: pricesSelector.prices.isFetching,
-      prices: pricesSelector.getHotelPrices(id),
+      ...pricesSelector.meta,
+      isFetching: pricesSelector.isFetching,
+      prices: pricesSelector.get(),
     }
   })
 }
 
-interface PricesProps extends RouteComponentProps<{ hotelId: string }> {
-  hotel: IHotel
-}
+interface PricesProps
+  extends RouteComponentProps<{
+    hotelId?: string | number
+  }> {}
 
 export default function Prices({ hotelId }: PricesProps) {
   const [params, setParams] = useSearch()
-  let id: number = parseInt(hotelId || "", 10)
   const dispatch = useThunkDispatch()
   const getPrices = useCallback(
-    (hotelId: number, params?: any) =>
-      dispatch(getPricesAction(hotelId, params)),
+    (params?: any) =>
+      dispatch(
+        getPricesAction({
+          ...params,
+          ...(hotelId ? { hotels: [hotelId] } : {}),
+        })
+      ),
     [dispatch, hotelId]
   )
   useEffect(() => {
-    id && getPrices(id, { page: currentPage })
-  }, [id, getPrices])
+    getPrices({ page: currentPage })
+  }, [getPrices])
   const {
     prices,
     total,
@@ -89,10 +81,7 @@ export default function Prices({ hotelId }: PricesProps) {
     currentPage,
     lastPage,
     isFetching,
-  } = useHotelPrices(id)
-  if (isNaN(id)) {
-    return null
-  }
+  } = useHotelPrices()
   return (
     <Fragment>
       <Grid>
@@ -101,7 +90,7 @@ export default function Prices({ hotelId }: PricesProps) {
             initialParams={params}
             onSearch={params => {
               setParams(params)
-              getPrices(id, { ...params, page: 1 })
+              getPrices({ ...params, page: 1 })
             }}
           />
         </Col>
@@ -113,7 +102,7 @@ export default function Prices({ hotelId }: PricesProps) {
             currentPage={currentPage}
             lastPage={lastPage}
             isFetching={isFetching}
-            onChange={page => getPrices(id, { page })}
+            onChange={page => getPrices({ page })}
           />
         </Col>
       </Grid>
@@ -122,23 +111,23 @@ export default function Prices({ hotelId }: PricesProps) {
           responsive
           bordered
           striped
-          headers={[
-            "Start Date",
-            "End Date",
-            "Meal Plan",
-            "Room Type",
-            "Base Price",
-            "Persons",
-            "A.W.E.B.",
-            "C.W.E.B.",
-            "C.Wo.E.B",
-          ]}
+          headers={["Start Date", "End Date"]
+            .concat(!hotelId ? ["Hotel"] : [])
+            .concat([
+              "Meal Plan",
+              "Room Type",
+              "Base Price",
+              "Persons",
+              "A.W.E.B.",
+              "C.W.E.B.",
+              "C.Wo.E.B",
+            ])}
           alignCols={{
-            4: "right",
             5: "right",
             6: "right",
             7: "right",
             8: "right",
+            9: "right",
           }}
           rows={prices.map(
             ({
@@ -146,28 +135,44 @@ export default function Prices({ hotelId }: PricesProps) {
               persons,
               start_date,
               end_date,
+              hotel,
               adult_with_extra_bed_price,
               child_with_extra_bed_price,
               child_without_extra_bed_price,
               meal_plan,
               room_type,
-            }) => [
-              moment
-                .utc(start_date)
-                .local()
-                .format("DD/MM/YYYY"),
-              moment
-                .utc(end_date)
-                .local()
-                .format("DD/MM/YYYY"),
-              meal_plan.name,
-              room_type.name,
-              base_price,
-              persons,
-              adult_with_extra_bed_price,
-              child_with_extra_bed_price,
-              child_without_extra_bed_price,
-            ]
+            }) =>
+              ([
+                moment
+                  .utc(start_date)
+                  .local()
+                  .format("DD/MM/YYYY"),
+                moment
+                  .utc(end_date)
+                  .local()
+                  .format("DD/MM/YYYY"),
+              ] as any)
+                .concat(
+                  !hotelId
+                    ? [
+                        <span>
+                          {hotel.name}{" "}
+                          <small>
+                            ({hotel.location.short_name} - {hotel.stars} Star)
+                          </small>
+                        </span>,
+                      ]
+                    : []
+                )
+                .concat([
+                  meal_plan.name,
+                  room_type.name,
+                  numberToLocalString(base_price),
+                  persons.toString(),
+                  numberToLocalString(adult_with_extra_bed_price),
+                  numberToLocalString(child_with_extra_bed_price),
+                  numberToLocalString(child_without_extra_bed_price),
+                ])
           )}
         />
       </List>

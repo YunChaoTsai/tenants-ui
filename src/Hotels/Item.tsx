@@ -3,15 +3,8 @@ import { RouteComponentProps, Link, Router } from "@reach/router"
 import { useSelector } from "react-redux"
 import { AxiosInstance } from "axios"
 
-import {
-  IHotel,
-  IStateWithKey,
-  selectors,
-  hotelActions as actions,
-} from "./store"
+import { IHotel, IStateWithKey, selectors, actions } from "./store"
 import { ThunkAction } from "./../types"
-import Prices from "./Prices"
-import AddPrices from "./AddPrices"
 import { Dialog, useDialog } from "@tourepedia/dialog"
 import { Button } from "@tourepedia/ui"
 import { AddContactForm } from "../Contacts"
@@ -19,6 +12,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import { useThunkDispatch } from "../utils"
 import Spinner from "../Shared/Spinner"
+import { HotelPricesList } from "../HotelPrices"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -61,7 +55,7 @@ function useHotelState(hotelId?: number | string) {
     hotel?: IHotel
   }
   return useSelector<IStateWithKey, StateProps>(state => {
-    const hotelSelector = selectors(state).hotels
+    const hotelSelector = selectors(state)
     return {
       isFetching: hotelSelector.isFetching,
       hotel: hotelSelector.getItem(hotelId),
@@ -192,17 +186,16 @@ export function Item({
           </fieldset>
         </Col>
       </Grid>
-      <hr />
-      <div>
-        <div className="clearfix mb-4">
-          <Link to="add-prices" className="btn btn-primary float-right">
-            Add Prices
-          </Link>
-          <h4>Prices</h4>
-        </div>
+      <div className="mt-4">
+        <Link
+          to={`/hotel-prices/new?id=${hotel.id}`}
+          className="btn float-right"
+        >
+          Add Prices
+        </Link>
+        <h3>Prices</h3>
         <Router>
-          <AddPrices path="add-prices" hotel={hotel} />
-          <Prices path="/" hotel={hotel} />
+          <HotelPricesList hotelId={hotel.id} path="/" />
         </Router>
       </div>
     </div>

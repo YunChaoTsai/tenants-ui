@@ -28,6 +28,7 @@ import { HotelPaymentPreferences } from "./HotelPaymentPreferences"
 import { HotelBookingStages } from "./HotelBookingStages"
 import { TripPlanRequests } from "./TripPlanRequests"
 import { Tenants } from "./Tenants"
+import { HotelPrices } from "./HotelPrices"
 import EmailVerified from "./EmailVerified"
 import { Container } from "./Shared/Layout"
 import Dropdown from "./Shared/Dropdown"
@@ -40,8 +41,8 @@ export const Header = function Header() {
   if (!user) return null
   const { name, tenant, permissions } = user
   return (
-    <header className="mb-4 border-b text-base">
-      <nav className="sm:flex items-stretch md:justify-between">
+    <header className="mb-4 text-base bg-white border-t-4 border-primary-600">
+      <nav className="sm:flex border-b items-stretch md:justify-between">
         <Link to="/" className="inline-flex h-16 px-2 mr-4 sm:mr-auto">
           <div className="flex items-center">
             <img
@@ -73,6 +74,7 @@ export const Header = function Header() {
             <Link to="/hotels">Hotels</Link>
             <ul>
               <NavLink to="/hotels">Hotels</NavLink>
+              <NavLink to="/hotel-prices">Hotel Prices</NavLink>
               <NavLink to="/meal-plans">Meal Plans</NavLink>
               <NavLink to="/room-types">Room Types</NavLink>
               <NavLink to="/hotel-payment-preferences">
@@ -163,6 +165,7 @@ export default function App() {
             <HotelBookingStages path="/hotel-booking-stages/*" />
             <TripPlanRequests path="/trip-plan-requests/*" />
             <Tenants path="/tenants/*" />
+            <HotelPrices path="/hotel-prices/*" />
             <EmailVerified path="email-verified" />
             <NotFound default />
           </Router>

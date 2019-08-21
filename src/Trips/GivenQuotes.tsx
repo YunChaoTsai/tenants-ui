@@ -131,9 +131,12 @@ function Quotes({ xhr, trip }: QuotesProps) {
       {givenQuotes.length === 0 ? (
         <p className="text-center">No quote given yet</p>
       ) : (
-        <ol className="list list--bordered">
+        <ol>
           {givenQuotes.map(givenQuote => (
-            <li key={givenQuote.id}>
+            <li
+              key={givenQuote.id}
+              className="p-4 shadow rounded mb-8 bg-white"
+            >
               <GivenQuote givenQuote={givenQuote} />
             </li>
           ))}
