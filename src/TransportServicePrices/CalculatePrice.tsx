@@ -36,7 +36,7 @@ import {
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
-import { EmptyNumberValidator } from "../utils"
+import { EmptyNumberValidator, numberToLocalString } from "../utils"
 import Spinner from "../Shared/Spinner"
 
 export function XHR(xhr: AxiosInstance) {
@@ -82,7 +82,7 @@ interface CalculatePriceSchema {
   }[]
 }
 
-const InitialValues: CalculatePriceSchema = {
+const INITIAL_VALUES: CalculatePriceSchema = {
   cabs: [
     {
       start_date: "",
@@ -104,14 +104,19 @@ interface CalculatePriceFormProps extends XHRProps {
   onChange?: (price: number, cabs: any) => void
   bookingFrom?: string
   bookingTo?: string
+  shouldEmptyInitialValues?: boolean
 }
 export const CalculatePriceForm = withXHR(function CalculatePriceForm({
-  initialValues = InitialValues,
+  initialValues: initialValuesProp,
+  shouldEmptyInitialValues = false,
   xhr,
   onChange,
   bookingFrom,
   bookingTo,
 }: CalculatePriceFormProps) {
+  const initialValues =
+    initialValuesProp ||
+    (shouldEmptyInitialValues ? { cabs: [] } : INITIAL_VALUES)
   const notifyOnChange = useCallback(
     (flattenValues: CalculatePriceSchema) => {
       onChange &&
@@ -270,7 +275,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
           <FieldArray
             name="cabs"
             render={({ name, push, remove }) => (
-              <div className="border-gray-300 border-t-4">
+              <div>
                 {values.cabs.map((cab, index) => (
                   <div key={index} className="border-gray-300 border-b-4">
                     <Grid>
@@ -477,8 +482,8 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                     </Grid>
                   </div>
                 ))}
-                <div className="mt-4">
-                  <Button onClick={() => push(initialValues.cabs[0])}>
+                <div className="pt-4">
+                  <Button onClick={() => push(INITIAL_VALUES.cabs[0])}>
                     + Add More Price Queries
                   </Button>
                 </div>
@@ -528,11 +533,13 @@ export default function CalculatePrice(props: RouteComponentProps) {
         Please enter your transportation query and press get price to get the
         prices.
       </p>
-      <CalculatePriceForm onChange={price => setPrice(price)} />
-      <footer className="mt-8 pb-8">
-        <h4>
-          <mark>Total Cost Price: {price}</mark>
-        </h4>
+      <div className="bg-white px-4 pb-4 rounded shadow">
+        <CalculatePriceForm onChange={price => setPrice(price)} />
+      </div>
+      <footer className="mt-4">
+        <mark className="inline-block text-2xl font-bold px-4 py-2 rounded">
+          Total Price: {numberToLocalString(price)}
+        </mark>
       </footer>
     </div>
   )

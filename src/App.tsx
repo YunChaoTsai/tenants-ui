@@ -41,8 +41,8 @@ export const Header = function Header() {
   if (!user) return null
   const { name, tenant, permissions } = user
   return (
-    <header className="mb-4 border-b text-base">
-      <nav className="sm:flex items-stretch md:justify-between">
+    <header className="mb-4 text-base bg-white border-t-4 border-primary-600">
+      <nav className="sm:flex border-b items-stretch md:justify-between">
         <Link to="/" className="inline-flex h-16 px-2 mr-4 sm:mr-auto">
           <div className="flex items-center">
             <img

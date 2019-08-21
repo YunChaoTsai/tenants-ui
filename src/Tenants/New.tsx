@@ -74,6 +74,7 @@ export function NewTenant({ xhr, navigate, location }: NewTenantProps) {
         render={({
           isSubmitting,
           status,
+          values,
         }: FormikProps<NewTenantCredentials>) => (
           <Form noValidate>
             {status ? <p className="text-red-700 my-2">{status}</p> : null}
@@ -117,6 +118,7 @@ export function NewTenant({ xhr, navigate, location }: NewTenantProps) {
                 label="Send Invitation email also"
                 name="send_invite"
                 type="checkbox"
+                checked={values.send_invite}
               />
               <footer>
                 <Button primary type="submit" disabled={isSubmitting}>

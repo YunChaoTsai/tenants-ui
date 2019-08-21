@@ -20,6 +20,7 @@ import { store as tripStageStore } from "./../TripStages"
 import { store as paymentStore } from "./../Payments"
 import { store as hotelBookingStageStore } from "./../HotelBookingStages"
 import { store as tagStore } from "./../Tags"
+import { store as extraServiceStore } from "./../ExtraServices"
 
 export const key = "TRIP_LIST_STATE"
 
@@ -53,11 +54,38 @@ export interface IQuoteCab {
   cab_type: cabTypeStore.ICabType
   transport_service_id: number
   transport_service: transportServiceStore.ITransportService
+  cab_locality?: locationStore.ILocation
   no_of_cabs: number
   calculated_price?: number
   given_price: number
   comments: string
 }
+
+export interface IQuoteHotelExtras {
+  id: number
+  service: extraServiceStore.IExtraService
+  date?: string
+  calculated_price?: number
+  given_price?: number
+  hotel?: hotelStore.IHotel
+}
+
+export interface IQuoteTransportExtras {
+  id: number
+  service: extraServiceStore.IExtraService
+  date?: string
+  calculated_price?: number
+  given_price?: number
+}
+
+export interface IQuoteOtherExtras {
+  id: number
+  service: extraServiceStore.IExtraService
+  date?: string
+  calculated_price?: number
+  given_price?: number
+}
+
 export interface IQuote {
   id: number
   trip_id: number
@@ -66,6 +94,9 @@ export interface IQuote {
   comments: string
   hotels: IQuoteHotel[]
   cabs: IQuoteCab[]
+  hotel_extras: IQuoteHotelExtras[]
+  transport_extras: IQuoteTransportExtras[]
+  other_extras: IQuoteTransportExtras[]
   created_by: userStore.IUser
   updated_by: userStore.IUser
   created_at: string

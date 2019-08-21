@@ -8,6 +8,7 @@ import {
   useFetchState,
   Dialog,
   useDialog,
+  ButtonGroup,
 } from "@tourepedia/ui"
 import { Formik, Form } from "formik"
 import * as Validator from "yup"
@@ -149,7 +150,10 @@ export const Quote = withXHR(function Quote({
     id,
     total_price,
     hotels,
+    hotel_extras,
     cabs,
+    transport_extras,
+    other_extras,
     comments,
     created_by,
     created_at,
@@ -194,124 +198,236 @@ export const Quote = withXHR(function Quote({
           </em>
         </blockquote>
       </header>
-      <section>
-        <h6>
-          <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
-            <Icons.BedIcon />
-          </span>
-          Accommodation
-        </h6>
-        <Table
-          striped
-          bordered
-          caption={
-            "Bellow are the details of daywise hotel accomodation and their prices"
-          }
-          responsive
-          headers={["Date", "Hotels", "Meal Plan", "Rooms", "Price"].concat(
-            showHotelBookingStatus ? ["Booking Stage"] : []
-          )}
-          alignCols={{ 4: "right", 5: "center" }}
-          rows={hotels.map(quoteHotel => {
-            const {
-              hotel,
-              checkin,
-              checkout,
-              meal_plan,
-              room_type,
-              no_of_rooms,
-              comments,
-              given_price,
-            } = quoteHotel
-            return [
-              <span className="whitespace-pre">
-                {moment
-                  .utc(checkin)
-                  .local()
-                  .format("DD MMM YYYY")}
-                <br />
-                <small>
-                  {moment.utc(checkout).diff(moment.utc(checkin), "days") + 1}{" "}
-                  Nights
-                </small>
-              </span>,
-              <div>
-                <b>{hotel.name}</b>
-                <br />
-                <small>
-                  {hotel.location.short_name}, {hotel.stars} Star
-                </small>
-                {comments ? <blockquote>{comments}</blockquote> : null}
-              </div>,
-              meal_plan.name,
-              <div>
-                {room_type.name}
-                <br />
-                <small>{no_of_rooms} Rooms</small>
-              </div>,
-              numberToLocalString(given_price),
-            ].concat(
-              showHotelBookingStatus
-                ? [<QuoteHotelBookingStage quoteHotel={quoteHotel} />]
-                : []
-            )
-          })}
-        />
-      </section>
-      <section>
-        <h6>
-          <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
-            <Icons.BusIcon />
-          </span>
-          Transportation
-        </h6>
-        <Table
-          striped
-          bordered
-          caption={
-            "Bellow are the details for the daywise transportation and their prices"
-          }
-          responsive
-          headers={["Date", "Service", "Cabs", "Price"]}
-          alignCols={{ 3: "right" }}
-          rows={cabs.map(
-            ({
-              from_date,
-              to_date,
-              cab_type,
-              transport_service,
-              no_of_cabs,
-              comments,
-              given_price,
-            }) => [
-              <span className="whitespace-pre">
-                {moment
-                  .utc(from_date)
-                  .local()
-                  .format("DD MMM YYYY")}{" "}
-                <br />
-                <small>
-                  {moment.utc(to_date).diff(moment.utc(from_date), "days") + 1}{" "}
-                  Days
-                </small>
-              </span>,
-              <div>
-                {transport_service.name}
-                {comments ? <blockquote>{comments}</blockquote> : null}
-              </div>,
-              <div>
-                {cab_type.name}
-                <br />
-                <small>{no_of_cabs} cabs</small>
-              </div>,
-              numberToLocalString(given_price),
-            ]
-          )}
-        />
-      </section>
+      {hotels.length ? (
+        <section>
+          <div className="flex">
+            <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
+              <Icons.BedIcon />
+            </span>
+            <div className="w-full">
+              <h6>Accommodation</h6>
+              <Table
+                striped
+                bordered
+                caption={
+                  "Bellow are the details of daywise hotel accomodation and their prices"
+                }
+                responsive
+                headers={[
+                  "Date",
+                  "Hotels",
+                  "Meal Plan",
+                  "Rooms",
+                  "Price",
+                ].concat(showHotelBookingStatus ? ["Booking Stage"] : [])}
+                alignCols={{ 4: "right", 5: "center" }}
+                rows={hotels.map(quoteHotel => {
+                  const {
+                    hotel,
+                    checkin,
+                    checkout,
+                    meal_plan,
+                    room_type,
+                    no_of_rooms,
+                    comments,
+                    given_price,
+                  } = quoteHotel
+                  return [
+                    <span className="whitespace-pre">
+                      {moment
+                        .utc(checkin)
+                        .local()
+                        .format("DD MMM YYYY")}
+                      <br />
+                      <small>
+                        {moment
+                          .utc(checkout)
+                          .diff(moment.utc(checkin), "days") + 1}{" "}
+                        Nights
+                      </small>
+                    </span>,
+                    <div>
+                      <b>{hotel.name}</b>
+                      <br />
+                      <small>
+                        {hotel.location.short_name}, {hotel.stars} Star
+                      </small>
+                      {comments ? <blockquote>{comments}</blockquote> : null}
+                    </div>,
+                    meal_plan.name,
+                    <div>
+                      {room_type.name}
+                      <br />
+                      <small>{no_of_rooms} Rooms</small>
+                    </div>,
+                    numberToLocalString(given_price),
+                  ].concat(
+                    showHotelBookingStatus
+                      ? [<QuoteHotelBookingStage quoteHotel={quoteHotel} />]
+                      : []
+                  )
+                })}
+              />
+              {hotel_extras.length ? (
+                <div>
+                  <h6>Hotel Extra Services</h6>
+                  <Table
+                    striped
+                    bordered
+                    caption={"Extras services for hotels"}
+                    responsive
+                    headers={["Date", "Hotel", "Service", "Price"]}
+                    alignCols={{ 3: "right" }}
+                    rows={hotel_extras.map(
+                      ({ service, date, hotel, given_price }) => [
+                        date ? (
+                          <span className="whitespace-pre">
+                            {moment
+                              .utc(date)
+                              .local()
+                              .format("DD MMM YYYY")}{" "}
+                          </span>
+                        ) : null,
+                        hotel && hotel.name,
+                        service.name,
+                        numberToLocalString(given_price),
+                      ]
+                    )}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : null}
+      {cabs.length ? (
+        <section>
+          <div className="flex">
+            <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
+              <Icons.BusIcon />
+            </span>
+            <div className="w-full">
+              <h6>Transportation</h6>
+              <Table
+                striped
+                bordered
+                caption={
+                  "Bellow are the details for the daywise transportation and their prices"
+                }
+                responsive
+                headers={["Date", "Service", "Cabs", "Price"]}
+                alignCols={{ 3: "right" }}
+                rows={cabs.map(
+                  ({
+                    from_date,
+                    to_date,
+                    cab_type,
+                    transport_service,
+                    cab_locality,
+                    no_of_cabs,
+                    comments,
+                    given_price,
+                  }) => [
+                    <span className="whitespace-pre">
+                      {moment
+                        .utc(from_date)
+                        .local()
+                        .format("DD MMM YYYY")}{" "}
+                      <br />
+                      <small>
+                        {moment
+                          .utc(to_date)
+                          .diff(moment.utc(from_date), "days") + 1}{" "}
+                        Days
+                      </small>
+                    </span>,
+                    <div>
+                      {transport_service.name}
+                      {comments ? <blockquote>{comments}</blockquote> : null}
+                    </div>,
+                    <div>
+                      {cab_type.name}
+                      <br />
+                      <small>{no_of_cabs} cabs</small>
+                      {cab_locality ? (
+                        <span>
+                          {" "}
+                          • <small>Locality: {cab_locality.short_name}</small>
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                    </div>,
+                    numberToLocalString(given_price),
+                  ]
+                )}
+              />
+              {transport_extras.length ? (
+                <div>
+                  <h6>Transport Extra Services</h6>
+                  <Table
+                    striped
+                    bordered
+                    caption={"Extras services for Transportation"}
+                    responsive
+                    headers={["Date", "Service", "Price"]}
+                    alignCols={{ 2: "right" }}
+                    rows={transport_extras.map(
+                      ({ service, date, given_price }) => [
+                        date ? (
+                          <span className="whitespace-pre">
+                            {moment
+                              .utc(date)
+                              .local()
+                              .format("DD MMM YYYY")}{" "}
+                          </span>
+                        ) : null,
+                        service.name,
+                        numberToLocalString(given_price),
+                      ]
+                    )}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : null}
+      {other_extras.length ? (
+        <section>
+          <div className="flex">
+            <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
+              <Icons.StarEmptyIcon />
+            </span>
+            <div className="w-full">
+              <h6>Other Services</h6>
+              <Table
+                striped
+                bordered
+                caption={"Other Services provided with this quote"}
+                responsive
+                headers={["Date", "Service", "Price"]}
+                alignCols={{ 2: "right" }}
+                rows={other_extras.map(({ service, date, given_price }) => [
+                  date ? (
+                    <span className="whitespace-pre">
+                      {moment
+                        .utc(date)
+                        .local()
+                        .format("DD MMM YYYY")}{" "}
+                    </span>
+                  ) : null,
+                  service.name,
+                  numberToLocalString(given_price),
+                ])}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
       {!readOnly ? (
-        <footer>
-          <div className="button-group">
+        <div>
+          <ButtonGroup>
             <Button onClick={open}>Give this quote</Button>
             <Dialog open={showGiveQuote} onClose={close}>
               <Dialog.Header>
@@ -342,30 +458,27 @@ export const Quote = withXHR(function Quote({
                       actions.setSubmitting(false)
                     }
                   }}
-                  render={({ isSubmitting, values, setFieldValue }) => (
+                  render={({ isSubmitting, setFieldValue }) => (
                     <Form noValidate>
-                      <FormGroup>
-                        <label>Multiplication Factor</label>
-                        <select
-                          name="factor"
-                          value={values.factor}
-                          onChange={e => {
-                            setFieldValue(
-                              "given_price",
-                              Math.ceil(
-                                quote.total_price * parseFloat(e.target.value)
-                              )
+                      <InputField
+                        label="Multiplication Factor"
+                        name="factor"
+                        type="number"
+                        step={0.05}
+                        onChange={e => {
+                          setFieldValue(
+                            "given_price",
+                            Math.ceil(
+                              quote.total_price *
+                                parseFloat(e.currentTarget.value)
                             )
-                            setFieldValue(e.target.name, e.target.value)
-                          }}
-                        >
-                          <option value={1.1}>1.1</option>
-                          <option value={1.2}>1.2</option>
-                          <option value={1.3}>1.3</option>
-                          <option value={1.4}>1.4</option>
-                          <option value={1.5}>1.5</option>
-                        </select>
-                      </FormGroup>
+                          )
+                          setFieldValue(
+                            e.currentTarget.name,
+                            e.currentTarget.value
+                          )
+                        }}
+                      />
                       <InputField
                         name="given_price"
                         label="Given Price"
@@ -401,7 +514,7 @@ export const Quote = withXHR(function Quote({
             >
               Edit
             </Link>
-          </div>
+          </ButtonGroup>
           {instalments ? (
             <Table
               striped
@@ -418,7 +531,7 @@ export const Quote = withXHR(function Quote({
               ])}
             />
           ) : null}
-        </footer>
+        </div>
       ) : null}
     </div>
   )
@@ -443,9 +556,9 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
       {quotes.length === 0 ? (
         <p className="text-center">No quote created for this trip</p>
       ) : (
-        <ol className="list list--bordered">
+        <ol>
           {quotes.map(quote => (
-            <li key={quote.id}>
+            <li key={quote.id} className="p-4 shadow rounded mb-8 bg-white">
               <Quote
                 quote={quote}
                 navigate={navigate}

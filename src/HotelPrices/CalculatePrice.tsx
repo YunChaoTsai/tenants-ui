@@ -27,7 +27,7 @@ import { SelectRoomTypes } from "./../RoomTypes"
 import { withXHR, XHRProps } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
-import { EmptyNumberValidator } from "../utils"
+import { EmptyNumberValidator, numberToLocalString } from "../utils"
 import Spinner from "../Shared/Spinner"
 
 type IHotel = hotelStore.IHotel
@@ -125,14 +125,19 @@ interface CalculatePriceFormProps extends XHRProps {
   onChange?: (price: number, hotels: any) => void
   bookingFrom?: string
   bookingTo?: string
+  shouldEmptyInitialValues?: boolean
 }
 export const CalculatePriceForm = withXHR(function CalculatePriceForm({
-  initialValues = INITIAL_VALUES,
+  initialValues: initialValuesProp,
+  shouldEmptyInitialValues = false,
   xhr,
   onChange,
   bookingFrom,
   bookingTo,
 }: CalculatePriceFormProps) {
+  const initialValues =
+    initialValuesProp ||
+    (shouldEmptyInitialValues ? { hotels: [] } : INITIAL_VALUES)
   const notifyOnChange = useCallback(
     (flattenValues: CalculatePriceParams) => {
       onChange &&
@@ -303,7 +308,7 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
             <FieldArray
               name="hotels"
               render={({ name, push, remove }) => (
-                <div className="border-gray-300 border-t-4">
+                <div>
                   {values.hotels.map((hotel, index) => (
                     <div key={index} className="border-gray-300 border-b-4">
                       <Grid>
@@ -714,8 +719,8 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                       </Grid>
                     </div>
                   ))}
-                  <div className="mt-4">
-                    <Button onClick={() => push(initialValues.hotels[0])}>
+                  <div className="pt-4">
+                    <Button onClick={() => push(INITIAL_VALUES.hotels[0])}>
                       + Add {values.hotels.length ? "Another" : ""} Hotel Query
                     </Button>
                   </div>
@@ -766,11 +771,13 @@ export default function CalculatePrice(props: RouteComponentProps) {
         Please enter the desired hotel configuration query and press get price
         to get the prices.
       </p>
-      <CalculatePriceForm onChange={price => setPrice(price)} />
-      <footer className="mt-8 pb-8">
-        <h4>
-          <mark>Total Cost Price: {price}</mark>
-        </h4>
+      <div className="bg-white px-4 pb-4 rounded shadow">
+        <CalculatePriceForm onChange={price => setPrice(price)} />
+      </div>
+      <footer className="mt-4">
+        <mark className="inilne-block text-xl font-bold rounded px-4 py-2">
+          Total Price: {numberToLocalString(price)}
+        </mark>
       </footer>
     </div>
   )
