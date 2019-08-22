@@ -198,76 +198,82 @@ export const Quote = withXHR(function Quote({
           </em>
         </blockquote>
       </header>
-      {hotels.length ? (
+      {hotels.length || hotel_extras.length ? (
         <section>
           <div className="flex">
             <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
               <Icons.BedIcon />
             </span>
             <div className="w-full">
-              <h6>Accommodation</h6>
-              <Table
-                striped
-                bordered
-                caption={
-                  "Bellow are the details of daywise hotel accomodation and their prices"
-                }
-                responsive
-                headers={[
-                  "Date",
-                  "Hotels",
-                  "Meal Plan",
-                  "Rooms",
-                  "Price",
-                ].concat(showHotelBookingStatus ? ["Booking Stage"] : [])}
-                alignCols={{ 4: "right", 5: "center" }}
-                rows={hotels.map(quoteHotel => {
-                  const {
-                    hotel,
-                    checkin,
-                    checkout,
-                    meal_plan,
-                    room_type,
-                    no_of_rooms,
-                    comments,
-                    given_price,
-                  } = quoteHotel
-                  return [
-                    <span className="whitespace-pre">
-                      {moment
-                        .utc(checkin)
-                        .local()
-                        .format("DD MMM YYYY")}
-                      <br />
-                      <small>
-                        {moment
-                          .utc(checkout)
-                          .diff(moment.utc(checkin), "days") + 1}{" "}
-                        Nights
-                      </small>
-                    </span>,
-                    <div>
-                      <b>{hotel.name}</b>
-                      <br />
-                      <small>
-                        {hotel.location.short_name}, {hotel.stars} Star
-                      </small>
-                      {comments ? <blockquote>{comments}</blockquote> : null}
-                    </div>,
-                    meal_plan.name,
-                    <div>
-                      {room_type.name}
-                      <br />
-                      <small>{no_of_rooms} Rooms</small>
-                    </div>,
-                    numberToLocalString(given_price),
-                  ].concat(
-                    showHotelBookingStatus
-                      ? [<QuoteHotelBookingStage quoteHotel={quoteHotel} />]
-                      : []
-                  )
-                })}
-              />
+              {hotels.length ? (
+                <div>
+                  <h6>Accommodation</h6>
+                  <Table
+                    striped
+                    bordered
+                    caption={
+                      "Bellow are the details of daywise hotel accomodation and their prices"
+                    }
+                    responsive
+                    headers={[
+                      "Date",
+                      "Hotels",
+                      "Meal Plan",
+                      "Rooms",
+                      "Price",
+                    ].concat(showHotelBookingStatus ? ["Booking Stage"] : [])}
+                    alignCols={{ 4: "right", 5: "center" }}
+                    rows={hotels.map(quoteHotel => {
+                      const {
+                        hotel,
+                        checkin,
+                        checkout,
+                        meal_plan,
+                        room_type,
+                        no_of_rooms,
+                        comments,
+                        given_price,
+                      } = quoteHotel
+                      return [
+                        <span className="whitespace-pre">
+                          {moment
+                            .utc(checkin)
+                            .local()
+                            .format("DD MMM YYYY")}
+                          <br />
+                          <small>
+                            {moment
+                              .utc(checkout)
+                              .diff(moment.utc(checkin), "days") + 1}{" "}
+                            Nights
+                          </small>
+                        </span>,
+                        <div>
+                          <b>{hotel.name}</b>
+                          <br />
+                          <small>
+                            {hotel.location.short_name}, {hotel.stars} Star
+                          </small>
+                          {comments ? (
+                            <blockquote>{comments}</blockquote>
+                          ) : null}
+                        </div>,
+                        meal_plan.name,
+                        <div>
+                          {room_type.name}
+                          <br />
+                          <small>{no_of_rooms} Rooms</small>
+                        </div>,
+                        numberToLocalString(given_price),
+                      ].concat(
+                        showHotelBookingStatus
+                          ? [<QuoteHotelBookingStage quoteHotel={quoteHotel} />]
+                          : []
+                      )
+                    })}
+                  />
+                </div>
+              ) : null}
               {hotel_extras.length ? (
                 <div>
                   <h6>Hotel Extra Services</h6>
@@ -300,68 +306,75 @@ export const Quote = withXHR(function Quote({
           </div>
         </section>
       ) : null}
-      {cabs.length ? (
+      {cabs.length || transport_extras.length ? (
         <section>
           <div className="flex">
             <span className="inline-flex w-8 h-8 align-items-center justify-content-center bg-primary-100 rounded-full mr-2">
               <Icons.BusIcon />
             </span>
             <div className="w-full">
-              <h6>Transportation</h6>
-              <Table
-                striped
-                bordered
-                caption={
-                  "Bellow are the details for the daywise transportation and their prices"
-                }
-                responsive
-                headers={["Date", "Service", "Cabs", "Price"]}
-                alignCols={{ 3: "right" }}
-                rows={cabs.map(
-                  ({
-                    from_date,
-                    to_date,
-                    cab_type,
-                    transport_service,
-                    cab_locality,
-                    no_of_cabs,
-                    comments,
-                    given_price,
-                  }) => [
-                    <span className="whitespace-pre">
-                      {moment
-                        .utc(from_date)
-                        .local()
-                        .format("DD MMM YYYY")}{" "}
-                      <br />
-                      <small>
-                        {moment
-                          .utc(to_date)
-                          .diff(moment.utc(from_date), "days") + 1}{" "}
-                        Days
-                      </small>
-                    </span>,
-                    <div>
-                      {transport_service.name}
-                      {comments ? <blockquote>{comments}</blockquote> : null}
-                    </div>,
-                    <div>
-                      {cab_type.name}
-                      <br />
-                      <small>{no_of_cabs} cabs</small>
-                      {cab_locality ? (
-                        <span>
-                          {" "}
-                          • <small>Locality: {cab_locality.short_name}</small>
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                    </div>,
-                    numberToLocalString(given_price),
-                  ]
-                )}
-              />
+              {cabs.length ? (
+                <div>
+                  <h6>Transportation</h6>
+                  <Table
+                    striped
+                    bordered
+                    caption={
+                      "Bellow are the details for the daywise transportation and their prices"
+                    }
+                    responsive
+                    headers={["Date", "Service", "Cabs", "Price"]}
+                    alignCols={{ 3: "right" }}
+                    rows={cabs.map(
+                      ({
+                        from_date,
+                        to_date,
+                        cab_type,
+                        transport_service,
+                        cab_locality,
+                        no_of_cabs,
+                        comments,
+                        given_price,
+                      }) => [
+                        <span className="whitespace-pre">
+                          {moment
+                            .utc(from_date)
+                            .local()
+                            .format("DD MMM YYYY")}{" "}
+                          <br />
+                          <small>
+                            {moment
+                              .utc(to_date)
+                              .diff(moment.utc(from_date), "days") + 1}{" "}
+                            Days
+                          </small>
+                        </span>,
+                        <div>
+                          {transport_service.name}
+                          {comments ? (
+                            <blockquote>{comments}</blockquote>
+                          ) : null}
+                        </div>,
+                        <div>
+                          {cab_type.name}
+                          <br />
+                          <small>{no_of_cabs} cabs</small>
+                          {cab_locality ? (
+                            <span>
+                              {" "}
+                              •{" "}
+                              <small>Locality: {cab_locality.short_name}</small>
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                        </div>,
+                        numberToLocalString(given_price),
+                      ]
+                    )}
+                  />
+                </div>
+              ) : null}
               {transport_extras.length ? (
                 <div>
                   <h6>Transport Extra Services</h6>
@@ -439,8 +452,8 @@ export const Quote = withXHR(function Quote({
                 <Formik
                   initialValues={{
                     comments: "",
-                    factor: 1.1,
-                    given_price: Math.ceil(quote.total_price * 1.1),
+                    factor: 1.3,
+                    given_price: Math.ceil(quote.total_price * 1.3),
                   }}
                   validationSchema={giveQuoteSchema}
                   onSubmit={(values, actions) => {
@@ -464,7 +477,7 @@ export const Quote = withXHR(function Quote({
                         label="Multiplication Factor"
                         name="factor"
                         type="number"
-                        step={0.05}
+                        step={0.01}
                         onChange={e => {
                           setFieldValue(
                             "given_price",

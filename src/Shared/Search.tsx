@@ -8,6 +8,7 @@ export interface SearchProps {
     q: string
   }
   onSearch: (params: any) => void
+  placeholder?: string
 }
 
 export function useSearch(initialValues: any = {}) {
@@ -22,6 +23,7 @@ const defaultInitialParams = {
 export function Search({
   initialParams = defaultInitialParams,
   onSearch,
+  placeholder = "Search...",
 }: SearchProps) {
   return (
     <Formik
@@ -33,7 +35,7 @@ export function Search({
             <InputField
               name="q"
               noGroup
-              placeholder="Search..."
+              placeholder={placeholder}
               type="search"
             />
             <Button type="submit">

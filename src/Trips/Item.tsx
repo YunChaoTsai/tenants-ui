@@ -69,11 +69,13 @@ const BasicDetails = withXHR(function BasicDetails({
     trip_id,
     contacts,
     tags,
+    latest_stage,
+    created_by,
   } = trip
   return (
     <Grid>
       <Col>
-        <Table autoWidth bordered caption="Basic details of the trip">
+        <Table autoWidth bordered>
           <tbody>
             <tr>
               <th>ID</th>
@@ -93,11 +95,12 @@ const BasicDetails = withXHR(function BasicDetails({
                   .local()
                   .format("DD MMM, YYYY")}
                 {" for "}
-                {moment.utc(end_date).diff(moment.utc(start_date), "days")} Days
+                {moment.utc(end_date).diff(moment.utc(start_date), "days")}{" "}
+                Nights
               </td>
             </tr>
             <tr>
-              <th>Guest</th>
+              <th>Traveler</th>
               <td>
                 {contacts.map(contact => (
                   <div key={contact.id}>
@@ -107,14 +110,11 @@ const BasicDetails = withXHR(function BasicDetails({
                       <a href={`tel:${contact.phone_number}`}>
                         {contact.phone_number}
                       </a>
+                      {contact.phone_number && contact.email ? (
+                        <span> • </span>
+                      ) : null}
                       {contact.email ? (
-                        <span>
-                          {" "}
-                          • 
-                          <a href={`mailto:${contact.email}`}>
-                            {contact.email}
-                          </a>
-                        </span>
+                        <a href={`mailto:${contact.email}`}>{contact.email}</a>
                       ) : null}
                     </small>
                   </div>
@@ -125,7 +125,14 @@ const BasicDetails = withXHR(function BasicDetails({
               <th>Pax</th>
               <td>
                 {no_of_adults} Adults
-                {children ? <span>with {children} Children</span> : ""}
+                {children ? <span> with {children} Children</span> : ""}
+              </td>
+            </tr>
+            <tr>
+              <th>Stage</th>
+              <td>
+                <div>{latest_stage ? latest_stage.name : "Initiated"}</div>
+                <small>by {created_by.name}</small>
               </td>
             </tr>
           </tbody>

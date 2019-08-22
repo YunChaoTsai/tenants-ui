@@ -110,6 +110,7 @@ export interface IGivenQuote {
   comments?: string
   created_by: userStore.IUser
   created_at: string
+  locations: Array<locationStore.ILocation>
 }
 
 export interface ITrip extends IBaseItem {
@@ -135,6 +136,7 @@ export interface ITrip extends IBaseItem {
   hotel_payments?: paymentStore.IPayment<IQuoteHotel>[]
   cab_payments?: paymentStore.IPayment<IQuoteCab>[]
   tags?: Array<tagStore.ITag>
+  created_by: userStore.IUser
 }
 
 export interface ITrips extends IBaseState<ITrip> {}
