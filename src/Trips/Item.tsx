@@ -288,7 +288,7 @@ const BasicDetails = withXHR(function BasicDetails({
 })
 
 function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
-  const { id, locations, trip_source, trip_id } = trip
+  const { id, locations, trip_source, trip_id, activity_logs } = trip
   return (
     <div>
       <Helmet>
@@ -300,6 +300,28 @@ function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
       <BasicDetails trip={trip} />
       <Payments trip={trip} />
       <LatestGivenQuote trip={trip} />
+      {activity_logs ? (
+        <div>
+          <h5>Activities</h5>
+          <ol className="list-disc pl-4">
+            {activity_logs.map(activity => (
+              <li key={activity.id} className="py-2">
+                <span>{activity.description}</span> <br />
+                {activity.causer ? (
+                  <small className="text-gray-600">
+                    {" "}
+                    by {activity.causer.name} •{" "}
+                    {moment
+                      .utc(activity.created_at)
+                      .local()
+                      .fromNow()}
+                  </small>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
     </div>
   )
 }

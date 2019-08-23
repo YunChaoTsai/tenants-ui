@@ -21,6 +21,7 @@ import { store as paymentStore } from "./../Payments"
 import { store as hotelBookingStageStore } from "./../HotelBookingStages"
 import { store as tagStore } from "./../Tags"
 import { store as extraServiceStore } from "./../ExtraServices"
+import { store as activityLogStore } from "./../ActivityLogs"
 
 export const key = "TRIP_LIST_STATE"
 
@@ -137,6 +138,7 @@ export interface ITrip extends IBaseItem {
   cab_payments?: paymentStore.IPayment<IQuoteCab>[]
   tags?: Array<tagStore.ITag>
   created_by: userStore.IUser
+  activity_logs?: Array<activityLogStore.IActivityLog>
 }
 
 export interface ITrips extends IBaseState<ITrip> {}
