@@ -217,6 +217,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                     if (error.formikErrors) {
                       actions.setErrors(error.formikErrors)
                     }
+                    actions.setSubmitting(false)
                     return Promise.reject(error)
                   })
               } else {
@@ -289,78 +290,50 @@ export const ConvertTrip = withXHR(function ConvertTrip({
                                     />
                                   </Col>
                                   <Col>
-                                    <FormGroup>
-                                      <label
-                                        htmlFor={`${name}.${index}.percentage`}
-                                      >
-                                        Percentage
-                                      </label>
-                                      <Field
-                                        name={`${name}.${index}.percentage`}
-                                        render={({
-                                          field,
-                                        }: FieldProps<
-                                          ITripConversionSchema
-                                        >) => (
-                                          <Input
-                                            {...field}
-                                            onChange={(
-                                              e: React.ChangeEvent<
-                                                HTMLInputElement
-                                              >
-                                            ) => {
-                                              setFieldValue(
-                                                `${name}.${index}.amount`,
-                                                (latest_given_quote.given_price *
-                                                  parseFloat(
-                                                    e.target.value || "0"
-                                                  )) /
-                                                  100
-                                              )
-                                              field.onChange(e)
-                                            }}
-                                            type="number"
-                                          />
-                                        )}
-                                      />
-                                    </FormGroup>
+                                    <InputField
+                                      label="Percentage"
+                                      name={`${name}.${index}.percentage`}
+                                      onChange={(
+                                        e: React.ChangeEvent<HTMLInputElement>
+                                      ) => {
+                                        setFieldValue(
+                                          `${name}.${index}.amount`,
+                                          (latest_given_quote.given_price *
+                                            parseFloat(
+                                              e.currentTarget.value || "0"
+                                            )) /
+                                            100
+                                        )
+                                        setFieldValue(
+                                          e.currentTarget.name,
+                                          e.currentTarget.value
+                                        )
+                                      }}
+                                      type="number"
+                                    />
                                   </Col>
                                   <Col>
-                                    <FormGroup>
-                                      <label
-                                        htmlFor={`${name}.${index}.amount`}
-                                      >
-                                        Amount
-                                      </label>
-                                      <Field
-                                        name={`${name}.${index}.amount`}
-                                        render={({
-                                          field,
-                                        }: FieldProps<
-                                          ITripConversionSchema
-                                        >) => (
-                                          <Input
-                                            {...field}
-                                            onChange={(
-                                              e: React.ChangeEvent<
-                                                HTMLInputElement
-                                              >
-                                            ) => {
-                                              setFieldValue(
-                                                `${name}.${index}.percentage`,
-                                                (100 *
-                                                  parseFloat(
-                                                    e.target.value || "0"
-                                                  )) /
-                                                  latest_given_quote.given_price
-                                              )
-                                              field.onChange(e)
-                                            }}
-                                            type="number"
-                                          />
-                                        )}
-                                      />
-                                    </FormGroup>
+                                    <InputField
+                                      label="Amount"
+                                      name={`${name}.${index}.amount`}
+                                      onChange={(
+                                        e: React.ChangeEvent<HTMLInputElement>
+                                      ) => {
+                                        setFieldValue(
+                                          `${name}.${index}.percentage`,
+                                          (100 *
+                                            parseFloat(
+                                              e.currentTarget.value || "0"
+                                            )) /
+                                            latest_given_quote.given_price
+                                        )
+                                        setFieldValue(
+                                          e.currentTarget.name,
+                                          e.currentTarget.value
+                                        )
+                                      }}
+                                      type="number"
+                                    />
                                   </Col>
                                   <Col className="d-flex align-items-center">
                                     <div className="button-group">
