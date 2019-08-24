@@ -198,4 +198,8 @@ export const XHRContext = React.createContext<AxiosInstance>(axios)
 export const withXHR = withContext<AxiosInstance, "xhr">(XHRContext, "xhr")
 export type XHRProps = { xhr: AxiosInstance }
 
+export function useXHR() {
+  return React.useContext(XHRContext)
+}
+
 export default axios
