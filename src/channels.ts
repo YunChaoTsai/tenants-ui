@@ -2,11 +2,12 @@ import Echo from "laravel-echo"
 import Pusher from "pusher-js"
 
 import { getAuthorizationToken } from "./xhr"
+import config from "./config"
 
-const client = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
-  cluster: process.env.REACT_APP_PUSHER_APP_CLUSTER,
+const client = new Pusher(config.pusher.key, {
+  cluster: config.pusher.cluster,
   forceTLS: true,
-  authEndpoint: "http://localhost:8000/broadcasting/auth",
+  authEndpoint: config.pusher.authEndpoint,
   auth: {
     headers: {
       Authorization: `Bearer ${getAuthorizationToken()}`,

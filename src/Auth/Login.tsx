@@ -12,6 +12,7 @@ import { actions, IUser } from "./store"
 import { getUserAction } from "./User"
 import { searchToQuery, useThunkDispatch } from "./../utils"
 import { InputField } from "./../Shared/InputField"
+import config from "../config"
 
 // schemas
 export interface ILoginCredentials {
@@ -85,7 +86,7 @@ export default function Login({ location }: LoginProps) {
       <div className="min-h-screen">
         <div className="text-center">
           <img
-            src={process.env.PUBLIC_URL + "/logo.png"}
+            src={config.publicUrl + "/logo.png"}
             className="inline-block mt-16 w-20 rounded-full shadow"
           />
         </div>

@@ -7,6 +7,7 @@ import axios, {
 } from "axios"
 import { compose } from "redux"
 import { withContext, queryToSearch } from "./utils"
+import config from "./config"
 
 export function getAuthorizationToken() {
   return localStorage.getItem("access_token")
@@ -169,7 +170,7 @@ function rateLimitErrorInterceptor(error: AxiosError): any {
  * If in any case, we need to disabled this behaviour, we can write the
  * full uri (https://apis.tourepedia.com/login) instead of path (/login)
  */
-axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL
+axios.defaults.baseURL = config.apiBaseUrl
 
 // inject the interceptors for request and response
 axios.interceptors.request.use(

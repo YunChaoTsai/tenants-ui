@@ -37,6 +37,7 @@ import Dropdown from "./Shared/Dropdown"
 import "./main.css"
 import "./typography.css"
 import { Notification, useNotifications } from "./Notifications"
+import config from "./config"
 
 function NotificationList() {
   const { user } = useAuthUser()
@@ -87,7 +88,7 @@ export const Header = function Header() {
           <div className="flex items-center">
             <img
               alt="Tourepedia Logo"
-              src={process.env.PUBLIC_URL + "/logo.png"}
+              src={config.publicUrl + "/logo.png"}
               className="inline-block align-middle rounded-full shadow h-8 w-8 mr-2"
             />
             <h1 className="font-normal text-base m-0 md:block">
@@ -224,7 +225,7 @@ function Footer() {
         <div className="py-4">
           <span>&copy; 2019 Tourepedia. All rights reserved</span>
           {" • "}
-          <span>v{process.env.REACT_APP_VERSION}</span>
+          <span>v{config.appVersion}</span>
         </div>
       </Container>
     </footer>
