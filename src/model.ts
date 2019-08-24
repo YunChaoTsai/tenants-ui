@@ -120,7 +120,8 @@ export function createReducer<
   actions: {
     list: ReturnType<ReturnType<typeof createAsyncAction>>
     item: ReturnType<ReturnType<typeof createAsyncAction>>
-  }
+  },
+  reducer?: (state: IState, action: ActionType<any>) => IState
 ) {
   return (state: IState = INITIAL_STATE, action: ActionType<any>): IState => {
     if (actions.list) {
@@ -153,6 +154,9 @@ export function createReducer<
         case getType(actions.item.failure):
           return { ...state, isFetching: false }
       }
+    }
+    if (reducer) {
+      return reducer(state, action)
     }
     return state
   }

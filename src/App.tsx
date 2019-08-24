@@ -1,8 +1,9 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { Router, Link, Location } from "@reach/router"
 import Helmet from "react-helmet-async"
-import { Icons } from "@tourepedia/ui"
+import { Icons, Badge } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
+import classNames from "classnames"
 
 import { Login, Logout, useAuthUser, InvitedSignup, TenantSignup } from "./Auth"
 import { NavLink } from "./Shared/NavLink"
@@ -35,6 +36,45 @@ import Dropdown from "./Shared/Dropdown"
 
 import "./main.css"
 import "./typography.css"
+import { Notification, useNotifications } from "./Notifications"
+
+function NotificationList() {
+  const { user } = useAuthUser()
+  const {
+    notifications,
+    fetchNotifications,
+    markAllAsRead,
+  } = useNotifications()
+  useEffect(() => {
+    user && fetchNotifications()
+  }, [user, fetchNotifications])
+  if (!user) return null
+  return notifications && notifications.length ? (
+    <Dropdown as="li" className="inline-block" alignRight>
+      <a href="#view-notifications" className="toggler">
+        <Badge primary>
+          {notifications.filter(n => !n.read_at).length.toString()}
+        </Badge>
+      </a>
+      <ul
+        className="menu"
+        style={{ maxHeight: "40vh", minWidth: "250px", overflow: "auto" }}
+      >
+        <header className="px-3 py-2 text-sm border-b flex justify-between">
+          <span className="font-bold ">Notifications</span>
+          <button className="text-primary-600" onClick={markAllAsRead}>
+            Mark All as Read
+          </button>
+        </header>
+        {notifications.map((n, i) => (
+          <li key={n.id} className="border-t">
+            <Notification notification={n} />
+          </li>
+        ))}
+      </ul>
+    </Dropdown>
+  ) : null
+}
 
 export const Header = function Header() {
   const { user } = useAuthUser()
@@ -109,6 +149,7 @@ export const Header = function Header() {
               </ul>
             </Dropdown>
           ) : null}
+          <NotificationList />
           <Dropdown as="li" className="inline-block" alignRight>
             <a className="toggler" href="#profile-and-settings">
               <Icons.CogAltIcon title={`Hi ${name}`} />

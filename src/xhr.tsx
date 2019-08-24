@@ -8,6 +8,14 @@ import axios, {
 import { compose } from "redux"
 import { withContext, queryToSearch } from "./utils"
 
+export function getAuthorizationToken() {
+  return localStorage.getItem("access_token")
+}
+
+export function storeAuthorizationToken(token: string) {
+  localStorage.setItem("access_token", token)
+}
+
 /**
  * Request interceptor for Authorization Header
  *
@@ -21,9 +29,7 @@ import { withContext, queryToSearch } from "./utils"
 function authorizationHeaderInterceptor(
   config: AxiosRequestConfig
 ): AxiosRequestConfig {
-  config.headers["Authorization"] = `Bearer ${localStorage.getItem(
-    "access_token"
-  )}`
+  config.headers["Authorization"] = `Bearer ${getAuthorizationToken()}`
   return config
 }
 
@@ -88,7 +94,7 @@ function methodTypeInterceptor(config: AxiosRequestConfig) {
 function accessTokenInterceptor(response: AxiosResponse): AxiosResponse {
   const { data } = response
   if (data.access_token) {
-    localStorage.setItem("access_token", data.access_token)
+    storeAuthorizationToken(data.access_token)
   }
   return response
 }

@@ -1,5 +1,6 @@
 import { createAsyncAction, ActionType, getType } from "typesafe-actions"
 import { store as tenantStore } from "./../Tenants"
+import { store as notificationStore } from "./../Notifications"
 
 export const key = "AUTHENTICATED_USER_STATE"
 
@@ -17,6 +18,7 @@ export interface IUser {
   email: string
   tenant?: tenantStore.ITenant
   permissions: Array<string>
+  notifications?: Array<notificationStore.INotification>
 }
 
 export interface IState {

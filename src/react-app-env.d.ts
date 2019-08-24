@@ -8,5 +8,7 @@ declare namespace NodeJS {
     readonly REACT_APP_APPLICATION_NAME: string
     readonly REACT_APP_API_BASE_URL: string
     readonly REACT_APP_VERSION: string
+    readonly REACT_APP_PUSHER_APP_KEY: string
+    readonly REACT_APP_PUSHER_APP_CLUSTER: string
   }
 }
