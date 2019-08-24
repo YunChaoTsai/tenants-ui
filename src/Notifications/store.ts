@@ -1,4 +1,9 @@
-import { createAsyncAction, ActionType, getType } from "typesafe-actions"
+import {
+  createAsyncAction,
+  ActionType,
+  getType,
+  createStandardAction,
+} from "typesafe-actions"
 import {
   IBaseItem,
   IBaseState,
@@ -36,12 +41,15 @@ export const actions = {
     "@NOTIFICATIONS/LIST_FETCH_REQUEST",
     "@NOTIFICATIONS/LIST_FETCH_SUCCESS",
     "@NOTIFICATIONS/LIST_FETCH_FAILED"
-  )<undefined, { data: INotification[]; meta: IMeta }, Error>(),
+  )<undefined, { data: INotification[]; meta?: IMeta }, Error>(),
   markAsRead: createAsyncAction(
     "@NOTIFICATIONS/MARK_AS_READ_REQUEST",
     "@NOTIFICATIONS/MARK_AS_READ_SUCCESS",
     "@NOTIFICATIONS/MARK_AS_READ_FAILED"
   )<undefined, { data: INotification[] }, Error>(),
+  pushNewNotification: createStandardAction(
+    "@NOTIFICATIONS/PUSH_NEW_NOTIFICATION"
+  )<INotification>(),
 }
 
 export type TActions = ActionType<typeof actions>
@@ -55,6 +63,11 @@ export const reducer = createReducer<INotification, IState>(
         return {
           ...state,
           state: model(state.state).insert(action.payload.data),
+        }
+      case getType(actions.pushNewNotification):
+        return {
+          ...state,
+          state: model(state.state).insert([action.payload], undefined, true),
         }
     }
     return state

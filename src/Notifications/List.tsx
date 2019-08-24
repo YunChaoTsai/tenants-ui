@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { AxiosInstance } from "axios"
 import { Link } from "@reach/router"
 import classNames from "classnames"
@@ -10,8 +10,11 @@ import { INotification, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction } from "./../types"
 import { IPaginate } from "../model"
 import { useThunkDispatch } from "../utils"
-import { notificationsChannel } from "../channels"
-import { store as authStore } from "./../Auth"
+import { useChannels } from "../channels"
+import { useAuthUser } from "./../Auth"
+
+const NOTIFICATION_EVENT =
+  ".Illuminate\\Notifications\\Events\\BroadcastNotificationCreated"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -32,39 +35,12 @@ export function XHR(xhr: AxiosInstance) {
 
 export const getNotificationsAction = (
   params?: any
-): ThunkAction<Promise<INotification[]>> => async (
-  dispatch,
-  getState,
-  { xhr }
-) => {
+): ThunkAction<Promise<INotification[]>> => async (dispatch, _, { xhr }) => {
   dispatch(actions.list.request())
   return XHR(xhr)
     .getNotifications(params)
     .then(({ data, meta }) => {
       dispatch(actions.list.success({ data, meta }))
-      const user = authStore.selectors(getState()).user
-      if (user) {
-        notificationsChannel(user.id).notification(
-          (notification: INotification) => {
-            const notifications = selectors(getState()).get()
-            dispatch(
-              actions.list.success({
-                data: [
-                  {
-                    ...notification,
-                    data:
-                      typeof notification.data === "string"
-                        ? JSON.parse(notification.data)
-                        : notification.data,
-                  },
-                  ...notifications,
-                ],
-                meta,
-              })
-            )
-          }
-        )
-      }
       return data
     })
     .catch(error => {
@@ -217,4 +193,30 @@ export function Notification({
       </footer>
     </div>
   )
+}
+
+export function useNotificationsChannel(userId?: number) {
+  const channels = useChannels()
+  const notificationsChannel = useMemo(() => {
+    return channels && channels.private("users." + userId)
+  }, [userId, channels])
+  if (!userId || !channels) return
+  return notificationsChannel
+}
+
+export function useConnectedNotificationChannel() {
+  const { user } = useAuthUser()
+  const dispatch = useThunkDispatch()
+  const notificationsChannel = useNotificationsChannel(user && user.id)
+  useEffect(() => {
+    if (notificationsChannel) {
+      const pushNewNotification = (notification: INotification) => {
+        dispatch(actions.pushNewNotification(notification))
+      }
+      notificationsChannel.notification(pushNewNotification)
+      return () => {
+        notificationsChannel.stopListening(NOTIFICATION_EVENT)
+      }
+    }
+  }, [dispatch, notificationsChannel])
 }

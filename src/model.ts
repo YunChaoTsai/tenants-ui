@@ -55,12 +55,20 @@ export function init<Item extends IBaseItem>(items?: Item[]): IBaseState<Item> {
 export function model<Item extends IBaseItem>(prevState?: IBaseState<Item>) {
   const state = prevState || init<Item>()
   return {
-    insert(items?: Item[], meta?: IMeta): IBaseState<Item> {
+    insert(
+      items?: Item[],
+      meta?: IMeta,
+      atStart: boolean = false
+    ): IBaseState<Item> {
       if (!items) return state
       return items.reduce((state: IBaseState<Item>, item) => {
         let { byId, items, meta: stateMeta } = state
         if (!byId[item.id]) {
-          items = items.concat(item.id)
+          if (atStart) {
+            items = [item.id].concat(items)
+          } else {
+            items = items.concat(item.id)
+          }
         }
         byId[item.id] = item
         return {

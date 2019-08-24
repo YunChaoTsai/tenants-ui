@@ -1,4 +1,13 @@
 import * as store from "./store"
-import { useNotifications, Notification } from "./List"
+import {
+  useNotifications,
+  Notification,
+  useConnectedNotificationChannel,
+} from "./List"
 
-export { store, Notification, useNotifications }
+export {
+  store,
+  Notification,
+  useNotifications,
+  useConnectedNotificationChannel,
+}

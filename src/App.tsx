@@ -1,9 +1,8 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { Router, Link, Location } from "@reach/router"
 import Helmet from "react-helmet-async"
 import { Icons, Badge } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
-import classNames from "classnames"
 
 import { Login, Logout, useAuthUser, InvitedSignup, TenantSignup } from "./Auth"
 import { NavLink } from "./Shared/NavLink"
@@ -36,8 +35,13 @@ import Dropdown from "./Shared/Dropdown"
 
 import "./main.css"
 import "./typography.css"
-import { Notification, useNotifications } from "./Notifications"
+import {
+  Notification,
+  useNotifications,
+  useConnectedNotificationChannel,
+} from "./Notifications"
 import config from "./config"
+import { ChannelContextProvider } from "./channels"
 
 function NotificationList() {
   const { user } = useAuthUser()
@@ -46,6 +50,7 @@ function NotificationList() {
     fetchNotifications,
     markAllAsRead,
   } = useNotifications()
+  useConnectedNotificationChannel()
   useEffect(() => {
     user && fetchNotifications()
   }, [user, fetchNotifications])
@@ -176,7 +181,7 @@ export const Header = function Header() {
 
 export default function App() {
   return (
-    <Fragment>
+    <ChannelContextProvider>
       <Helmet titleTemplate="%s | Tourepedia" defaultTitle="Tourepedia" />
       <Header />
       <main style={{ minHeight: "80vh" }}>
@@ -214,7 +219,7 @@ export default function App() {
         </Container>
       </main>
       <Footer />
-    </Fragment>
+    </ChannelContextProvider>
   )
 }
 
