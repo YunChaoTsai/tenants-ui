@@ -48,6 +48,7 @@ export interface ExtraServicesParams {
     price?: number
     date?: string
     hotel?: IHotel
+    comments?: string
   }[]
 }
 
@@ -60,6 +61,7 @@ export const validationSchema = Validator.object().shape({
       date: Validator.string(),
       hotel: Validator.object(),
       price: EmptyNumberValidator().positive("Price should be positive"),
+      comments: Validator.string(),
     })
   ),
 })
@@ -71,6 +73,7 @@ export const INITIAL_VALUES: ExtraServicesParams = {
       date: "",
       hotel: undefined,
       price: undefined,
+      comments: "",
     },
   ],
 }
@@ -152,13 +155,14 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
         hotel_extras: [],
       }
       values.hotel_extras.forEach(values => {
-        const { date, service, price, hotel } = values
+        const { date, service, hotel, ...otherData } = values
         if (service) {
           flattenValues.hotel_extras.push({
             ...values,
             date: date ? moment(date).format("YYYY-MM-DD") : "",
           })
           hotel_extras.push({
+            ...otherData,
             date: date
               ? moment(date)
                   .hours(0)
@@ -169,7 +173,6 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
               : "",
             hotel_id: hotel && hotel.id,
             service: service && service.name,
-            price,
           })
         }
       })
@@ -207,11 +210,7 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
           actions.setSubmitting(false)
         })
       }
-      render={({
-        isSubmitting,
-        values,
-        setFieldValue,
-      }: FormikProps<ExtraServicesParams>) => {
+      render={({ values, setFieldValue }: FormikProps<ExtraServicesParams>) => {
         return (
           <Form noValidate>
             <FieldArray
@@ -296,6 +295,13 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
                                 }
                               />
                             )}
+                          />
+                        </Col>
+                        <Col>
+                          <InputField
+                            name={`${name}.${index}.comments`}
+                            label="Comments"
+                            placeholder="Any comments regarding service"
                           />
                         </Col>
                         <Col className="pt-4 border-l text-right">

@@ -69,6 +69,7 @@ export interface IQuoteHotelExtras {
   calculated_price?: number
   given_price?: number
   hotel?: hotelStore.IHotel
+  comments: string
 }
 
 export interface IQuoteTransportExtras {
@@ -77,6 +78,7 @@ export interface IQuoteTransportExtras {
   date?: string
   calculated_price?: number
   given_price?: number
+  comments: string
 }
 
 export interface IQuoteOtherExtras {
@@ -85,6 +87,7 @@ export interface IQuoteOtherExtras {
   date?: string
   calculated_price?: number
   given_price?: number
+  comments: string
 }
 
 export interface IQuote {

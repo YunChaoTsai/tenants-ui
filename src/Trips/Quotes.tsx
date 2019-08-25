@@ -282,10 +282,16 @@ export const Quote = withXHR(function Quote({
                     bordered
                     caption={"Extras services for hotels"}
                     responsive
-                    headers={["Date", "Hotel", "Service", "Price"]}
+                    headers={["Service", "Date", "Hotel", "Price"]}
                     alignCols={{ 3: "right" }}
                     rows={hotel_extras.map(
-                      ({ service, date, hotel, given_price }) => [
+                      ({ service, date, hotel, given_price, comments }) => [
+                        <div>
+                          <div>{service.name}</div>
+                          {comments ? (
+                            <blockquote>{comments}</blockquote>
+                          ) : null}
+                        </div>,
                         date ? (
                           <span className="whitespace-pre">
                             {moment
@@ -295,7 +301,6 @@ export const Quote = withXHR(function Quote({
                           </span>
                         ) : null,
                         hotel && hotel.name,
-                        service.name,
                         numberToLocalString(given_price),
                       ]
                     )}
@@ -383,10 +388,16 @@ export const Quote = withXHR(function Quote({
                     bordered
                     caption={"Extras services for Transportation"}
                     responsive
-                    headers={["Date", "Service", "Price"]}
+                    headers={["Service", "Date", "Price"]}
                     alignCols={{ 2: "right" }}
                     rows={transport_extras.map(
-                      ({ service, date, given_price }) => [
+                      ({ service, date, given_price, comments }) => [
+                        <div>
+                          <div>{service.name}</div>
+                          {comments ? (
+                            <blockquote>{comments}</blockquote>
+                          ) : null}
+                        </div>,
                         date ? (
                           <span className="whitespace-pre">
                             {moment
@@ -395,7 +406,6 @@ export const Quote = withXHR(function Quote({
                               .format("DD MMM YYYY")}{" "}
                           </span>
                         ) : null,
-                        service.name,
                         numberToLocalString(given_price),
                       ]
                     )}
@@ -419,20 +429,25 @@ export const Quote = withXHR(function Quote({
                 bordered
                 caption={"Other Services provided with this quote"}
                 responsive
-                headers={["Date", "Service", "Price"]}
+                headers={["Service", "Date", "Price"]}
                 alignCols={{ 2: "right" }}
-                rows={other_extras.map(({ service, date, given_price }) => [
-                  date ? (
-                    <span className="whitespace-pre">
-                      {moment
-                        .utc(date)
-                        .local()
-                        .format("DD MMM YYYY")}{" "}
-                    </span>
-                  ) : null,
-                  service.name,
-                  numberToLocalString(given_price),
-                ])}
+                rows={other_extras.map(
+                  ({ service, date, given_price, comments }) => [
+                    <div>
+                      <div>{service.name}</div>
+                      {comments ? <blockquote>{comments}</blockquote> : null}
+                    </div>,
+                    date ? (
+                      <span className="whitespace-pre">
+                        {moment
+                          .utc(date)
+                          .local()
+                          .format("DD MMM YYYY")}{" "}
+                      </span>
+                    ) : null,
+                    numberToLocalString(given_price),
+                  ]
+                )}
               />
             </div>
           </div>

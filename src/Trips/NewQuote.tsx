@@ -45,7 +45,9 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
   const [cabs, setCabs] = useState<any>([])
   const [transportExtras, setTransportExtras] = useState<any>([])
   const [otherExtras, setOtherExtras] = useState<any>([])
-  const [comments, setComments] = useState<string>(quote ? quote.comments : "")
+  const [comments, setComments] = useState<string>(
+    quote ? quote.comments || "" : ""
+  )
   const [errors, setErrors] = useState<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const saveQuote = useCallback(() => {
