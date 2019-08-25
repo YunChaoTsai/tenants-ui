@@ -8,7 +8,7 @@ import {
   IMeta,
   createReducer,
 } from "./../model"
-import { store as locationStore } from "./../Locations"
+import { store as locationStore } from "./../TransportLocations"
 
 export const key = "TRANSPORT_SERVICES_STATE"
 
@@ -16,7 +16,8 @@ export interface ITransportService extends IBaseItem {
   id: number
   distance: number
   name: string
-  locations: locationStore.ILocation[]
+  locations: locationStore.ITransportLocation[]
+  comments: string
 }
 
 export interface ITransportServices extends IBaseState<ITransportService> {}

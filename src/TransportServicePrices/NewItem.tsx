@@ -16,6 +16,10 @@ import moment from "moment"
 import { ITransportServicePrice } from "./store"
 import { store as cabTypeStore, SelectCabTypes } from "./../CabTypes"
 import {
+  store as transportLocationStore,
+  SelectTransportLocations,
+} from "./../TransportLocations"
+import {
   SelectTransportServices as SelectServices,
   store as transportServiceStore,
 } from "./../TransportServices"
@@ -23,10 +27,11 @@ import { withXHR, XHRProps } from "./../xhr"
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
+import { EmptyNumberValidator } from "../utils"
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    storePrice(data: any): Promise<ITransportServicePrice> {
+    async storePrice(data: any): Promise<ITransportServicePrice> {
       return xhr.post("/cab-prices", data).then(resp => resp.data.cab_price)
     },
   }
@@ -41,12 +46,15 @@ const validationSchema = Validator.object().shape({
       transport_service: Validator.object().required(
         "Transport service is required"
       ),
-      price: Validator.number(),
-      per_km_charges: Validator.number(),
-      minimum_km_per_day: Validator.number(),
-      night_charges: Validator.number(),
-      toll_charges: Validator.number(),
-      parking_charges: Validator.number(),
+      cab_locality: Validator.object(),
+      per_day_charges: EmptyNumberValidator(),
+      per_day_parking_charges: EmptyNumberValidator(),
+      price: EmptyNumberValidator(),
+      per_km_charges: EmptyNumberValidator(),
+      minimum_km_per_day: EmptyNumberValidator(),
+      night_charges: EmptyNumberValidator(),
+      toll_charges: EmptyNumberValidator(),
+      parking_charges: EmptyNumberValidator(),
     })
   ),
 })
@@ -57,6 +65,9 @@ interface AddPriceCredentials {
     end_date: string
     cab_type?: cabTypeStore.ICabType
     transport_service?: transportServiceStore.ITransportService
+    cab_locality?: transportLocationStore.ITransportLocation
+    per_day_charges?: number
+    per_day_parking_charges?: number
     price?: number
     per_km_charges?: number
     minimum_km_per_day?: number
@@ -73,12 +84,15 @@ const initialValues: AddPriceCredentials = {
       end_date: "",
       cab_type: undefined,
       transport_service: undefined,
+      cab_locality: undefined,
+      per_day_charges: undefined,
+      per_day_parking_charges: undefined,
       price: undefined,
       per_km_charges: undefined,
       minimum_km_per_day: undefined,
-      toll_charges: 0,
-      night_charges: 0,
-      parking_charges: 0,
+      toll_charges: undefined,
+      night_charges: undefined,
+      parking_charges: undefined,
     },
   ],
 }
@@ -100,6 +114,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
           const {
             cab_type,
             transport_service,
+            cab_locality,
             start_date,
             end_date,
             ...otherData
@@ -121,6 +136,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                 .format("YYYY-MM-DD HH:mm:ss"),
               cab_type_id: cab_type.id,
               transport_service_id: transport_service.id,
+              cab_locality_id: cab_locality && cab_locality.name,
             })
           }
         })
@@ -206,11 +222,45 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                             )}
                           />
                         </Col>
+                        <Col>
+                          <FormikFormGroup
+                            name={`${name}.${index}.cab_locality`}
+                            render={({
+                              field,
+                            }: FieldProps<AddPriceCredentials>) => (
+                              <SelectTransportLocations
+                                {...field}
+                                label="Cab Locality"
+                                multiple={false}
+                                fetchOnMount
+                                onChange={(value, name) =>
+                                  setFieldValue(name, value)
+                                }
+                              />
+                            )}
+                          />
+                        </Col>
                       </Grid>
                       <Grid>
                         <Col>
                           <InputField
-                            label="Price (fixed)"
+                            label="Per Day Charges"
+                            name={`${name}.${index}.per_day_charges`}
+                            type="number"
+                            min={0}
+                          />
+                        </Col>
+                        <Col>
+                          <InputField
+                            label="Per Day Parking Charges"
+                            name={`${name}.${index}.per_day_parking_charges`}
+                            type="number"
+                            min={0}
+                          />
+                        </Col>
+                        <Col>
+                          <InputField
+                            label="Price (fixed Per Service)"
                             name={`${name}.${index}.price`}
                             type="number"
                             min={0}

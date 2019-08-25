@@ -167,7 +167,7 @@ export default function List(_: RouteComponentProps) {
                 .format("DD/MM/YYYY"),
               cab_type.name,
               transport_service.name,
-              cab_locality ? cab_locality.short_name : "",
+              cab_locality ? cab_locality.name : "",
               numberToLocalString(per_day_charges),
               numberToLocalString(per_day_parking_charges),
               numberToLocalString(price),
