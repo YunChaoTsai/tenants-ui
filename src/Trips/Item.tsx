@@ -16,6 +16,7 @@ import { useThunkDispatch } from "./../utils"
 import NavLink from "../Shared/NavLink"
 import Component from "../Shared/Component"
 import EditTags from "../Tags/EditTags"
+import EditOwners from "./EditOwners"
 import { useSelector } from "react-redux"
 import Payments from "./Payments"
 import LatestGivenQuote from "./LatestGivenQuote"
@@ -23,6 +24,7 @@ import { SelectTripStages } from "../TripStages"
 import { Formik, Form } from "formik"
 import { FormikFormGroup } from "../Shared/InputField"
 import { withXHR, XHRProps } from "../xhr"
+import { useCheckPermissions, PERMISSIONS } from "../Auth"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -58,6 +60,7 @@ const BasicDetails = withXHR(function BasicDetails({
   trip,
   xhr,
 }: XHRProps & { trip: ITrip }) {
+  const { hasPermission } = useCheckPermissions()
   const {
     id,
     start_date,
@@ -71,6 +74,8 @@ const BasicDetails = withXHR(function BasicDetails({
     tags,
     latest_stage,
     created_by,
+    sales_team = [],
+    operations_team = [],
   } = trip
   return (
     <Grid>
@@ -132,7 +137,91 @@ const BasicDetails = withXHR(function BasicDetails({
               <th>Stage</th>
               <td>
                 <div>{latest_stage ? latest_stage.name : "Initiated"}</div>
-                <small>by {created_by.name}</small>
+                <small>Initiated by {created_by.name}</small>
+              </td>
+            </tr>
+            <tr>
+              <th>Sales Team</th>
+              <td>
+                <div>{sales_team.map(user => user.name)}</div>
+                {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
+                  <div>
+                    <Component initialState={false}>
+                      {({ state: isEditing, setState: setIsEditing }) => (
+                        <div>
+                          {!isEditing ? (
+                            <button
+                              className="text-sm"
+                              onClick={() => {
+                                setIsEditing(true)
+                              }}
+                            >
+                              <span className="rotate-90 inline-block mr-1">
+                                &#9998;
+                              </span>{" "}
+                              Edit
+                            </button>
+                          ) : null}
+                          {isEditing ? (
+                            <EditOwners
+                              type="sales_team"
+                              users={sales_team}
+                              itemId={trip.id}
+                              onSuccess={() => {
+                                setIsEditing(false)
+                              }}
+                              onCancel={() => {
+                                setIsEditing(false)
+                              }}
+                            />
+                          ) : null}
+                        </div>
+                      )}
+                    </Component>
+                  </div>
+                ) : null}
+              </td>
+            </tr>
+            <tr>
+              <th>Operations Team</th>
+              <td>
+                <div>{operations_team.map(user => user.name)}</div>
+                {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
+                  <div>
+                    <Component initialState={false}>
+                      {({ state: isEditing, setState: setIsEditing }) => (
+                        <div>
+                          {!isEditing ? (
+                            <button
+                              className="text-sm"
+                              onClick={() => {
+                                setIsEditing(true)
+                              }}
+                            >
+                              <span className="rotate-90 inline-block mr-1">
+                                &#9998;
+                              </span>{" "}
+                              Edit
+                            </button>
+                          ) : null}
+                          {isEditing ? (
+                            <EditOwners
+                              type="operations_team"
+                              users={operations_team}
+                              itemId={trip.id}
+                              onSuccess={() => {
+                                setIsEditing(false)
+                              }}
+                              onCancel={() => {
+                                setIsEditing(false)
+                              }}
+                            />
+                          ) : null}
+                        </div>
+                      )}
+                    </Component>
+                  </div>
+                ) : null}
               </td>
             </tr>
           </tbody>

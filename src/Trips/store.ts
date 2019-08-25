@@ -139,6 +139,8 @@ export interface ITrip extends IBaseItem {
   tags?: Array<tagStore.ITag>
   created_by: userStore.IUser
   activity_logs?: Array<activityLogStore.IActivityLog>
+  sales_team?: Array<userStore.IUser>
+  operations_team?: Array<userStore.IUser>
 }
 
 export interface ITrips extends IBaseState<ITrip> {}

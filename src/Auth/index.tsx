@@ -8,6 +8,7 @@ import {
   AuthUserProvider,
   useAuthUser,
 } from "./User"
+import { PERMISSIONS, useCheckPermissions } from "./Permissions"
 import * as store from "./store"
 
 export {
@@ -20,4 +21,6 @@ export {
   RedirectUnlessAuthenticated,
   AuthUserProvider,
   useAuthUser,
+  PERMISSIONS,
+  useCheckPermissions,
 }

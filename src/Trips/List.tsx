@@ -131,7 +131,7 @@ export default function List({  }: RouteComponentProps) {
               striped
               bordered
               responsive
-              headers={["Destinations", "Dates", "Traveler", "Stage"]}
+              headers={["Destinations", "Dates", "Traveler", "Stage", "Teams"]}
               rows={trips.map(
                 ({
                   id,
@@ -147,6 +147,8 @@ export default function List({  }: RouteComponentProps) {
                   created_by,
                   created_at,
                   latest_given_quote,
+                  sales_team = [],
+                  operations_team = [],
                 }) => [
                   <div>
                     <div>
@@ -154,19 +156,19 @@ export default function List({  }: RouteComponentProps) {
                         {trip_id || id}-{trip_source.short_name}
                       </Link>
                     </div>
-                    <small>
+                    <div>
                       {locations.map(l => l.short_name).join(" • ")}
-                    </small>
-                    {latest_given_quote ? (
-                      <small>
-                        {" "}
-                        (
-                        {latest_given_quote.locations
-                          .map(l => l.short_name)
-                          .join("-")}
-                        )
-                      </small>
-                    ) : null}
+                      {latest_given_quote ? (
+                        <small>
+                          {" "}
+                          (
+                          {latest_given_quote.locations
+                            .map(l => l.short_name)
+                            .join("-")}
+                          )
+                        </small>
+                      ) : null}
+                    </div>
                   </div>,
                   <div>
                     <div>
@@ -238,6 +240,16 @@ export default function List({  }: RouteComponentProps) {
                         </span>
                       )}
                     </small>
+                  </div>,
+                  <div>
+                    <div>
+                      Sales Team:{" "}
+                      {sales_team.map(user => user.name).join(" • ")}
+                    </div>
+                    <div>
+                      Ops Team:{" "}
+                      {operations_team.map(user => user.name).join(" • ")}
+                    </div>
                   </div>,
                 ]
               )}

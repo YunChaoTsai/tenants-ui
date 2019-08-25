@@ -4,7 +4,15 @@ import Helmet from "react-helmet-async"
 import { Icons, Badge } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
 
-import { Login, Logout, useAuthUser, InvitedSignup, TenantSignup } from "./Auth"
+import {
+  Login,
+  Logout,
+  useAuthUser,
+  InvitedSignup,
+  TenantSignup,
+  useCheckPermissions,
+  PERMISSIONS,
+} from "./Auth"
 import { NavLink } from "./Shared/NavLink"
 import Dashboard from "./Dashboard"
 import NotFound from "./NotFound"
@@ -84,8 +92,9 @@ function NotificationList() {
 
 export const Header = function Header() {
   const { user } = useAuthUser()
+  const { hasPermission, hasAnyPermission } = useCheckPermissions()
   if (!user) return null
-  const { name, tenant, permissions } = user
+  const { name, tenant } = user
   return (
     <header className="mb-4 text-base bg-white border-t-4 border-primary-600">
       <nav className="sm:flex border-b items-stretch md:justify-between">
@@ -108,8 +117,10 @@ export const Header = function Header() {
             </Link>
             <ul>
               <NavLink to="/trips">Trips</NavLink>
-              {permissions.indexOf("view_trip_plan_requests") >= 0 ||
-              permissions.indexOf("manage_trip_plan_requests") >= 0 ? (
+              {hasAnyPermission(
+                PERMISSIONS.VIEW_TRIP_PLAN_REQUESTS,
+                PERMISSIONS.MANAGE_TRIP_PLAN_REQUESTS
+              ) ? (
                 <NavLink to="/trip-plan-requests">Trip Plan Requests</NavLink>
               ) : null}
               <NavLink to="/trip-sources">Trip Sources</NavLink>
@@ -141,15 +152,15 @@ export const Header = function Header() {
               <NavLink to="/cabs">Cabs</NavLink>
             </ul>
           </Dropdown>
-          {permissions.indexOf("manage_users") >= 0 ? (
+          {hasPermission(PERMISSIONS.MANAGE_USERS) ? (
             <Dropdown as="li" className="inline-block" alignRight>
               <Link to="/users">Users</Link>
               <ul className="menu">
                 <NavLink to="/users">Users</NavLink>
-                {permissions.indexOf("manage_roles") >= 0 ? (
+                {hasPermission(PERMISSIONS.MANAGE_ROLES) ? (
                   <NavLink to="/roles">Roles</NavLink>
                 ) : null}
-                {permissions.indexOf("manage_tenants") >= 0 ? (
+                {hasPermission(PERMISSIONS.MANAGE_TENANTS) ? (
                   <NavLink to="/tenants">Agents</NavLink>
                 ) : null}
               </ul>
