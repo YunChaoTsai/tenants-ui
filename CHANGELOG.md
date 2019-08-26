@@ -1,3 +1,25 @@
+# [1.14.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.13.0...v1.14.0) (2019-08-26)
+
+
+### Bug Fixes
+
+* **channels:** channel should intialize after auth ([0259c61](https://github.com/tourepedia/tp-admin-ui/commit/0259c61))
+* **trip-conversion:** show errors for invalid fields ([841af17](https://github.com/tourepedia/tp-admin-ui/commit/841af17))
+
+
+### Features
+
+* **activity-log:** add activity logs ([50e9579](https://github.com/tourepedia/tp-admin-ui/commit/50e9579))
+* **keys:** add pusher keys for test and prod ([4866d63](https://github.com/tourepedia/tp-admin-ui/commit/4866d63))
+* **links:** add prices links on services page ([2e257ea](https://github.com/tourepedia/tp-admin-ui/commit/2e257ea))
+* **notifications:** show conversion notifications for trips ([a80b61f](https://github.com/tourepedia/tp-admin-ui/commit/a80b61f))
+* **quote-extra-comments:** add comment field to quote extras ([1a2ca08](https://github.com/tourepedia/tp-admin-ui/commit/1a2ca08))
+* **quote-extras:** add extra services to quotes ([4aec199](https://github.com/tourepedia/tp-admin-ui/commit/4aec199)), closes [#106](https://github.com/tourepedia/tp-admin-ui/issues/106) [#107](https://github.com/tourepedia/tp-admin-ui/issues/107)
+* **transport-services:** add transport locations module ([30091e9](https://github.com/tourepedia/tp-admin-ui/commit/30091e9))
+* **trip:** show creator, locations for the trip ([7e0c7da](https://github.com/tourepedia/tp-admin-ui/commit/7e0c7da)), closes [#86](https://github.com/tourepedia/tp-admin-ui/issues/86)
+* **trip-owners:** add trip owners ([2fb8502](https://github.com/tourepedia/tp-admin-ui/commit/2fb8502)), closes [#86](https://github.com/tourepedia/tp-admin-ui/issues/86)
+* **xhr-hook:** add xhr hook ([1b388d4](https://github.com/tourepedia/tp-admin-ui/commit/1b388d4))
+
 # [1.13.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.12.0...v1.13.0) (2019-08-13)
 
 
