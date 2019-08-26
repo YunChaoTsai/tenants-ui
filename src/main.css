@@ -128,7 +128,8 @@ svg:not(:root) {
   overflow: hidden;
 }
 
-nav a {
+nav > a,
+nav ul > li > a {
   padding: 0.5em 0.75rem;
   display: inline-block;
   color: inherit;

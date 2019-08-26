@@ -67,9 +67,9 @@
   right: 19px;
 }
 
-.drop-down > .menu a,
-.drop-down > ul a,
-.drop-down > ol a {
+.drop-down > .menu > li > a,
+.drop-down > ul > li > a,
+.drop-down > ol > li > a {
   width: 100%;
   padding: 0.5rem 0.75rem;
   display: inline-block;

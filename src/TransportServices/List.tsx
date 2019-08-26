@@ -125,9 +125,12 @@ export default function List({  }: RouteComponentProps) {
           bordered
           headers={["Destinations", "Distance (kms)"]}
           alignCols={{ 1: "right" }}
-          rows={transportServices.map(transportService => [
-            transportService.name,
-            transportService.distance,
+          rows={transportServices.map(({ name, comments, distance }) => [
+            <div>
+              {name}
+              {comments ? <blockquote>{comments}</blockquote> : null}
+            </div>,
+            distance,
           ])}
         />
       </Listable>

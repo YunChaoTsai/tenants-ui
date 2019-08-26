@@ -8,14 +8,7 @@ import {
   FieldArray,
   FieldProps,
 } from "formik"
-import {
-  Button,
-  Icons,
-  useDidMount,
-  Select,
-  ButtonGroup,
-  Badge,
-} from "@tourepedia/ui"
+import { Button, Icons, useDidMount, Select, Badge } from "@tourepedia/ui"
 import * as Validator from "yup"
 import moment from "moment"
 import { AxiosInstance } from "axios"
@@ -25,7 +18,6 @@ import {
   SelectTransportServices as SelectServices,
   store as transportServiceStore,
 } from "./../TransportServices"
-import { store as locationStore, SelectLocations } from "./../Locations"
 import {
   InputField,
   Input,
@@ -38,6 +30,10 @@ import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { EmptyNumberValidator, numberToLocalString } from "../utils"
 import Spinner from "../Shared/Spinner"
+import {
+  SelectTransportLocations,
+  store as locationStore,
+} from "./../TransportLocations"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -72,7 +68,7 @@ interface CalculatePriceSchema {
     no_of_days: number
     cab_type?: cabTypeStore.ICabType
     transport_service?: transportServiceStore.ITransportService
-    cab_locality?: locationStore.ILocation
+    cab_locality?: locationStore.ITransportLocation
     no_of_cabs: number
     calculated_price?: number
     given_price?: number
@@ -364,8 +360,9 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                               render={({
                                 field,
                               }: FieldProps<CalculatePriceSchema>) => (
-                                <SelectLocations
+                                <SelectTransportLocations
                                   {...field}
+                                  creatable={false}
                                   label="Cab Locality"
                                   multiple={false}
                                   onChange={(value, name) =>

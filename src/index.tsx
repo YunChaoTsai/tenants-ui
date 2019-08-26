@@ -26,6 +26,7 @@ import { store as hotelBookingStageStore } from "./HotelBookingStages"
 import { store as tripPlanRequestStore } from "./TripPlanRequests"
 import { store as tenantStore } from "./Tenants"
 import { store as hotelPriceStore } from "./HotelPrices"
+import { store as notificationStore } from "./Notifications"
 import { IAppState } from "./types"
 import xhr, { XHRContext } from "./xhr"
 
@@ -49,6 +50,7 @@ const rootReducer = combineReducers<IAppState>({
   [tripPlanRequestStore.key]: tripPlanRequestStore.reducer,
   [tenantStore.key]: tenantStore.reducer,
   [hotelPriceStore.key]: hotelPriceStore.reducer,
+  [notificationStore.key]: notificationStore.reducer,
 })
 
 const store = configureStore<IAppState>(rootReducer, {

@@ -8,9 +8,17 @@ import NewItem from "./NewItem"
 export default function TransportServicesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="btn float-right">
-        New Transport Service
-      </Link>
+      <div className="float-right button-group">
+        <Link to="/transport-service-prices" className="btn">
+          Prices
+        </Link>
+        <Link to="/transport-service-prices/upload-prices" className="btn">
+          Upload Prices
+        </Link>
+        <Link to="new" className="btn">
+          New Transport Service
+        </Link>
+      </div>
       <h2>Transport Services</h2>
       <hr />
       <Router>

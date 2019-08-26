@@ -10,7 +10,7 @@ import {
 } from "./../model"
 import { store as transportServiceStore } from "./../TransportServices"
 import { store as cabTypeStore } from "./../CabTypes"
-import { store as locationStore } from "./../Locations"
+import { store as transportLocationStore } from "./../TransportLocations"
 
 export const key = "TRANSPORT_SERVICE_PRICES_STATE"
 
@@ -23,7 +23,7 @@ export interface ITransportServicePrice extends IBaseItem {
   transport_service_id: number
   transport_service: transportServiceStore.ITransportService
   cab_locality_id?: number
-  cab_locality?: locationStore.ILocation
+  cab_locality?: transportLocationStore.ITransportLocation
   per_day_charges?: number
   per_day_parking_charges?: number
   price?: number

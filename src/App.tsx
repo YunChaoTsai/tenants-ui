@@ -1,10 +1,18 @@
-import React, { Fragment } from "react"
+import React, { useEffect } from "react"
 import { Router, Link, Location } from "@reach/router"
 import Helmet from "react-helmet-async"
-import { Icons } from "@tourepedia/ui"
+import { Icons, Badge } from "@tourepedia/ui"
 import "@tourepedia/ui/styles/index.css"
 
-import { Login, Logout, useAuthUser, InvitedSignup, TenantSignup } from "./Auth"
+import {
+  Login,
+  Logout,
+  useAuthUser,
+  InvitedSignup,
+  TenantSignup,
+  useCheckPermissions,
+  PERMISSIONS,
+} from "./Auth"
 import { NavLink } from "./Shared/NavLink"
 import Dashboard from "./Dashboard"
 import NotFound from "./NotFound"
@@ -35,11 +43,58 @@ import Dropdown from "./Shared/Dropdown"
 
 import "./main.css"
 import "./typography.css"
+import {
+  Notification,
+  useNotifications,
+  useConnectedNotificationChannel,
+} from "./Notifications"
+import config from "./config"
+import { ChannelContextProvider } from "./channels"
+
+function NotificationList() {
+  const { user } = useAuthUser()
+  const {
+    notifications,
+    fetchNotifications,
+    markAllAsRead,
+  } = useNotifications()
+  useConnectedNotificationChannel()
+  useEffect(() => {
+    user && fetchNotifications()
+  }, [user, fetchNotifications])
+  if (!user) return null
+  return notifications && notifications.length ? (
+    <Dropdown as="li" className="inline-block" alignRight>
+      <a href="#view-notifications" className="toggler">
+        <Badge primary>
+          {notifications.filter(n => !n.read_at).length.toString()}
+        </Badge>
+      </a>
+      <ul
+        className="menu"
+        style={{ maxHeight: "40vh", minWidth: "250px", overflow: "auto" }}
+      >
+        <header className="px-3 py-2 text-sm border-b flex justify-between">
+          <span className="font-bold ">Notifications</span>
+          <button className="text-primary-600" onClick={markAllAsRead}>
+            Mark All as Read
+          </button>
+        </header>
+        {notifications.map((n, i) => (
+          <li key={n.id} className="border-t">
+            <Notification notification={n} />
+          </li>
+        ))}
+      </ul>
+    </Dropdown>
+  ) : null
+}
 
 export const Header = function Header() {
   const { user } = useAuthUser()
+  const { hasPermission, hasAnyPermission } = useCheckPermissions()
   if (!user) return null
-  const { name, tenant, permissions } = user
+  const { name, tenant } = user
   return (
     <header className="mb-4 text-base bg-white border-t-4 border-primary-600">
       <nav className="sm:flex border-b items-stretch md:justify-between">
@@ -47,7 +102,7 @@ export const Header = function Header() {
           <div className="flex items-center">
             <img
               alt="Tourepedia Logo"
-              src={process.env.PUBLIC_URL + "/logo.png"}
+              src={config.publicUrl + "/logo.png"}
               className="inline-block align-middle rounded-full shadow h-8 w-8 mr-2"
             />
             <h1 className="font-normal text-base m-0 md:block">
@@ -62,8 +117,10 @@ export const Header = function Header() {
             </Link>
             <ul>
               <NavLink to="/trips">Trips</NavLink>
-              {permissions.indexOf("view_trip_plan_requests") >= 0 ||
-              permissions.indexOf("manage_trip_plan_requests") >= 0 ? (
+              {hasAnyPermission(
+                PERMISSIONS.VIEW_TRIP_PLAN_REQUESTS,
+                PERMISSIONS.MANAGE_TRIP_PLAN_REQUESTS
+              ) ? (
                 <NavLink to="/trip-plan-requests">Trip Plan Requests</NavLink>
               ) : null}
               <NavLink to="/trip-sources">Trip Sources</NavLink>
@@ -95,20 +152,21 @@ export const Header = function Header() {
               <NavLink to="/cabs">Cabs</NavLink>
             </ul>
           </Dropdown>
-          {permissions.indexOf("manage_users") >= 0 ? (
+          {hasPermission(PERMISSIONS.MANAGE_USERS) ? (
             <Dropdown as="li" className="inline-block" alignRight>
               <Link to="/users">Users</Link>
               <ul className="menu">
                 <NavLink to="/users">Users</NavLink>
-                {permissions.indexOf("manage_roles") >= 0 ? (
+                {hasPermission(PERMISSIONS.MANAGE_ROLES) ? (
                   <NavLink to="/roles">Roles</NavLink>
                 ) : null}
-                {permissions.indexOf("manage_tenants") >= 0 ? (
+                {hasPermission(PERMISSIONS.MANAGE_TENANTS) ? (
                   <NavLink to="/tenants">Agents</NavLink>
                 ) : null}
               </ul>
             </Dropdown>
           ) : null}
+          <NotificationList />
           <Dropdown as="li" className="inline-block" alignRight>
             <a className="toggler" href="#profile-and-settings">
               <Icons.CogAltIcon title={`Hi ${name}`} />
@@ -134,7 +192,7 @@ export const Header = function Header() {
 
 export default function App() {
   return (
-    <Fragment>
+    <ChannelContextProvider>
       <Helmet titleTemplate="%s | Tourepedia" defaultTitle="Tourepedia" />
       <Header />
       <main style={{ minHeight: "80vh" }}>
@@ -172,7 +230,7 @@ export default function App() {
         </Container>
       </main>
       <Footer />
-    </Fragment>
+    </ChannelContextProvider>
   )
 }
 
@@ -183,7 +241,7 @@ function Footer() {
         <div className="py-4">
           <span>&copy; 2019 Tourepedia. All rights reserved</span>
           {" • "}
-          <span>v{process.env.REACT_APP_VERSION}</span>
+          <span>v{config.appVersion}</span>
         </div>
       </Container>
     </footer>

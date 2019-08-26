@@ -55,12 +55,20 @@ export function init<Item extends IBaseItem>(items?: Item[]): IBaseState<Item> {
 export function model<Item extends IBaseItem>(prevState?: IBaseState<Item>) {
   const state = prevState || init<Item>()
   return {
-    insert(items?: Item[], meta?: IMeta): IBaseState<Item> {
+    insert(
+      items?: Item[],
+      meta?: IMeta,
+      atStart: boolean = false
+    ): IBaseState<Item> {
       if (!items) return state
       return items.reduce((state: IBaseState<Item>, item) => {
         let { byId, items, meta: stateMeta } = state
         if (!byId[item.id]) {
-          items = items.concat(item.id)
+          if (atStart) {
+            items = [item.id].concat(items)
+          } else {
+            items = items.concat(item.id)
+          }
         }
         byId[item.id] = item
         return {
@@ -120,7 +128,8 @@ export function createReducer<
   actions: {
     list: ReturnType<ReturnType<typeof createAsyncAction>>
     item: ReturnType<ReturnType<typeof createAsyncAction>>
-  }
+  },
+  reducer?: (state: IState, action: ActionType<any>) => IState
 ) {
   return (state: IState = INITIAL_STATE, action: ActionType<any>): IState => {
     if (actions.list) {
@@ -153,6 +162,9 @@ export function createReducer<
         case getType(actions.item.failure):
           return { ...state, isFetching: false }
       }
+    }
+    if (reducer) {
+      return reducer(state, action)
     }
     return state
   }

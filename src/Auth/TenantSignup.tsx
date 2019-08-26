@@ -10,6 +10,7 @@ import { RedirectIfAuthenticated } from "./User"
 import { searchToQuery } from "./../utils"
 import { InputField } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "../xhr"
+import config from "../config"
 
 // schemas
 export interface ITenantSignupCredentials {
@@ -93,7 +94,7 @@ const TenantSignup = withXHR(function TenantSignup({
         <h1 className="flex justify-center items-center mt-4">
           <Link to="/">
             <img
-              src={process.env.PUBLIC_URL + "/logo.png"}
+              src={config.publicUrl + "/logo.png"}
               className="inline-blockw-20 w-8 rounded-full shadow"
             />
           </Link>

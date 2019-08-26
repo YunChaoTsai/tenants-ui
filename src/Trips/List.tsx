@@ -3,7 +3,7 @@ import { RouteComponentProps, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
 import moment from "moment"
 import Helmet from "react-helmet-async"
-import { Table, Icons, Paginate, Button } from "@tourepedia/ui"
+import { Table, Icons, Paginate, Button, Badge } from "@tourepedia/ui"
 
 import { ITrip, IStateWithKey, actions, selectors } from "./store"
 import { ThunkAction } from "./../types"
@@ -12,7 +12,7 @@ import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
 import { useSelector } from "react-redux"
-import { useThunkDispatch } from "../utils"
+import { useThunkDispatch, numberToLocalString } from "../utils"
 import { SelectTripStages, store as tripStageStore } from "../TripStages"
 import { SelectTags, store as tagStore } from "../Tags"
 import { Formik, Form } from "formik"
@@ -93,6 +93,7 @@ export default function List({  }: RouteComponentProps) {
       <Grid>
         <Col>
           <Search
+            placeholder="Search by id, destination..."
             onSearch={params => {
               setParams(params)
               getTrips({ ...params, page: 1 })
@@ -130,14 +131,7 @@ export default function List({  }: RouteComponentProps) {
               striped
               bordered
               responsive
-              headers={[
-                "ID",
-                "Dates",
-                "Stages",
-                "Destinations",
-                "Traveler",
-                "Pax",
-              ]}
+              headers={["Destinations", "Dates", "Traveler", "Stage", "Teams"]}
               rows={trips.map(
                 ({
                   id,
@@ -150,23 +144,60 @@ export default function List({  }: RouteComponentProps) {
                   children,
                   contact,
                   latest_stage,
+                  created_by,
+                  created_at,
+                  latest_given_quote,
+                  sales_team = [],
+                  operations_team = [],
                 }) => [
-                  <Link to={id.toString()}>
-                    {trip_source.short_name}-{trip_id || id}
-                  </Link>,
-                  `${moment
-                    .utc(start_date)
-                    .local()
-                    .format("DD/MM/YYYY")} to ${moment
-                    .utc(end_date)
-                    .local()
-                    .format("DD/MM/YYYY")}`,
-                  latest_stage ? latest_stage.name : "Initiated",
-                  locations.map(l => l.short_name).join(" • "),
+                  <div>
+                    <div>
+                      <Link to={id.toString()}>
+                        {trip_id || id}-{trip_source.short_name}
+                      </Link>
+                    </div>
+                    <div>
+                      {locations.map(l => l.short_name).join(" • ")}
+                      {latest_given_quote ? (
+                        <small>
+                          {" "}
+                          (
+                          {latest_given_quote.locations
+                            .map(l => l.short_name)
+                            .join("-")}
+                          )
+                        </small>
+                      ) : null}
+                    </div>
+                  </div>,
+                  <div>
+                    <div>
+                      {moment
+                        .utc(start_date)
+                        .local()
+                        .format("Do MMM, YYYY")}{" "}
+                      • {moment(end_date).diff(start_date, "days")} Nights
+                    </div>
+                    <small>
+                      (
+                      {moment.utc().isBefore(start_date)
+                        ? `${moment
+                            .utc(start_date)
+                            .local()
+                            .diff(moment(), "days")} days remaining`
+                        : moment.utc().isAfter(end_date)
+                        ? `${moment.utc().diff(end_date, "days")} days ago`
+                        : "On Trip"}
+                      )
+                    </small>
+                  </div>,
                   contact ? (
                     <div>
                       <div>{contact.name}</div>
                       <small>
+                        {no_of_adults} Adults
+                        {children ? " with " + children : ""}
+                        {contact.phone_number || contact.email ? " • " : ""}
                         {contact.phone_number ? (
                           <a href={`tel:${contact.phone_number}`}>
                             {contact.phone_number}
@@ -181,9 +212,45 @@ export default function List({  }: RouteComponentProps) {
                       </small>
                     </div>
                   ) : null,
-                  `${no_of_adults} Adults${
-                    children ? " with " + children : ""
-                  }`,
+                  <div>
+                    <div>{latest_stage ? latest_stage.name : "Initiated"}</div>
+                    <small>
+                      {latest_given_quote ? (
+                        <span>
+                          <Badge primary>
+                            <Icons.RupeeIcon />{" "}
+                            {numberToLocalString(
+                              latest_given_quote.given_price
+                            )}
+                          </Badge>{" "}
+                          by {latest_given_quote.created_by.name}
+                          {" • "}
+                          {moment
+                            .utc(created_at)
+                            .local()
+                            .fromNow()}
+                        </span>
+                      ) : (
+                        <span>
+                          Initiated by {created_by.name} •{" "}
+                          {moment
+                            .utc(created_at)
+                            .local()
+                            .fromNow()}
+                        </span>
+                      )}
+                    </small>
+                  </div>,
+                  <div>
+                    <div>
+                      Sales Team:{" "}
+                      {sales_team.map(user => user.name).join(" • ")}
+                    </div>
+                    <div>
+                      Ops Team:{" "}
+                      {operations_team.map(user => user.name).join(" • ")}
+                    </div>
+                  </div>,
                 ]
               )}
             />

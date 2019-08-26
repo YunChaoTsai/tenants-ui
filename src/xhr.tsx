@@ -7,6 +7,15 @@ import axios, {
 } from "axios"
 import { compose } from "redux"
 import { withContext, queryToSearch } from "./utils"
+import config from "./config"
+
+export function getAuthorizationToken() {
+  return localStorage.getItem("access_token")
+}
+
+export function storeAuthorizationToken(token: string) {
+  localStorage.setItem("access_token", token)
+}
 
 /**
  * Request interceptor for Authorization Header
@@ -21,9 +30,7 @@ import { withContext, queryToSearch } from "./utils"
 function authorizationHeaderInterceptor(
   config: AxiosRequestConfig
 ): AxiosRequestConfig {
-  config.headers["Authorization"] = `Bearer ${localStorage.getItem(
-    "access_token"
-  )}`
+  config.headers["Authorization"] = `Bearer ${getAuthorizationToken()}`
   return config
 }
 
@@ -88,7 +95,7 @@ function methodTypeInterceptor(config: AxiosRequestConfig) {
 function accessTokenInterceptor(response: AxiosResponse): AxiosResponse {
   const { data } = response
   if (data.access_token) {
-    localStorage.setItem("access_token", data.access_token)
+    storeAuthorizationToken(data.access_token)
   }
   return response
 }
@@ -163,7 +170,7 @@ function rateLimitErrorInterceptor(error: AxiosError): any {
  * If in any case, we need to disabled this behaviour, we can write the
  * full uri (https://apis.tourepedia.com/login) instead of path (/login)
  */
-axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL
+axios.defaults.baseURL = config.apiBaseUrl
 
 // inject the interceptors for request and response
 axios.interceptors.request.use(
@@ -190,5 +197,9 @@ axios.interceptors.response.use(
 export const XHRContext = React.createContext<AxiosInstance>(axios)
 export const withXHR = withContext<AxiosInstance, "xhr">(XHRContext, "xhr")
 export type XHRProps = { xhr: AxiosInstance }
+
+export function useXHR() {
+  return React.useContext(XHRContext)
+}
 
 export default axios

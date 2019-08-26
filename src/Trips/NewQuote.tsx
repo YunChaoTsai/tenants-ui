@@ -45,7 +45,9 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
   const [cabs, setCabs] = useState<any>([])
   const [transportExtras, setTransportExtras] = useState<any>([])
   const [otherExtras, setOtherExtras] = useState<any>([])
-  const [comments, setComments] = useState<string>(quote ? quote.comments : "")
+  const [comments, setComments] = useState<string>(
+    quote ? quote.comments || "" : ""
+  )
   const [errors, setErrors] = useState<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const saveQuote = useCallback(() => {
@@ -178,6 +180,8 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
                   .format("YYYY-MM-DD"),
                 no_of_nights:
                   moment.utc(checkout).diff(moment.utc(checkin), "days") + 1,
+                edited_given_price:
+                  hotel.calculated_price !== hotel.given_price,
                 rooms_detail: {
                   room_type,
                   adults_with_extra_bed,
@@ -192,6 +196,7 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
       cabs: quote
         ? {
             cabs: quote.cabs.map(({ from_date, to_date, ...cab }) => ({
+              edited_given_price: cab.calculated_price !== cab.given_price,
               start_date: moment
                 .utc(from_date)
                 .local()

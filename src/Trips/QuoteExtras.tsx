@@ -44,6 +44,7 @@ export interface ExtraServicesParams {
     service?: extraServiceStore.IExtraService
     price?: number
     date?: string
+    comments?: string
   }[]
 }
 
@@ -55,6 +56,7 @@ export const validationSchema = Validator.object().shape({
         .required("Service field is required"),
       date: Validator.string(),
       price: EmptyNumberValidator().positive("Price should be positive"),
+      comments: Validator.string(),
     })
   ),
 })
@@ -65,6 +67,7 @@ export const INITIAL_VALUES: ExtraServicesParams = {
       service: undefined,
       date: "",
       price: undefined,
+      comments: "",
     },
   ],
 }
@@ -96,23 +99,20 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
               price + parseFloat((cab.price ? cab.price : 0).toString()),
             0
           ),
-          flattenValues.other_extras.map(
-            ({ service, date, price, ...otherData }) => {
-              return {
-                ...otherData,
-                date: date
-                  ? moment(date)
-                      .hours(0)
-                      .minutes(0)
-                      .seconds(0)
-                      .utc()
-                      .format("YYYY-MM-DD HH:mm:ss")
-                  : "",
-                price: price,
-                service: service ? service.name : undefined,
-              }
+          flattenValues.other_extras.map(({ service, date, ...otherData }) => {
+            return {
+              ...otherData,
+              date: date
+                ? moment(date)
+                    .hours(0)
+                    .minutes(0)
+                    .seconds(0)
+                    .utc()
+                    .format("YYYY-MM-DD HH:mm:ss")
+                : "",
+              service: service ? service.name : undefined,
             }
-          )
+          })
         )
     },
     [onChange]
@@ -145,13 +145,14 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
         other_extras: [],
       }
       values.other_extras.forEach(values => {
-        const { date, service, price } = values
+        const { date, service, ...otherData } = values
         if (service) {
           flattenValues.other_extras.push({
             ...values,
             date: moment(date).format("YYYY-MM-DD"),
           })
           other_extras.push({
+            ...otherData,
             date: date
               ? moment(date)
                   .hours(0)
@@ -161,7 +162,6 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
                   .format("YYYY-MM-DD HH:mm:ss")
               : "",
             service: service ? service.name : undefined,
-            price,
           })
         }
       })
@@ -272,6 +272,13 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
                               required
                             />
                           )}
+                        </Col>
+                        <Col>
+                          <InputField
+                            name={`${name}.${index}.comments`}
+                            label="Comments"
+                            placeholder="Any comments regarding service"
+                          />
                         </Col>
                         <Col className="pt-4 border-l text-right">
                           <ButtonGroup>
