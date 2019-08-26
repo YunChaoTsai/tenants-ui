@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/tourepedia/tp-admin-ui/compare/v1.14.0...v1.14.1) (2019-08-26)
+
+
+### Bug Fixes
+
+* **pusher-keys:** keys are switched for test and prod ([4034dac](https://github.com/tourepedia/tp-admin-ui/commit/4034dac))
+
 # [1.14.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.13.0...v1.14.0) (2019-08-26)
 
 
