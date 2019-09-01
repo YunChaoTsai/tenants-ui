@@ -367,8 +367,7 @@ export const Quote = withXHR(function Quote({
                           {cab_locality ? (
                             <span>
                               {" "}
-                              •{" "}
-                              <small>Locality: {cab_locality.short_name}</small>
+                              • <small>{cab_locality.name}</small>
                             </span>
                           ) : (
                             ""

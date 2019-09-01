@@ -11,6 +11,7 @@ import {
 } from "./../model"
 import { store as locationStore } from "./../Locations"
 import { store as transportServiceStore } from "./../TransportServices"
+import { store as transportLocationStore } from "./../TransportLocations"
 import { store as tripSourceStore } from "./../TripSources"
 import { store as hotelStore } from "./../Hotels"
 import { store as cabTypeStore } from "./../CabTypes"
@@ -55,7 +56,7 @@ export interface IQuoteCab {
   cab_type: cabTypeStore.ICabType
   transport_service_id: number
   transport_service: transportServiceStore.ITransportService
-  cab_locality?: locationStore.ILocation
+  cab_locality?: transportLocationStore.ITransportLocation
   no_of_cabs: number
   calculated_price?: number
   given_price: number
