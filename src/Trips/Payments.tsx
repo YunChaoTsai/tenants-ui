@@ -85,7 +85,7 @@ function Amount({ amount }: { amount: number }) {
 function Due({ date, amount }: { date: string; amount: number }) {
   return (
     <div>
-      <Amount amount={amount} />
+      <DateString date={date} />
       <br />
       <InstalmentStatus dueAmount={amount} dueDate={date} />
     </div>
@@ -212,8 +212,8 @@ function CustomerPayments({
           []
         )
         .map(instalment => [
-          <DateString date={instalment.due_date} />,
           <Due date={instalment.due_date} amount={instalment.due_amount} />,
+          <Amount amount={instalment.due_amount} />,
           <Amount amount={instalment.amount} />,
           <Amount amount={instalment.paid_amount} />,
           <Transactions instalment={instalment} />,
@@ -261,13 +261,13 @@ function HotelPayments({
                     </td>
                   ) : null}
                   <td>
-                    <DateString date={instalment.due_date} />
-                  </td>
-                  <td>
                     <Due
                       date={instalment.due_date}
                       amount={instalment.due_amount}
                     />
+                  </td>
+                  <td>
+                    <Amount amount={instalment.due_amount} />
                   </td>
                   <td>
                     <Amount amount={instalment.amount} />
@@ -335,7 +335,7 @@ const LogTransaction = withXHR(function LogTransaction({
                   if (e.formikErrors) {
                     actions.setErrors(e.formikErrors)
                   }
-                  actions.setStatus(false)
+                  actions.setSubmitting(false)
                 })
             }}
             render={({ isSubmitting, status }) => (
