@@ -29,15 +29,15 @@ interface IInstalment {
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getQuotes(tripId: number | string, params?: any): Promise<IQuote[]> {
+    async getQuotes(tripId: number | string, params?: any): Promise<IQuote[]> {
       return xhr
         .get(`/trips/${tripId}/quotes`, { params })
         .then(resp => resp.data.data)
     },
-    giveQuote(data: any): Promise<IGivenQuote> {
+    async giveQuote(data: any): Promise<IGivenQuote> {
       return xhr.post(`/given-quotes`, data).then(resp => resp.data.data)
     },
-    getInstalments(
+    async getInstalments(
       quoteId: number
     ): Promise<{
       data: IInstalment[]
@@ -45,7 +45,7 @@ export function XHR(xhr: AxiosInstance) {
     }> {
       return xhr.get(`/quote-instalments/${quoteId}`).then(resp => resp.data)
     },
-    changeHotelBookingStage(
+    async changeHotelBookingStage(
       quoteHotelId: number,
       stageId: number
     ): Promise<any> {
@@ -57,6 +57,12 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
+const quoteHotelStageChangeValidationSchema = Validator.object().shape({
+  stage: Validator.object()
+    .required("Stage field is required")
+    .typeError("Stage field is required"),
+})
+
 export const QuoteHotelBookingStage = withXHR(function QuoteHotelBookingStage({
   xhr,
   quoteHotel,
@@ -65,21 +71,28 @@ export const QuoteHotelBookingStage = withXHR(function QuoteHotelBookingStage({
   const [showEdit, setShowEdit] = useState<boolean>(false)
   if (showEdit) {
     return (
-      <span>
+      <div className="text-left">
         <Formik
           initialValues={{ stage: latest_booking_stage }}
-          validationSchema={Validator.object().shape({
-            stage: Validator.object().required("Stage field is required"),
-          })}
+          validationSchema={quoteHotelStageChangeValidationSchema}
           onSubmit={(values, actions) => {
             if (!values.stage) {
+              actions.setStatus("Stage field is required")
               actions.setSubmitting(false)
               return
             }
+            actions.setStatus(false)
             XHR(xhr)
               .changeHotelBookingStage(id, values.stage.id)
               .then(() => {
                 window.location = window.location
+              })
+              .catch(e => {
+                actions.setStatus(e.message)
+                if (e.formikErrors) {
+                  actions.setErrors(e.formikErrors)
+                }
+                actions.setSubmitting(false)
               })
           }}
           render={({ isSubmitting, setFieldValue }) => (
@@ -99,7 +112,7 @@ export const QuoteHotelBookingStage = withXHR(function QuoteHotelBookingStage({
                   )}
                 />
                 <footer>
-                  <Button disabled={isSubmitting} type="submit">
+                  <Button disabled={isSubmitting} primary type="submit">
                     Save
                   </Button>
                   <Button
@@ -113,7 +126,7 @@ export const QuoteHotelBookingStage = withXHR(function QuoteHotelBookingStage({
             </Form>
           )}
         />
-      </span>
+      </div>
     )
   }
   return (
@@ -567,6 +580,7 @@ export const Quote = withXHR(function Quote({
 interface QuotesProps extends RouteComponentProps, XHRProps {
   trip: ITrip
 }
+
 function Quotes({ xhr, trip, navigate }: QuotesProps) {
   const [quotes, setQuotes] = useState<IQuote[]>([])
   function getQuotes() {
