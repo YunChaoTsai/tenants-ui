@@ -11,6 +11,7 @@ import { $PropertyType } from "utility-types"
 import { numberToLocalString } from "./../utils"
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField } from "./../Shared/InputField"
+import { RouteComponentProps } from "@reach/router"
 
 function XHR(xhr: AxiosInstance) {
   return {
@@ -22,10 +23,12 @@ function XHR(xhr: AxiosInstance) {
   }
 }
 
-export default function Payments({ trip }: { trip: ITrip }) {
+export default function Payments({
+  trip,
+}: { trip: ITrip } & RouteComponentProps) {
   const { customer_payments, hotel_payments, cab_payments } = trip
   return (
-    <section>
+    <section className="bg-white p-4">
       {customer_payments ? (
         <CustomerPayments payments={customer_payments} />
       ) : null}
@@ -42,7 +45,7 @@ function InstalmentStatus({
   dueAmount: number
   dueDate: string
 }) {
-  let state: string = "Due"
+  let state: "Due" | "Paid" | "Overdue" = "Due"
   if (dueAmount <= 0) {
     state = "Paid"
   } else {
@@ -52,15 +55,15 @@ function InstalmentStatus({
       state = "Overdue"
     }
   }
-  if (state == "Due") {
+  if (state === "Due") {
     return null
   }
   return (
     <Badge
       className={classNames(
-        state === "Paid" && "bg-green-300",
-        state === "Overdue" && "bg-red-300",
-        state === "Due" && "bg-yellow-300"
+        state === "Paid" &&
+          "bg-green-200 text-green-800 border border-green-300",
+        state === "Overdue" && "bg-red-200 text-red-800 border border-red-300"
       )}
     >
       {state}
@@ -85,7 +88,7 @@ function Amount({ amount }: { amount: number }) {
 function Due({ date, amount }: { date: string; amount: number }) {
   return (
     <div>
-      <Amount amount={amount} />
+      <DateString date={date} />
       <br />
       <InstalmentStatus dueAmount={amount} dueDate={date} />
     </div>
@@ -212,8 +215,8 @@ function CustomerPayments({
           []
         )
         .map(instalment => [
-          <DateString date={instalment.due_date} />,
           <Due date={instalment.due_date} amount={instalment.due_amount} />,
+          <Amount amount={instalment.due_amount} />,
           <Amount amount={instalment.amount} />,
           <Amount amount={instalment.paid_amount} />,
           <Transactions instalment={instalment} />,
@@ -261,13 +264,13 @@ function HotelPayments({
                     </td>
                   ) : null}
                   <td>
-                    <DateString date={instalment.due_date} />
-                  </td>
-                  <td>
                     <Due
                       date={instalment.due_date}
                       amount={instalment.due_amount}
                     />
+                  </td>
+                  <td>
+                    <Amount amount={instalment.due_amount} />
                   </td>
                   <td>
                     <Amount amount={instalment.amount} />
@@ -335,7 +338,7 @@ const LogTransaction = withXHR(function LogTransaction({
                   if (e.formikErrors) {
                     actions.setErrors(e.formikErrors)
                   }
-                  actions.setStatus(false)
+                  actions.setSubmitting(false)
                 })
             }}
             render={({ isSubmitting, status }) => (

@@ -11,9 +11,8 @@ export interface SearchProps {
   placeholder?: string
 }
 
-export function useSearch(initialValues: any = {}) {
-  const [params, setParams] = useState<any>(initialValues)
-  return [params, setParams]
+export function useSearch<T extends {} = {}>(initialValues: T = {} as any) {
+  return useState<T>(initialValues)
 }
 
 const defaultInitialParams = {

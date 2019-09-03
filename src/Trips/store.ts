@@ -11,6 +11,7 @@ import {
 } from "./../model"
 import { store as locationStore } from "./../Locations"
 import { store as transportServiceStore } from "./../TransportServices"
+import { store as transportLocationStore } from "./../TransportLocations"
 import { store as tripSourceStore } from "./../TripSources"
 import { store as hotelStore } from "./../Hotels"
 import { store as cabTypeStore } from "./../CabTypes"
@@ -24,6 +25,21 @@ import { store as extraServiceStore } from "./../ExtraServices"
 import { store as activityLogStore } from "./../ActivityLogs"
 
 export const key = "TRIP_LIST_STATE"
+
+export interface ITripLatestStage extends tripStageStore.ITripStage {
+  pivot: {
+    created_by: userStore.IUser
+    created_at: string
+  }
+}
+
+export interface IQuoteHotelLatestBookingStage
+  extends hotelBookingStageStore.IHotelBookingStage {
+  pivot: {
+    created_by: userStore.IUser
+    created_at: string
+  }
+}
 
 export interface IQuoteHotel {
   id: number
@@ -44,7 +60,7 @@ export interface IQuoteHotel {
   given_price: number
   comments: string
   booking_stages: hotelBookingStageStore.IHotelBookingStage[]
-  latest_booking_stage?: hotelBookingStageStore.IHotelBookingStage
+  latest_booking_stage?: IQuoteHotelLatestBookingStage
 }
 export interface IQuoteCab {
   id: number
@@ -55,7 +71,7 @@ export interface IQuoteCab {
   cab_type: cabTypeStore.ICabType
   transport_service_id: number
   transport_service: transportServiceStore.ITransportService
-  cab_locality?: locationStore.ILocation
+  cab_locality?: transportLocationStore.ITransportLocation
   no_of_cabs: number
   calculated_price?: number
   given_price: number
@@ -134,7 +150,7 @@ export interface ITrip extends IBaseItem {
   contacts: contactStore.IContact[]
   contact: contactStore.IContact
   stages: tripStageStore.ITripStage[]
-  latest_stage?: tripStageStore.ITripStage
+  latest_stage?: ITripLatestStage
   converted_at?: string
   customer_payments?: paymentStore.IPayment<ITrip>[]
   hotel_payments?: paymentStore.IPayment<IQuoteHotel>[]
@@ -144,6 +160,7 @@ export interface ITrip extends IBaseItem {
   activity_logs?: Array<activityLogStore.IActivityLog>
   sales_team?: Array<userStore.IUser>
   operations_team?: Array<userStore.IUser>
+  total_quotes: number | null
 }
 
 export interface ITrips extends IBaseState<ITrip> {}
@@ -187,4 +204,8 @@ export function selectors<State extends IStateWithKey>(state: State) {
       return this.state.isFetching
     },
   }
+}
+
+export function isTripConverted(trip: ITrip): boolean {
+  return !!trip.converted_at
 }

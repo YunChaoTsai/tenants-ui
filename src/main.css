@@ -212,16 +212,37 @@ nav ul > li > a {
 .btn--icon + .btn--icon {
   margin-left: 10px;
 }
+.tabs > li {
+  color: #718096;
+  border: 1px solid transparent;
+  border-bottom: none;
+  display: inline-block;
+  position: relative;
+  border-top-left-radius: 0.125em;
+  border-top-right-radius: 0.125em;
+  padding-bottom: 4px;
+}
+.tabs > li:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+}
+
+.tabs li.active {
+  color: #2d3748;
+}
+.tabs li.active:after {
+  background: #718096;
+}
 
 .tabs > li > a {
   display: inline-block;
   padding: 0.5em 1em;
   color: inherit;
-}
-
-.tabs li.active {
-  background: #667eea;
-  color: white;
 }
 
 .form-group .select [role="group"] label {

@@ -4,7 +4,7 @@ import { AxiosInstance } from "axios"
 import moment from "moment"
 
 import { ITrip, IGivenQuote } from "./store"
-import { withXHR, XHRProps } from "./../xhr"
+import { useXHR } from "./../xhr"
 import { Quote } from "./Quotes"
 import { Button, Table, useFetchState, Icons } from "@tourepedia/ui"
 import Spinner from "./../Shared/Spinner"
@@ -17,10 +17,10 @@ export interface IInstalment {
 
 export function XHR(xhr: AxiosInstance) {
   return {
-    getGivenQuotes(params?: any): Promise<IGivenQuote[]> {
+    async getGivenQuotes(params?: any): Promise<IGivenQuote[]> {
       return xhr.get("/given-quotes", { params }).then(resp => resp.data.data)
     },
-    getInstalments(
+    async getInstalments(
       givenQuoteId: number
     ): Promise<{
       data: IInstalment[]
@@ -33,16 +33,16 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-export const GivenQuote = withXHR(function GivenQuote({
+export function GivenQuote({
   givenQuote,
-  xhr,
   readOnly,
   showHotelBookingStatus,
-}: XHRProps & {
+}: {
   givenQuote: IGivenQuote
   readOnly?: boolean
   showHotelBookingStatus?: boolean
 }) {
+  const xhr = useXHR()
   const {
     id,
     given_price,
@@ -110,13 +110,14 @@ export const GivenQuote = withXHR(function GivenQuote({
       ) : null}
     </div>
   )
-})
+}
 
-interface QuotesProps extends RouteComponentProps, XHRProps {
+interface QuotesProps extends RouteComponentProps {
   trip: ITrip
 }
-function Quotes({ xhr, trip }: QuotesProps) {
+export default function Quotes({ trip }: QuotesProps) {
   const [givenQuotes, setGivenQuotes] = useState<IGivenQuote[]>([])
+  const xhr = useXHR()
   function getGivenQuotes() {
     XHR(xhr)
       .getGivenQuotes({ trip_id: trip.id })
@@ -126,8 +127,7 @@ function Quotes({ xhr, trip }: QuotesProps) {
     getGivenQuotes()
   }, [])
   return (
-    <Fragment>
-      <h4>Given Quotes</h4>
+    <div className="mt-4">
       {givenQuotes.length === 0 ? (
         <p className="text-center">No quote given yet</p>
       ) : (
@@ -142,8 +142,6 @@ function Quotes({ xhr, trip }: QuotesProps) {
           ))}
         </ol>
       )}
-    </Fragment>
+    </div>
   )
 }
-
-export default withXHR(Quotes)

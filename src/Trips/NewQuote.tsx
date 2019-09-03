@@ -266,7 +266,7 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
     .local()
     .format("YYYY-MM-DD HH:mm:ss")
   return (
-    <div className="pb-8" ref={containerRef}>
+    <div className="pb-8 mt-4" ref={containerRef}>
       <h3 className="mb-8">Create a new quote</h3>
       <section className="mb-16">
         <header className="flex">
