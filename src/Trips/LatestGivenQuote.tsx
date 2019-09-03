@@ -2,25 +2,18 @@ import React, { useEffect } from "react"
 import { AxiosInstance } from "axios"
 import moment from "moment"
 import { Icons, Button, useFetchState, Dialog, useDialog } from "@tourepedia/ui"
-import {
-  Formik,
-  Form,
-  FormikProps,
-  FormikActions,
-  FieldArray,
-  Field,
-  FieldProps,
-} from "formik"
+import { Formik, Form, FormikProps, FormikActions, FieldArray } from "formik"
 import * as Validator from "yup"
 
-import { InputField, Input, FormGroup } from "./../Shared/InputField"
+import { InputField } from "./../Shared/InputField"
 import { ITrip } from "./store"
 import { Quote } from "./Quotes"
 import { GivenQuote, XHR as GiveQuotesXHR, IInstalment } from "./GivenQuotes"
-import { withXHR, XHRProps } from "./../xhr"
+import { useXHR } from "./../xhr"
 import { Grid, Col } from "../Shared/Layout"
 import Spinner from "../Shared/Spinner"
 import { numberToLocalString } from "./../utils"
+import { RouteComponentProps } from "@reach/router"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -30,19 +23,15 @@ export function XHR(xhr: AxiosInstance) {
   }
 }
 
-const LatestGivenQuote = withXHR(function LatestGivenQuote({
-  trip,
-  xhr,
-}: XHRProps & { trip: ITrip }) {
+function LatestGivenQuote({ trip }: { trip: ITrip } & RouteComponentProps) {
+  const xhr = useXHR()
   const [isConvertVisible, showConvert, hideConvert] = useDialog()
   const { latest_given_quote, converted_at } = trip
   return latest_given_quote ? (
-    <fieldset>
-      <legend>
-        <h4>
-          {converted_at ? "Quote used for conversion" : "Latest Given Quote"}
-        </h4>
-      </legend>
+    <div className="p-4 bg-white rounded-b">
+      <h4 className="mb-4 pb-2 text-gray-600 border-b">
+        {converted_at ? "Quote used for conversion" : "Latest Given Quote"}
+      </h4>
       <GivenQuote
         givenQuote={latest_given_quote}
         readOnly={!!converted_at}
@@ -61,9 +50,9 @@ const LatestGivenQuote = withXHR(function LatestGivenQuote({
           </Button>
         </footer>
       )}
-    </fieldset>
+    </div>
   ) : null
-})
+}
 
 const tripConversionValidationSchema = Validator.object()
   .shape({
@@ -95,13 +84,12 @@ interface ITripConversionSchema {
   comments: string
 }
 
-export const ConvertTrip = withXHR(function ConvertTrip({
+function ConvertTrip({
   trip,
   isConvertVisible,
   hideConvert,
   onConvert,
-  xhr,
-}: XHRProps & {
+}: {
   trip: ITrip
   isConvertVisible: boolean
   hideConvert: () => void
@@ -116,6 +104,7 @@ export const ConvertTrip = withXHR(function ConvertTrip({
     no_of_adults,
     children,
   } = trip
+  const xhr = useXHR()
   const [
     instalments,
     fetchInstalments,
@@ -413,6 +402,6 @@ export const ConvertTrip = withXHR(function ConvertTrip({
       </Dialog.Body>
     </Dialog>
   )
-})
+}
 
 export default LatestGivenQuote

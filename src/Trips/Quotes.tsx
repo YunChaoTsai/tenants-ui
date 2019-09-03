@@ -15,12 +15,11 @@ import * as Validator from "yup"
 import moment from "moment"
 import { $PropertyType } from "utility-types"
 
-import { ITrip, IQuote, IGivenQuote, IQuoteHotel } from "./store"
-import { withXHR, XHRProps } from "./../xhr"
-import { InputField, FormGroup, FormikFormGroup } from "./../Shared/InputField"
+import { ITrip, IQuote, IGivenQuote } from "./store"
+import { useXHR } from "./../xhr"
+import { InputField } from "./../Shared/InputField"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
-import { SelectHotelBookingStages } from "../HotelBookingStages"
 
 interface IInstalment {
   amount: number
@@ -45,99 +44,8 @@ export function XHR(xhr: AxiosInstance) {
     }> {
       return xhr.get(`/quote-instalments/${quoteId}`).then(resp => resp.data)
     },
-    async changeHotelBookingStage(
-      quoteHotelId: number,
-      stageId: number
-    ): Promise<any> {
-      return xhr.patch("/quote-hotel-booking-stages", {
-        items: [quoteHotelId],
-        stage: stageId,
-      })
-    },
   }
 }
-
-const quoteHotelStageChangeValidationSchema = Validator.object().shape({
-  stage: Validator.object()
-    .required("Stage field is required")
-    .typeError("Stage field is required"),
-})
-
-export const QuoteHotelBookingStage = withXHR(function QuoteHotelBookingStage({
-  xhr,
-  quoteHotel,
-}: XHRProps & { quoteHotel: IQuoteHotel }) {
-  const { id, latest_booking_stage } = quoteHotel
-  const [showEdit, setShowEdit] = useState<boolean>(false)
-  if (showEdit) {
-    return (
-      <div className="text-left">
-        <Formik
-          initialValues={{ stage: latest_booking_stage }}
-          validationSchema={quoteHotelStageChangeValidationSchema}
-          onSubmit={(values, actions) => {
-            if (!values.stage) {
-              actions.setStatus("Stage field is required")
-              actions.setSubmitting(false)
-              return
-            }
-            actions.setStatus(false)
-            XHR(xhr)
-              .changeHotelBookingStage(id, values.stage.id)
-              .then(() => {
-                window.location = window.location
-              })
-              .catch(e => {
-                actions.setStatus(e.message)
-                if (e.formikErrors) {
-                  actions.setErrors(e.formikErrors)
-                }
-                actions.setSubmitting(false)
-              })
-          }}
-          render={({ isSubmitting, setFieldValue }) => (
-            <Form noValidate>
-              <fieldset>
-                <legend>Change Booking Stage</legend>
-                <FormikFormGroup
-                  name="stage"
-                  render={({ field }) => (
-                    <SelectHotelBookingStages
-                      {...field}
-                      label="Select the booking stage"
-                      multiple={false}
-                      fetchOnMount
-                      onChange={(value, name) => setFieldValue(name, value)}
-                    />
-                  )}
-                />
-                <footer>
-                  <Button disabled={isSubmitting} primary type="submit">
-                    Save
-                  </Button>
-                  <Button
-                    className="btn--secondary"
-                    onClick={() => setShowEdit(false)}
-                  >
-                    Cancel
-                  </Button>
-                </footer>
-              </fieldset>
-            </Form>
-          )}
-        />
-      </div>
-    )
-  }
-  return (
-    <span>
-      {latest_booking_stage ? latest_booking_stage.name : null}
-      <Button className="btn--secondary" onClick={() => setShowEdit(true)}>
-        &#9998;
-      </Button>
-    </span>
-  )
-})
 
 const giveQuoteSchema = Validator.object()
   .shape({
@@ -147,18 +55,19 @@ const giveQuoteSchema = Validator.object()
     comments: Validator.string(),
   })
   .required("Quote data is required")
-export const Quote = withXHR(function Quote({
+
+export function Quote({
   quote,
-  xhr,
   readOnly = false,
   navigate,
   showHotelBookingStatus,
-}: XHRProps & {
+}: {
   quote: IQuote
   readOnly?: boolean
   navigate?: $PropertyType<RouteComponentProps, "navigate">
   showHotelBookingStatus?: boolean
 }) {
+  const xhr = useXHR()
   const {
     id,
     total_price,
@@ -230,7 +139,7 @@ export const Quote = withXHR(function Quote({
                     responsive
                     headers={[
                       "Date",
-                      "Hotels",
+                      "Hotel",
                       "Meal Plan",
                       "Rooms",
                       "Price",
@@ -246,6 +155,7 @@ export const Quote = withXHR(function Quote({
                         no_of_rooms,
                         comments,
                         given_price,
+                        latest_booking_stage,
                       } = quoteHotel
                       return [
                         <span className="whitespace-pre">
@@ -280,7 +190,13 @@ export const Quote = withXHR(function Quote({
                         numberToLocalString(given_price),
                       ].concat(
                         showHotelBookingStatus
-                          ? [<QuoteHotelBookingStage quoteHotel={quoteHotel} />]
+                          ? [
+                              <span>
+                                {latest_booking_stage
+                                  ? latest_booking_stage.name
+                                  : "Pending"}
+                              </span>,
+                            ]
                           : []
                       )
                     })}
@@ -575,13 +491,14 @@ export const Quote = withXHR(function Quote({
       ) : null}
     </div>
   )
-})
+}
 
-interface QuotesProps extends RouteComponentProps, XHRProps {
+interface QuotesProps extends RouteComponentProps {
   trip: ITrip
 }
 
-function Quotes({ xhr, trip, navigate }: QuotesProps) {
+export default function Quotes({ trip, navigate }: QuotesProps) {
+  const xhr = useXHR()
   const [quotes, setQuotes] = useState<IQuote[]>([])
   function getQuotes() {
     XHR(xhr)
@@ -592,8 +509,7 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
     getQuotes()
   }, [])
   return (
-    <Fragment>
-      <h4 className="my-4">All Quotes</h4>
+    <div className="mt-4">
       {quotes.length === 0 ? (
         <p className="text-center">No quote created for this trip</p>
       ) : (
@@ -609,8 +525,6 @@ function Quotes({ xhr, trip, navigate }: QuotesProps) {
           ))}
         </ol>
       )}
-    </Fragment>
+    </div>
   )
 }
-
-export default withXHR(Quotes)

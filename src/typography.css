@@ -33,7 +33,7 @@ h5,
 h6 {
   margin-bottom: 0.5em;
   font-family: inherit;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   color: inherit;
 }
@@ -42,5 +42,5 @@ b,
 th,
 dt,
 strong {
-  font-weight: 600;
+  font-weight: 700;
 }

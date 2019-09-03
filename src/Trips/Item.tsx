@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from "react"
-import { RouteComponentProps, Router } from "@reach/router"
+import React, { useEffect, useCallback, Fragment } from "react"
+import { RouteComponentProps, Router, Link } from "@reach/router"
 import { AxiosInstance } from "axios"
 import moment from "moment"
 import Helmet from "react-helmet-async"
@@ -23,8 +23,9 @@ import LatestGivenQuote from "./LatestGivenQuote"
 import { SelectTripStages } from "../TripStages"
 import { Formik, Form } from "formik"
 import { FormikFormGroup } from "../Shared/InputField"
-import { withXHR, XHRProps } from "../xhr"
+import { useXHR } from "../xhr"
 import { useCheckPermissions, PERMISSIONS } from "../Auth"
+import HotelBookings from "./HotelBookings"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -56,11 +57,28 @@ export const getTripAction = (
     })
 }
 
-const BasicDetails = withXHR(function BasicDetails({
-  trip,
-  xhr,
-}: XHRProps & { trip: ITrip }) {
+function Breadcrumbs({ trip }: { trip: ITrip }) {
+  const { trip_id, id } = trip
+  return (
+    <nav className="flex items-center mb-2">
+      <Link to="/" className="text-gray-600">
+        Home
+      </Link>
+      <Icons.ChevronDownIcon className="rotate-270 text-gray-500 text-sm" />
+      <Link to="/trips" className="text-gray-600">
+        Trips
+      </Link>
+      <Icons.ChevronDownIcon className="rotate-270 text-gray-500 text-sm" />
+      <Link to={`/trips/${id}`} className="text-gray-500">
+        {trip_id}
+      </Link>
+    </nav>
+  )
+}
+
+export function BasicDetails({ trip }: { trip: ITrip }) {
   const { hasPermission } = useCheckPermissions()
+  const xhr = useXHR()
   const {
     id,
     start_date,
@@ -74,81 +92,274 @@ const BasicDetails = withXHR(function BasicDetails({
     tags,
     latest_stage,
     created_by,
+    created_at,
+    latest_given_quote,
     sales_team = [],
     operations_team = [],
   } = trip
   return (
-    <Grid>
-      <Col>
-        <Table autoWidth bordered>
-          <tbody>
-            <tr>
-              <th>ID</th>
-              <td>
-                {trip_source.short_name}-{trip_id || id}
-              </td>
-            </tr>
-            <tr>
-              <th>Destination</th>
-              <td>{locations.map(l => l.short_name)}</td>
-            </tr>
-            <tr>
-              <th>Dates</th>
-              <td>
-                {moment
-                  .utc(start_date)
-                  .local()
-                  .format("DD MMM, YYYY")}
-                {" for "}
-                {moment.utc(end_date).diff(moment.utc(start_date), "days")}{" "}
-                Nights
-              </td>
-            </tr>
-            <tr>
-              <th>Traveler</th>
-              <td>
-                {contacts.map(contact => (
-                  <div key={contact.id}>
-                    {contact.name}
-                    <br />
-                    <small>
-                      <a href={`tel:${contact.phone_number}`}>
-                        {contact.phone_number}
-                      </a>
-                      {contact.phone_number && contact.email ? (
-                        <span> • </span>
-                      ) : null}
-                      {contact.email ? (
-                        <a href={`mailto:${contact.email}`}>{contact.email}</a>
-                      ) : null}
-                    </small>
+    <section>
+      <header className="px-4 py-2 rounded-t bg-white">
+        <Grid>
+          <Col className="my-2">
+            <h3 className="text-2xl m-0">
+              {locations.map(l => l.short_name)}
+              {latest_given_quote ? (
+                <span className="ml-1">
+                  (
+                  {latest_given_quote.locations
+                    .map(l => l.short_name)
+                    .join("-")}
+                  )
+                </span>
+              ) : null}
+            </h3>
+            <div className="text-sm text-gray-600">
+              {trip_id || id}-{trip_source.short_name}
+            </div>
+            <div className="mt-2">
+              <div className="flex items-center py-1">
+                <Icons.CalendarIcon className="mr-2" />
+                <div className="whitespace-pre">
+                  {moment
+                    .utc(start_date)
+                    .local()
+                    .format("DD MMM, YYYY")}
+                  {" • "}
+                  {moment
+                    .utc(end_date)
+                    .diff(moment.utc(start_date), "days")}{" "}
+                  Nights,{" "}
+                  {moment.utc(end_date).diff(moment.utc(start_date), "days") +
+                    1}{" "}
+                  Days
+                </div>
+              </div>
+              <div className="flex items-center py-1">
+                <Icons.UsersIcon className="mr-2" />
+                <div>
+                  {no_of_adults} Adults
+                  {children ? <span> with {children} Children</span> : ""}
+                </div>
+              </div>
+            </div>
+          </Col>
+          <Col className="my-2">
+            <div className="mb-1 uppercase text-gray-600 font-bold text-sm tracking-wide">
+              Guest
+            </div>
+            <div>
+              {contacts.map(contact => (
+                <div key={contact.id}>
+                  <div className="mb-1">{contact.name}</div>
+                  <div className="text-sm">
+                    {contact.phone_number ? (
+                      <div>
+                        <a
+                          href={`tel:${contact.phone_number}`}
+                          className="text-gray-600"
+                        >
+                          {contact.phone_number}
+                        </a>
+                      </div>
+                    ) : null}
+                    {contact.email ? (
+                      <div>
+                        <a
+                          href={`mailto:${contact.email}`}
+                          className="text-gray-600"
+                        >
+                          {contact.email}
+                        </a>
+                      </div>
+                    ) : null}
                   </div>
-                ))}
-              </td>
-            </tr>
-            <tr>
-              <th>Pax</th>
-              <td>
-                {no_of_adults} Adults
-                {children ? <span> with {children} Children</span> : ""}
-              </td>
-            </tr>
-            <tr>
-              <th>Stage</th>
-              <td>
-                <div>{latest_stage ? latest_stage.name : "Initiated"}</div>
-                <small>Initiated by {created_by.name}</small>
-              </td>
-            </tr>
-            <tr>
-              <th>Sales Team</th>
-              <td>
-                <div>{sales_team.map(user => user.name)}</div>
-                {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
-                  <div>
+                </div>
+              ))}
+            </div>
+          </Col>
+          <Col className="my-2">
+            <Component initialState={false}>
+              {({ state: isEditing, setState: setIsEditing }) => (
+                <div>
+                  {!isEditing ? (
+                    <header>
+                      <div className="mb-1 uppercase text-gray-600 font-bold text-sm tracking-wide">
+                        Stage
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="ml-2"
+                        >
+                          <span className="rotate-90 inline-block">
+                            &#9998;
+                          </span>
+                        </button>
+                      </div>
+                    </header>
+                  ) : null}
+                  {isEditing ? (
+                    <Formik
+                      initialValues={{
+                        stage: latest_stage,
+                      }}
+                      onSubmit={(values, actions) => {
+                        const { stage } = values
+                        XHR(xhr)
+                          .changeTripStage({
+                            trips: [id],
+                            stage: stage ? stage.id : null,
+                          })
+                          .then(() => {
+                            actions.setSubmitting(false)
+                            setIsEditing(false)
+                          })
+                          .catch(error => {
+                            actions.setStatus(error.message)
+                            if (error.formikErrors) {
+                              actions.setErrors(error.formikErrors)
+                            }
+                            actions.setSubmitting(false)
+                            return Promise.reject(error)
+                          })
+                      }}
+                      render={({ setFieldValue, isSubmitting, status }) => (
+                        <Form noValidate>
+                          <fieldset>
+                            <legend>Edit Trip Stage</legend>
+                            {status ? (
+                              <p className="text-red-700 mb-2">{status}</p>
+                            ) : null}
+                            <FormikFormGroup
+                              name="stage"
+                              render={({ field }) => (
+                                <SelectTripStages
+                                  {...field}
+                                  label="Select next stage for the trip*"
+                                  fetchOnMount
+                                  multiple={false}
+                                  onChange={(value, name) =>
+                                    setFieldValue(name, value)
+                                  }
+                                />
+                              )}
+                            />
+                            <footer>
+                              <Button
+                                disabled={isSubmitting}
+                                type="submit"
+                                primary
+                              >
+                                Update
+                              </Button>{" "}
+                              <Button
+                                disabled={isSubmitting}
+                                onClick={() => setIsEditing(false)}
+                              >
+                                Cancel
+                              </Button>
+                            </footer>
+                          </fieldset>
+                        </Form>
+                      )}
+                    />
+                  ) : (
+                    <div>
+                      <div className="mb-1">
+                        {latest_stage ? latest_stage.name : "Initiated"}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <div>
+                          by{" "}
+                          {latest_stage
+                            ? latest_stage.pivot.created_by.name
+                            : created_by.name}
+                        </div>
+                        <div>
+                          {moment
+                            .utc(
+                              latest_stage
+                                ? latest_stage.pivot.created_at
+                                : created_at
+                            )
+                            .local()
+                            .fromNow()}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Component>
+          </Col>
+          <Col className="my-2">
+            <Component initialState={false}>
+              {({ state: isEditing, setState: setIsEditing }) => (
+                <div>
+                  {!isEditing ? (
+                    <header className="mb-2">
+                      <div className="mb-1 uppercase text-gray-600 font-bold text-sm tracking-wide">
+                        Tags
+                        <button
+                          className="ml-2"
+                          onClick={() => {
+                            setIsEditing(true)
+                          }}
+                        >
+                          <span className="rotate-90 inline-block">
+                            &#9998;
+                          </span>
+                        </button>
+                      </div>
+                    </header>
+                  ) : null}
+                  {isEditing ? (
+                    <EditTags
+                      type="trip"
+                      tags={tags}
+                      itemId={trip.id}
+                      onSuccess={() => {
+                        setIsEditing(false)
+                      }}
+                      onCancel={() => {
+                        setIsEditing(false)
+                      }}
+                    />
+                  ) : (
+                    <div>
+                      {tags && tags.length ? (
+                        <BadgeList style={{ marginLeft: "-5px" }}>
+                          {tags.map(t => (
+                            <Badge key={t.id}>{t.name}</Badge>
+                          ))}
+                        </BadgeList>
+                      ) : (
+                        <div
+                          className="text-gray-600 text-sm"
+                          title={`Tag trips to quickly indentify and group trips`}
+                        >
+                          No Tags
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </Component>
+          </Col>
+        </Grid>
+      </header>
+      <footer className="px-4 py-2 text-sm bg-gray-200 rounded-b">
+        <Grid>
+          <Col className="py-1">
+            <div className="flex items-center">
+              <span className="text-gray-600">Sales Team: </span>
+              <div className="ml-2">
+                <div className="flex items-center">
+                  <span>{sales_team.map(user => user.name)}</span>
+                  {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
                     <Component initialState={false}>
                       {({ state: isEditing, setState: setIsEditing }) => (
-                        <div>
+                        <div className="ml-2">
                           {!isEditing ? (
                             <button
                               className="text-sm"
@@ -158,8 +369,7 @@ const BasicDetails = withXHR(function BasicDetails({
                             >
                               <span className="rotate-90 inline-block mr-1">
                                 &#9998;
-                              </span>{" "}
-                              Edit
+                              </span>
                             </button>
                           ) : null}
                           {isEditing ? (
@@ -178,19 +388,21 @@ const BasicDetails = withXHR(function BasicDetails({
                         </div>
                       )}
                     </Component>
-                  </div>
-                ) : null}
-              </td>
-            </tr>
-            <tr>
-              <th>Operations Team</th>
-              <td>
-                <div>{operations_team.map(user => user.name)}</div>
-                {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
-                  <div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </Col>
+          <Col className="py-1">
+            <div className="flex items-center">
+              <span className="text-gray-600">Operations Team: </span>
+              <div className="ml-2">
+                <div className="flex items-center">
+                  <span>{sales_team.map(user => user.name)}</span>
+                  {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
                     <Component initialState={false}>
                       {({ state: isEditing, setState: setIsEditing }) => (
-                        <div>
+                        <div className="ml-2">
                           {!isEditing ? (
                             <button
                               className="text-sm"
@@ -200,8 +412,7 @@ const BasicDetails = withXHR(function BasicDetails({
                             >
                               <span className="rotate-90 inline-block mr-1">
                                 &#9998;
-                              </span>{" "}
-                              Edit
+                              </span>
                             </button>
                           ) : null}
                           {isEditing ? (
@@ -220,176 +431,22 @@ const BasicDetails = withXHR(function BasicDetails({
                         </div>
                       )}
                     </Component>
-                  </div>
-                ) : null}
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Col>
-      <Col>
-        <section>
-          <Component initialState={false}>
-            {({ state: isEditing, setState: setIsEditing }) => (
-              <div>
-                {!isEditing ? (
-                  <header>
-                    Stage{" "}
-                    <Button
-                      style={{ background: "none" }}
-                      className="p-0 w-8 h-8 ml-2 border-transparent"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      <span className="rotate-90 inline-block">&#9998;</span>
-                    </Button>
-                  </header>
-                ) : null}
-                {isEditing ? (
-                  <Formik
-                    initialValues={{
-                      stage: trip.latest_stage,
-                    }}
-                    onSubmit={(values, actions) => {
-                      const { stage } = values
-                      XHR(xhr)
-                        .changeTripStage({
-                          trips: [id],
-                          stage: stage ? stage.id : null,
-                        })
-                        .then(() => {
-                          actions.setSubmitting(false)
-                          setIsEditing(false)
-                        })
-                        .catch(error => {
-                          actions.setStatus(error.message)
-                          if (error.formikErrors) {
-                            actions.setErrors(error.formikErrors)
-                          }
-                          actions.setSubmitting(false)
-                          return Promise.reject(error)
-                        })
-                    }}
-                    render={({ setFieldValue, isSubmitting, status }) => (
-                      <Form noValidate>
-                        <fieldset>
-                          <legend>Edit Trip Stage</legend>
-                          {status ? (
-                            <p className="text-red-700 mb-2">{status}</p>
-                          ) : null}
-                          <FormikFormGroup
-                            name="stage"
-                            render={({ field }) => (
-                              <SelectTripStages
-                                {...field}
-                                label="Select next stage for the trip*"
-                                fetchOnMount
-                                multiple={false}
-                                onChange={(value, name) =>
-                                  setFieldValue(name, value)
-                                }
-                              />
-                            )}
-                          />
-                          <footer>
-                            <Button
-                              disabled={isSubmitting}
-                              type="submit"
-                              primary
-                            >
-                              Update
-                            </Button>{" "}
-                            <Button
-                              disabled={isSubmitting}
-                              onClick={() => setIsEditing(false)}
-                            >
-                              Cancel
-                            </Button>
-                          </footer>
-                        </fieldset>
-                      </Form>
-                    )}
-                  />
-                ) : (
-                  <div>
-                    {trip.latest_stage ? trip.latest_stage.name : "Initiated"}
-                  </div>
-                )}
+                  ) : null}
+                </div>
               </div>
-            )}
-          </Component>
-        </section>
-        <section className="mt-4">
-          <Component initialState={false}>
-            {({ state: isEditing, setState: setIsEditing }) => (
-              <div>
-                {!isEditing ? (
-                  <header className="mb-2">
-                    Tags
-                    <Button
-                      style={{ background: "none" }}
-                      className="p-0 w-8 h-8 ml-2 border-transparent"
-                      onClick={() => {
-                        setIsEditing(true)
-                      }}
-                    >
-                      <span className="rotate-90 inline-block">&#9998;</span>
-                    </Button>
-                  </header>
-                ) : null}
-                {isEditing ? (
-                  <EditTags
-                    type="trip"
-                    tags={tags}
-                    itemId={trip.id}
-                    onSuccess={() => {
-                      setIsEditing(false)
-                    }}
-                    onCancel={() => {
-                      setIsEditing(false)
-                    }}
-                  />
-                ) : (
-                  <div>
-                    {tags && tags.length ? (
-                      <BadgeList>
-                        {tags.map(t => (
-                          <Badge key={t.id}>{t.name}</Badge>
-                        ))}
-                      </BadgeList>
-                    ) : (
-                      <div>
-                        No Tags Assigned
-                        <br />
-                        <small>
-                          Use tags to quickly indentify and group trips
-                        </small>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </Component>
-        </section>
-      </Col>
-    </Grid>
+            </div>
+          </Col>
+        </Grid>
+      </footer>
+    </section>
   )
-})
+}
 
-function Index({ trip }: RouteComponentProps & { trip: ITrip }) {
-  const { id, locations, trip_source, trip_id, activity_logs } = trip
+function Activities({ trip }: { trip: ITrip } & RouteComponentProps) {
+  const { activity_logs } = trip
   return (
-    <div>
-      <Helmet>
-        <title>
-          {locations.map(l => l.short_name).join(" • ")} (
-          {trip_source.short_name}-{trip_id || id.toString()})
-        </title>
-      </Helmet>
-      <BasicDetails trip={trip} />
-      <Payments trip={trip} />
-      <LatestGivenQuote trip={trip} />
-      {activity_logs ? (
+    <div className="p-4 bg-white rounded-b">
+      {activity_logs && trip.total_quotes ? (
         <div>
           <h5>Activities</h5>
           <ol className="list-disc pl-4">
@@ -436,7 +493,7 @@ function useTripFetch() {
   ])
 }
 
-function useTrip(tripId?: string, shouldFetch: boolean = false) {
+export function useTrip(tripId?: string, shouldFetch: boolean = false) {
   const state = useTripState(tripId)
   const fetchTrip = useTripFetch()
   useEffect(() => {
@@ -468,31 +525,56 @@ export default function Item({
   if (!trip) {
     return null
   }
+  const { locations, latest_given_quote, trip_id, trip_source } = trip
   return (
-    <div>
-      <ul className="border-b flex mb-4 tabs">
-        <NavLink to=".." className="border">
-          <Icons.ChevronDownIcon className="rotate-90" />
-        </NavLink>
-        <NavLink to="" className="border">
-          Trip Details
-        </NavLink>
-        <NavLink to="given-quotes" className="border">
-          Given Quotes
-        </NavLink>
-        <NavLink to="quotes" className="border">
-          Quotes
-        </NavLink>
-        <NavLink to="new-quote" className="border">
-          New Quote
-        </NavLink>
-      </ul>
+    <Fragment>
+      <Helmet>
+        <title>
+          {`${locations.map(l => l.short_name)} (${
+            latest_given_quote
+              ? latest_given_quote.locations.map(l => l.short_name).join("-")
+              : ""
+          }) | ${trip_id}-${trip_source.short_name}`}
+        </title>
+      </Helmet>
+      <div className="mb-16">
+        <Breadcrumbs trip={trip} />
+        <BasicDetails trip={trip} />
+      </div>
+      {!trip.total_quotes ? (
+        <div className="my-4 text-center">
+          <Link to="new-quote" className="btn btn-primary px-3 py-2 text-lg">
+            Create Quote
+          </Link>
+        </div>
+      ) : (
+        <ul className="tabs bg-gray-200 border-b border-gray-400">
+          {trip.converted_at ? (
+            <NavLink to="hotel-bookings">Hotel Bookings</NavLink>
+          ) : null}
+          {trip.converted_at ? <NavLink to="payments">Payments</NavLink> : null}
+          <NavLink to="">Latest Given Quote</NavLink>
+          {trip.latest_given_quote ? (
+            <NavLink to="given-quotes">Given Quotes</NavLink>
+          ) : null}
+          {trip.total_quotes && !trip.converted_at ? (
+            <NavLink to="quotes">Quotes</NavLink>
+          ) : null}
+          {!trip.converted_at ? (
+            <NavLink to="new-quote">New Quote</NavLink>
+          ) : null}
+          <NavLink to="activities">Activities</NavLink>
+        </ul>
+      )}
       <Router>
-        <Index path="/" trip={trip} />
+        <LatestGivenQuote path="/" trip={trip} />
         <GivenQuotes path="given-quotes" trip={trip} />
         <Quotes path="quotes" trip={trip} />
         <NewQuote path="new-quote" trip={trip} />
+        <Payments path="payments" trip={trip} />
+        <HotelBookings path="hotel-bookings" trip={trip} />
+        <Activities path="activities" trip={trip} />
       </Router>
-    </div>
+    </Fragment>
   )
 }

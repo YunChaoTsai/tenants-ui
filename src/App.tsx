@@ -117,6 +117,9 @@ export const Header = function Header() {
             </Link>
             <ul>
               <NavLink to="/trips">Trips</NavLink>
+              <NavLink to="/trips/hotels-booking-pending">
+                Hotel Bookings
+              </NavLink>
               {hasAnyPermission(
                 PERMISSIONS.VIEW_TRIP_PLAN_REQUESTS,
                 PERMISSIONS.MANAGE_TRIP_PLAN_REQUESTS

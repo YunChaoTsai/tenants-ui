@@ -147,3 +147,34 @@ export function EmptyNumberValidator(
     .nullable(true)
     .typeError(message)
 }
+
+/**
+ * Join multiple attribute with •. A condition can also be passed
+ */
+export function joinAttributes(
+  ...args: Array<string | React.ReactNode | [boolean, string | React.ReactNode]>
+): React.ReactNode {
+  const elms = args
+    .map(item => {
+      if (Array.isArray(item)) {
+        const [shouldAdd, attribute] = item
+        if (shouldAdd) return attribute
+        return undefined
+      }
+      return item
+    })
+    .filter(item => item !== undefined && item !== "" && item !== null)
+  return (
+    <span>
+      {elms.reduce((children: Array<React.ReactNode>, item, index) => {
+        return children
+          .concat([<span key={index}>{item}</span>])
+          .concat(
+            index !== elms.length - 1
+              ? [<span key={`${item}-seperator`}> • </span>]
+              : []
+          )
+      }, [])}
+    </span>
+  )
+}

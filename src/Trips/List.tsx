@@ -16,7 +16,7 @@ import { useThunkDispatch, numberToLocalString } from "../utils"
 import { SelectTripStages, store as tripStageStore } from "../TripStages"
 import { SelectTags, store as tagStore } from "../Tags"
 import { Formik, Form } from "formik"
-import { FormikFormGroup, OnFormChange } from "../Shared/InputField"
+import { FormikFormGroup, OnFormChange, InputField } from "../Shared/InputField"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -42,7 +42,7 @@ export const getTripsAction = (
     })
 }
 
-function useTripsState() {
+export function useTripsState() {
   interface StateProps extends IPaginate {
     trips: ITrip[]
   }
@@ -56,25 +56,32 @@ function useTripsState() {
   })
 }
 
-function useTripsFetch() {
+export function useTripsFetch() {
   const dispatch = useThunkDispatch()
   return useCallback((params?: any) => dispatch(getTripsAction(params)), [
     dispatch,
   ])
 }
 
-function useTrips() {
+export function useTrips() {
   return {
     ...useTripsState(),
     fetchTrips: useTripsFetch(),
   }
 }
 
+interface IFilters {
+  q?: string
+  stages?: Array<tripStageStore.ITripStage>
+  tags?: Array<tagStore.ITag>
+  hotels_not_booked?: boolean
+}
+
 export default function List({  }: RouteComponentProps) {
-  const [params, setParams] = useSearch()
+  const [params, setParams] = useSearch<IFilters>()
   const {
     trips,
-    fetchTrips: getTrips,
+    fetchTrips,
     total,
     from,
     to,
@@ -82,21 +89,45 @@ export default function List({  }: RouteComponentProps) {
     lastPage,
     isFetching,
   } = useTrips()
+  const getTrips = useCallback(
+    params => {
+      fetchTrips(params)
+    },
+    [fetchTrips]
+  )
   useEffect(() => {
-    getTrips({ page: currentPage })
-  }, [getTrips])
+    const {
+      stages = [],
+      tags = [],
+      hotels_not_booked = false,
+      ...otherParams
+    } = params
+    getTrips({
+      stages: stages.map(s => s.name),
+      tags: tags.map(t => t.name),
+      hotels_not_booked: Number(hotels_not_booked),
+      ...otherParams,
+      page: 1,
+    })
+  }, [params, getTrips])
   return (
     <Fragment>
       <Helmet>
         <title>List of trips</title>
       </Helmet>
+      <div>
+        <Link to="new" className="float-right btn">
+          Add New Trip
+        </Link>
+        <h2>List of Trips</h2>
+      </div>
+      <hr />
       <Grid>
         <Col>
           <Search
             placeholder="Search by id, destination..."
-            onSearch={params => {
-              setParams(params)
-              getTrips({ ...params, page: 1 })
+            onSearch={newParams => {
+              setParams({ ...params, ...newParams })
             }}
           />
         </Col>
@@ -115,12 +146,18 @@ export default function List({  }: RouteComponentProps) {
       <Grid>
         <Col md="auto">
           <Filters
-            onChange={({ stages = [], tags = [] }) => {
-              getTrips({
-                stages: stages.map(s => s.name),
-                tags: tags.map(t => t.name),
+            onChange={({
+              stages = [],
+              tags = [],
+              hotels_not_booked = false,
+              ...otherParams
+            }) => {
+              setParams({
                 ...params,
-                page: 1,
+                stages,
+                tags,
+                hotels_not_booked,
+                ...otherParams,
               })
             }}
           />
@@ -261,12 +298,6 @@ export default function List({  }: RouteComponentProps) {
   )
 }
 
-interface IFilters {
-  q?: string
-  stages?: Array<tripStageStore.ITripStage>
-  tags?: Array<tagStore.ITag>
-}
-
 interface FilterProps {
   label?: string
   onChange: (filters: IFilters) => void
@@ -305,6 +336,11 @@ function Filters({ label = "Filters", onChange }: FilterProps) {
                 onChange={(value, name) => setFieldValue(name, value)}
               />
             )}
+          />
+          <InputField
+            name="hotels_not_booked"
+            type="checkbox"
+            label="Hotels Not Booked"
           />
           <OnFormChange
             onChange={({ values }) => {
