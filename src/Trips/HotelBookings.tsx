@@ -13,12 +13,13 @@ import {
   joinAttributes,
   copyNodeToClipboard,
 } from "../utils"
-import { useXHR } from "../xhr"
-import { FormikFormGroup } from "./../Shared/InputField"
+import { useXHR, XHRLink } from "../xhr"
+import { FormikFormGroup, InputField } from "./../Shared/InputField"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
 import { Grid, Col } from "../Shared/Layout"
 import Component from "../Shared/Component"
 import { useAuthUser } from "../Auth"
+import { store as hotelStore } from "../Hotels"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -207,7 +208,7 @@ function ComposeEmail({
   return (
     <Component initialState={false}>
       {({ state, setState }) => (
-        <div>
+        <Fragment>
           <Button onClick={() => setState(true)}>Compose Email</Button>
           <Dialog closeButton open={state} onClose={() => setState(false)}>
             <Dialog.Header>
@@ -392,8 +393,86 @@ function ComposeEmail({
               </Button>
             </Dialog.Footer>
           </Dialog>
-        </div>
+        </Fragment>
       )}
+    </Component>
+  )
+}
+
+function GenerateVoucher({
+  hotel,
+  quoteId,
+  isBooked,
+}: {
+  hotel: hotelStore.IHotel
+  quoteId: number
+  isBooked: boolean
+}) {
+  return (
+    <Component initialState={false}>
+      {({ state, setState }) => {
+        return (
+          <Fragment>
+            <Button onClick={() => setState(true)} primary={isBooked}>
+              Generate Voucher
+            </Button>
+            <Dialog open={state} onClose={() => setState(false)} closeButton>
+              <Formik
+                initialValues={{
+                  hotel_confirmation_number: "",
+                  voucher_number: "",
+                }}
+                onSubmit={() => {}}
+                render={({ values }) => (
+                  <Fragment>
+                    <Dialog.Header>
+                      <Dialog.Title>
+                        Generate Voucher for {hotel.name}
+                      </Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.Body>
+                      <InputField
+                        type="text"
+                        name="hotel_confirmation_number"
+                        label="Hotel Confirmation Number (optional)"
+                        placeholder="TSK123"
+                      />
+                      <InputField
+                        type="text"
+                        name="voucher_number"
+                        label="Voucher Number (optional)"
+                        placeholder="6525"
+                      />
+                    </Dialog.Body>
+                    <Dialog.Footer>
+                      <XHRLink
+                        href="/hotel-voucher-pdf"
+                        query={{
+                          hotel: hotel.id,
+                          to: new Date().getTimezoneOffset(),
+                          quote: quoteId,
+                          hcn: values.hotel_confirmation_number,
+                          vn: values.voucher_number,
+                        }}
+                        target="_blank"
+                        className="btn btn-primary"
+                      >
+                        Generate Voucher
+                      </XHRLink>{" "}
+                      <Button
+                        className="btn--secondary"
+                        onClick={() => setState(false)}
+                      >
+                        Close
+                      </Button>
+                    </Dialog.Footer>
+                  </Fragment>
+                )}
+              />
+            </Dialog>
+          </Fragment>
+        )
+      }}
     </Component>
   )
 }
@@ -447,10 +526,15 @@ export default function HotelBookings({ trip }: IHotelBookings) {
                 <div className="mb-4">
                   <QuoteHotelBookingStage quoteHotels={mergedQuoteHotels} />
                 </div>
-                <div>
+                <div className="btn-group">
                   <ComposeEmail
                     quoteHotels={mergedQuoteHotelsByCheckinCheckout}
                     trip={trip}
+                  />
+                  <GenerateVoucher
+                    hotel={hotel}
+                    quoteId={latest_given_quote.quote.id}
+                    isBooked={!!quoteHotel.booked_at}
                   />
                 </div>
               </Col>

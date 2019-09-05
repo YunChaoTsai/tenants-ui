@@ -202,4 +202,25 @@ export function useXHR() {
   return React.useContext(XHRContext)
 }
 
+/**
+ * XHR Get Link
+ */
+export function XHRLink({
+  href = "",
+  query,
+  ...props
+}: React.HTMLProps<HTMLAnchorElement> & {
+  query?: { [key: string]: any }
+}) {
+  return (
+    <a
+      href={`${axios.defaults.baseURL}${href}${queryToSearch({
+        ...(query || {}),
+        token: getAuthorizationToken(),
+      })}`}
+      {...props}
+    />
+  )
+}
+
 export default axios

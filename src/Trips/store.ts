@@ -61,6 +61,7 @@ export interface IQuoteHotel {
   comments: string
   booking_stages: hotelBookingStageStore.IHotelBookingStage[]
   latest_booking_stage?: IQuoteHotelLatestBookingStage
+  booked_at?: string
 }
 export interface IQuoteCab {
   id: number
