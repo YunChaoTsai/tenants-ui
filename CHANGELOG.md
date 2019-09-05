@@ -1,3 +1,19 @@
+# [1.15.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.14.1...v1.15.0) (2019-09-05)
+
+
+### Bug Fixes
+
+* **alignment:** hotel booking stages issue in quotes ([c207e0b](https://github.com/tourepedia/tp-admin-ui/commit/c207e0b))
+* **cab-locality:** cab-locality not visible in quote ([be9a70c](https://github.com/tourepedia/tp-admin-ui/commit/be9a70c))
+* **payments-ui:** show status with due date ([a35fc10](https://github.com/tourepedia/tp-admin-ui/commit/a35fc10))
+
+
+### Features
+
+* **compose-email:** add hotel confirmation email generation ([003c2ba](https://github.com/tourepedia/tp-admin-ui/commit/003c2ba)), closes [#111](https://github.com/tourepedia/tp-admin-ui/issues/111)
+* **hotel-booking-dashboard:** add bookings dashboard with ui changes ([ef5c912](https://github.com/tourepedia/tp-admin-ui/commit/ef5c912))
+* **hotel-voucher:** voucher creation ([7194d0c](https://github.com/tourepedia/tp-admin-ui/commit/7194d0c))
+
 ## [1.14.1](https://github.com/tourepedia/tp-admin-ui/compare/v1.14.0...v1.14.1) (2019-08-26)
 
 
