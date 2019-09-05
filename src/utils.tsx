@@ -4,6 +4,7 @@ import { Subtract, Diff } from "utility-types"
 import { useDispatch } from "react-redux"
 import { ThunkDispatch } from "./types"
 import * as Yup from "yup"
+import { ownerDocument } from "@tourepedia/ui"
 
 export function searchToQuery(
   search: string = "?",
@@ -177,4 +178,37 @@ export function joinAttributes(
       }, [])}
     </span>
   )
+}
+
+export function copyNodeToClipboard(selector: HTMLElement | string) {
+  try {
+    const document = ownerDocument()
+    let node: HTMLElement | null
+    if (!document || !window) {
+      throw new Error(
+        "HTMLDOM and Window must be in context for selection to work"
+      )
+    }
+    if (typeof selector === "string") {
+      node = document.querySelector(selector)
+    } else {
+      node = selector
+    }
+    if (!node) {
+      throw new Error("Node not found")
+    }
+    // create a range that selects the root node
+    const range = document.createRange()
+    range.selectNode(node)
+    const selection = window.getSelection()
+    if (selection) {
+      // select the range
+      selection.removeAllRanges()
+      selection.addRange(range)
+      document.execCommand("copy")
+    }
+  } catch (e) {
+    console.error(e)
+    window.alert("Please press Ctrl/Cmd+C to copy")
+  }
 }

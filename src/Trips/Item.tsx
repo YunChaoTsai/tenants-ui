@@ -4,6 +4,7 @@ import { AxiosInstance } from "axios"
 import moment from "moment"
 import Helmet from "react-helmet-async"
 import { Icons, Button, Badge, BadgeList, Table } from "@tourepedia/ui"
+import pluralize from "pluralize"
 
 import { ITrip, actions, IStateWithKey, selectors } from "./store"
 import { ThunkAction } from "./../types"
@@ -12,7 +13,7 @@ import GivenQuotes from "./GivenQuotes"
 import NewQuote from "./NewQuote"
 import { Grid, Col } from "../Shared/Layout"
 import Spinner from "../Shared/Spinner"
-import { useThunkDispatch } from "./../utils"
+import { useThunkDispatch, joinAttributes } from "./../utils"
 import NavLink from "../Shared/NavLink"
 import Component from "../Shared/Component"
 import EditTags from "../Tags/EditTags"
@@ -81,8 +82,6 @@ export function BasicDetails({ trip }: { trip: ITrip }) {
   const xhr = useXHR()
   const {
     id,
-    start_date,
-    end_date,
     locations,
     no_of_adults,
     children,
@@ -97,6 +96,9 @@ export function BasicDetails({ trip }: { trip: ITrip }) {
     sales_team = [],
     operations_team = [],
   } = trip
+  const start_date = moment.utc(trip.start_date).local()
+  const end_date = moment.utc(trip.end_date).local()
+  const no_of_nights = end_date.diff(moment.utc(start_date), "days")
   return (
     <section>
       <header className="px-4 py-2 rounded-t bg-white">
@@ -121,24 +123,20 @@ export function BasicDetails({ trip }: { trip: ITrip }) {
               <div className="flex items-center py-1">
                 <Icons.CalendarIcon className="mr-2" />
                 <div className="whitespace-pre">
-                  {moment
-                    .utc(start_date)
-                    .local()
-                    .format("DD MMM, YYYY")}
-                  {" • "}
-                  {moment
-                    .utc(end_date)
-                    .diff(moment.utc(start_date), "days")}{" "}
-                  Nights,{" "}
-                  {moment.utc(end_date).diff(moment.utc(start_date), "days") +
-                    1}{" "}
-                  Days
+                  {joinAttributes(
+                    start_date.format("DD MMM, YYYY"),
+                    `${pluralize("Night", no_of_nights, true)}, ${pluralize(
+                      "Day",
+                      no_of_nights + 1,
+                      true
+                    )}`
+                  )}
                 </div>
               </div>
               <div className="flex items-center py-1">
                 <Icons.UsersIcon className="mr-2" />
                 <div>
-                  {no_of_adults} Adults
+                  {pluralize("Adult", no_of_adults, true)}
                   {children ? <span> with {children} Children</span> : ""}
                 </div>
               </div>

@@ -9,6 +9,9 @@ import {
   Dialog,
   useDialog,
   ButtonGroup,
+  Badge,
+  InputGroup,
+  InputGroupAddon,
 } from "@tourepedia/ui"
 import { Formik, Form } from "formik"
 import * as Validator from "yup"
@@ -17,9 +20,11 @@ import { $PropertyType } from "utility-types"
 
 import { ITrip, IQuote, IGivenQuote } from "./store"
 import { useXHR } from "./../xhr"
-import { InputField } from "./../Shared/InputField"
+import { InputField, Input } from "./../Shared/InputField"
 import Spinner from "./../Shared/Spinner"
 import { numberToLocalString } from "../utils"
+import Component from "../Shared/Component"
+import { Grid, Col } from "../Shared/Layout"
 
 interface IInstalment {
   amount: number
@@ -414,32 +419,96 @@ export function Quote({
                       actions.setSubmitting(false)
                     }
                   }}
-                  render={({ isSubmitting, setFieldValue }) => (
+                  render={({ isSubmitting, setFieldValue, values }) => (
                     <Form noValidate>
-                      <InputField
-                        label="Multiplication Factor"
-                        name="factor"
-                        type="number"
-                        step={0.01}
-                        onChange={e => {
-                          setFieldValue(
-                            "given_price",
-                            Math.ceil(
-                              quote.total_price *
-                                parseFloat(e.currentTarget.value)
-                            )
-                          )
-                          setFieldValue(
-                            e.currentTarget.name,
-                            e.currentTarget.value
-                          )
-                        }}
-                      />
-                      <InputField
-                        name="given_price"
-                        label="Given Price"
-                        type="number"
-                      />
+                      <Grid>
+                        <Col>
+                          <InputField
+                            label="Multiplication Factor"
+                            name="factor"
+                            type="number"
+                            step={0.01}
+                            onChange={e => {
+                              setFieldValue(
+                                "given_price",
+                                Math.ceil(
+                                  quote.total_price *
+                                    parseFloat(e.currentTarget.value)
+                                )
+                              )
+                              setFieldValue(
+                                e.currentTarget.name,
+                                e.currentTarget.value
+                              )
+                            }}
+                          />
+                          <InputField
+                            name="given_price"
+                            label="Given Price"
+                            type="number"
+                          />
+                        </Col>
+                        <Col>
+                          <Component initialState={15}>
+                            {({ state, setState }) => {
+                              const profitValue = Number(
+                                Number(
+                                  values.given_price -
+                                    quote.total_price -
+                                    (values.given_price * state) / 100
+                                ).toFixed(2)
+                              )
+                              const effectiveFactor = Number(
+                                (profitValue + quote.total_price) /
+                                  quote.total_price
+                              ).toFixed(2)
+                              return (
+                                <div className="form-group">
+                                  <div className="pb-2">
+                                    See effective factor and profit (after
+                                    commission)
+                                  </div>
+                                  <label htmlFor="commission_factor">
+                                    Any commission
+                                  </label>
+                                  <InputGroup>
+                                    <Input
+                                      value={state}
+                                      type="number"
+                                      id="commission_factor"
+                                      min={0}
+                                      max={100}
+                                      onChange={e =>
+                                        setState(
+                                          Math.max(
+                                            Math.min(
+                                              parseFloat(
+                                                e.currentTarget.value || "0"
+                                              ),
+                                              100
+                                            ),
+                                            0
+                                          )
+                                        )
+                                      }
+                                    />
+                                    <InputGroupAddon>%</InputGroupAddon>
+                                  </InputGroup>
+                                  <div className="mt-2">
+                                    Effective Factor: {effectiveFactor}
+                                    <br />
+                                    Profit:{" "}
+                                    <Badge primary>
+                                      <Icons.RupeeIcon />{" "}
+                                      {numberToLocalString(profitValue)}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              )
+                            }}
+                          </Component>
+                        </Col>
+                      </Grid>
                       <InputField
                         name="comments"
                         as="textarea"
