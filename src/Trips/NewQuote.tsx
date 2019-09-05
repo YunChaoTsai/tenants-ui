@@ -287,7 +287,9 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
           <div className="mb-8 px-4">
             <CalculateHotelPrice
               bookingFrom={bookingFrom}
-              bookingTo={bookingTo}
+              bookingTo={moment(bookingTo)
+                .subtract(1, "day")
+                .format("YYYY-MM-DD HH:mm:ss")}
               initialValues={initialQuote.hotels}
               onChange={handleHotelChange}
             />

@@ -255,8 +255,29 @@ function ConvertTrip({
                       .
                     </b>
                   </p>
-                  <h5>Quote Details</h5>
+                  <h5>Given Quote Details</h5>
                   <hr />
+                  <h6>
+                    Given Price:{" "}
+                    <mark>
+                      <Icons.RupeeIcon />{" "}
+                      {numberToLocalString(latest_given_quote.given_price)} /-
+                    </mark>
+                  </h6>
+                  <blockquote>
+                    {latest_given_quote.comments ? (
+                      <p>{latest_given_quote.comments}</p>
+                    ) : null}
+                    <em>
+                      on{" "}
+                      {moment
+                        .utc(latest_given_quote.created_at)
+                        .local()
+                        .format("DD MMM, YYYY [at] hh:mm A")}{" "}
+                      by {latest_given_quote.created_by.name}&lt;
+                      {latest_given_quote.created_by.email}&gt;
+                    </em>
+                  </blockquote>
                   <Quote quote={latest_given_quote.quote} readOnly />
                 </fieldset>
                 <hr />

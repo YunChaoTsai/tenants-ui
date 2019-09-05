@@ -1,17 +1,25 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, Fragment } from "react"
 import { RouteComponentProps } from "@reach/router"
 import moment from "moment"
-import { Table, Button, Badge, Icons } from "@tourepedia/ui"
+import { Table, Button, Badge, Icons, Dialog } from "@tourepedia/ui"
 import * as Validator from "yup"
 import { Formik, Form } from "formik"
 import { AxiosInstance } from "axios"
+import pluralize from "pluralize"
 
 import { ITrip, isTripConverted, IQuoteHotel, IGivenQuote } from "./store"
-import { numberToLocalString, joinAttributes } from "../utils"
-import { useXHR } from "../xhr"
-import { FormikFormGroup } from "./../Shared/InputField"
+import {
+  numberToLocalString,
+  joinAttributes,
+  copyNodeToClipboard,
+} from "../utils"
+import { useXHR, XHRLink } from "../xhr"
+import { FormikFormGroup, InputField } from "./../Shared/InputField"
 import { SelectHotelBookingStages } from "../HotelBookingStages"
 import { Grid, Col } from "../Shared/Layout"
+import Component from "../Shared/Component"
+import { useAuthUser } from "../Auth"
+import { store as hotelStore } from "../Hotels"
 
 export function XHR(xhr: AxiosInstance) {
   return {
@@ -116,13 +124,11 @@ export function QuoteHotelBookingStage({
       {latest_booking_stage ? (
         <div className="text-sm text-gray-600">
           {joinAttributes(
-            <span>by {latest_booking_stage.pivot.created_by.name}</span>,
-            <span>
-              {moment
-                .utc(latest_booking_stage.pivot.created_at)
-                .local()
-                .fromNow()}
-            </span>
+            `by ${latest_booking_stage.pivot.created_by.name}`,
+            moment
+              .utc(latest_booking_stage.pivot.created_at)
+              .local()
+              .fromNow()
           )}
         </div>
       ) : null}
@@ -130,12 +136,13 @@ export function QuoteHotelBookingStage({
   )
 }
 
-export function mergeByHotel(quote: IGivenQuote) {
+export function groupByHotel(quote?: IGivenQuote): IQuoteHotel[][] {
+  if (!quote) return []
   const {
     quote: { hotels: quoteHotels },
   } = quote
-  return quoteHotels.reduce(
-    (byHotelId: { [key: string]: Array<IQuoteHotel> }, quoteHotel) => {
+  const byHotelId = quoteHotels.reduce<{ [key: string]: Array<IQuoteHotel> }>(
+    (byHotelId, quoteHotel) => {
       const { hotel } = quoteHotel
       if (!byHotelId[hotel.id]) {
         byHotelId[hotel.id] = []
@@ -144,6 +151,329 @@ export function mergeByHotel(quote: IGivenQuote) {
       return byHotelId
     },
     {}
+  )
+  return Object.keys(byHotelId).reduce<IQuoteHotel[][]>(
+    (groupedQuoteHotels, hotelId: string) => {
+      groupedQuoteHotels.push(byHotelId[hotelId])
+      return groupedQuoteHotels
+    },
+    []
+  )
+}
+
+export function groupByCheckinCheckout(quoteHotels: Array<IQuoteHotel>) {
+  const mergedQuoteHotels = quoteHotels.reduce<{
+    [key: string]: Array<IQuoteHotel>
+  }>((byCheckinCheckout, quoteHotel) => {
+    const { checkin, checkout } = quoteHotel
+    if (!byCheckinCheckout[`${checkin}-${checkout}`]) {
+      byCheckinCheckout[`${checkin}-${checkout}`] = []
+    }
+    byCheckinCheckout[`${checkin}-${checkout}`].push(quoteHotel)
+    return byCheckinCheckout
+  }, {})
+  return Object.keys(mergedQuoteHotels).reduce<IQuoteHotel[][]>(
+    (groupedQuoteHotels, hotelId: string) => {
+      groupedQuoteHotels.push(mergedQuoteHotels[hotelId])
+      return groupedQuoteHotels
+    },
+    []
+  )
+}
+
+function ComposeEmail({
+  // quoteHotels that grouped by checkin and checkout dates for a hotel
+  quoteHotels,
+  trip,
+}: {
+  quoteHotels: IQuoteHotel[][]
+  trip: ITrip
+}) {
+  const { user } = useAuthUser()
+  if (!quoteHotels.length || !user) return null
+  const quoteHotel = quoteHotels[0][0]
+  const { hotel } = quoteHotel
+  const total_given_price = quoteHotels.reduce(
+    (price, quoteHotels) =>
+      price +
+      Number(
+        quoteHotels.reduce(
+          (price, quoteHotel) => price + Number(quoteHotel.given_price),
+          0
+        )
+      ),
+    0
+  )
+  const { tenant } = user
+  return (
+    <Component initialState={false}>
+      {({ state, setState }) => (
+        <Fragment>
+          <Button onClick={() => setState(true)}>Compose Email</Button>
+          <Dialog closeButton open={state} onClose={() => setState(false)}>
+            <Dialog.Header>
+              <h4 className="mb-2 font-semibold">{hotel.name}</h4>
+              <div className="text-sm text-gray-600">
+                {joinAttributes(
+                  hotel.location.short_name,
+                  `${hotel.stars} Star`
+                )}
+              </div>
+            </Dialog.Header>
+            <Dialog.Body>
+              <p className="mb-4 text-gray-600 text-sm">
+                Copy this email content to your composer and edit any
+                information before send
+              </p>
+              <div>
+                <Button
+                  primary
+                  className="float-right"
+                  onClick={() => {
+                    copyNodeToClipboard("#hotel_email")
+                  }}
+                >
+                  Copy to Clipboard
+                </Button>
+              </div>
+              <div
+                id="hotel_email"
+                className="p-2 border rounded"
+                style={{
+                  fontFamily: "Verdana, sans-serif",
+                  fontWeight: "normal",
+                  fontSize: "small",
+                }}
+              >
+                <div>Dear Sir/Mam,</div>
+                <br />
+                {tenant ? (
+                  <Fragment>
+                    <div>Greetings from {tenant.name}.</div>
+                    <br />
+                  </Fragment>
+                ) : null}
+                <div>
+                  We are pleased to inform you that we have a new booking with
+                  the following details:
+                </div>
+                <br />
+                <div style={{ marginBottom: "10px" }}>
+                  <small>Hotel</small>
+                </div>
+                <div>
+                  <b>
+                    {hotel.name}, {hotel.location.short_name} ({hotel.stars}{" "}
+                    Star)
+                  </b>
+                </div>
+                <br />
+                <div style={{ marginBottom: "10px" }}>
+                  <small>Guest Details</small>
+                </div>
+                <div>
+                  <b>{trip.contacts.map(c => c.name).join(", ")}</b>
+                </div>
+                <div>
+                  <b>
+                    {trip.no_of_adults} Adults
+                    {trip.children ? `, ${trip.children} children` : ""}
+                  </b>
+                </div>
+                <br />
+                <div style={{ marginBottom: "10px" }}>
+                  <small>Room Details</small>
+                </div>
+                <ul
+                  style={{
+                    listStyle: "circle",
+                    paddingLeft: "20px",
+                  }}
+                >
+                  {quoteHotels.map(quoteHotels => {
+                    if (!quoteHotels.length) return null
+                    const quoteHotel = quoteHotels[0]
+                    const checkin = moment.utc(quoteHotel.checkin).local()
+                    const checkout = moment.utc(quoteHotel.checkout).local()
+                    const no_of_nights = checkout.diff(checkin, "days") + 1
+                    const formatedCheckin = checkin.format("Do MMM, YYYY")
+                    const total_given_price = quoteHotels.reduce<number>(
+                      (total_given_price, quoteHotel) =>
+                        total_given_price + Number(quoteHotel.given_price),
+                      0
+                    )
+                    return (
+                      <li
+                        key={`${quoteHotel.id}-${formatedCheckin}`}
+                        style={{ marginBottom: "10px" }}
+                      >
+                        <div>
+                          <b>
+                            {formatedCheckin} -{" "}
+                            {pluralize("Night", no_of_nights, true)}
+                            {"  (INR "}
+                            {numberToLocalString(total_given_price)} /-)
+                          </b>
+                        </div>
+                        {quoteHotels.map((quoteHotel, i) => {
+                          const {
+                            meal_plan,
+                            room_type,
+                            no_of_rooms,
+                            adults_with_extra_bed,
+                            children_with_extra_bed,
+                            children_without_extra_bed,
+                          } = quoteHotel
+                          return (
+                            <div
+                              key={`${quoteHotel.id}-${formatedCheckin}-${i}`}
+                            >
+                              <b>
+                                {meal_plan.name} - {no_of_rooms}{" "}
+                                {room_type.name}
+                              </b>
+                              {adults_with_extra_bed ||
+                              children_with_extra_bed ||
+                              children_without_extra_bed ? (
+                                <small>
+                                  {" "}
+                                  (
+                                  {[
+                                    adults_with_extra_bed
+                                      ? `${pluralize(
+                                          "Adult",
+                                          adults_with_extra_bed,
+                                          true
+                                        )} with EB`
+                                      : undefined,
+                                    children_with_extra_bed
+                                      ? `${pluralize(
+                                          "Child",
+                                          children_with_extra_bed,
+                                          true
+                                        )} with EB`
+                                      : undefined,
+                                    children_without_extra_bed
+                                      ? `${pluralize(
+                                          "Child",
+                                          children_without_extra_bed,
+                                          true
+                                        )} without EB`
+                                      : undefined,
+                                  ]
+                                    .filter(str => str)
+                                    .join(", ")}
+                                  )
+                                </small>
+                              ) : null}
+                            </div>
+                          )
+                        })}
+                      </li>
+                    )
+                  })}
+                </ul>
+                <br />
+                <div>
+                  <span>Total Price:</span>{" "}
+                  <b>INR {numberToLocalString(total_given_price)} /-</b>
+                </div>
+                <br />
+                <div>
+                  <strong>Please confirm this booking.</strong>
+                </div>
+              </div>
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Button
+                className="btn--secondary"
+                onClick={() => setState(false)}
+              >
+                Close
+              </Button>
+            </Dialog.Footer>
+          </Dialog>
+        </Fragment>
+      )}
+    </Component>
+  )
+}
+
+function GenerateVoucher({
+  hotel,
+  quoteId,
+  isBooked,
+}: {
+  hotel: hotelStore.IHotel
+  quoteId: number
+  isBooked: boolean
+}) {
+  return (
+    <Component initialState={false}>
+      {({ state, setState }) => {
+        return (
+          <Fragment>
+            <Button onClick={() => setState(true)} primary={isBooked}>
+              Generate Voucher
+            </Button>
+            <Dialog open={state} onClose={() => setState(false)} closeButton>
+              <Formik
+                initialValues={{
+                  hotel_confirmation_number: "",
+                  voucher_number: "",
+                }}
+                onSubmit={() => {}}
+                render={({ values }) => (
+                  <Fragment>
+                    <Dialog.Header>
+                      <Dialog.Title>
+                        Generate Voucher for {hotel.name}
+                      </Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.Body>
+                      <InputField
+                        type="text"
+                        name="hotel_confirmation_number"
+                        label="Hotel Confirmation Number (optional)"
+                        placeholder="TSK123"
+                      />
+                      <InputField
+                        type="text"
+                        name="voucher_number"
+                        label="Voucher Number (optional)"
+                        placeholder="6525"
+                      />
+                    </Dialog.Body>
+                    <Dialog.Footer>
+                      <XHRLink
+                        href="/hotel-voucher-pdf"
+                        query={{
+                          hotel: hotel.id,
+                          to: new Date().getTimezoneOffset(),
+                          quote: quoteId,
+                          hcn: values.hotel_confirmation_number,
+                          vn: values.voucher_number,
+                        }}
+                        target="_blank"
+                        className="btn btn-primary"
+                      >
+                        Generate Voucher
+                      </XHRLink>{" "}
+                      <Button
+                        className="btn--secondary"
+                        onClick={() => setState(false)}
+                      >
+                        Close
+                      </Button>
+                    </Dialog.Footer>
+                  </Fragment>
+                )}
+              />
+            </Dialog>
+          </Fragment>
+        )
+      }}
+    </Component>
   )
 }
 
@@ -154,26 +484,28 @@ interface IHotelBookings extends RouteComponentProps {
 export default function HotelBookings({ trip }: IHotelBookings) {
   const { latest_given_quote } = trip
   const isConverted = isTripConverted(trip)
-  const mergedByHotel: { [key: string]: Array<IQuoteHotel> } = useMemo(() => {
-    if (!latest_given_quote) return {}
-    return mergeByHotel(latest_given_quote)
+  const mergedByHotel = useMemo(() => {
+    if (!latest_given_quote) return []
+    return groupByHotel(latest_given_quote)
   }, [latest_given_quote])
   if (!isConverted || !latest_given_quote) {
     return <div>Trip not converted Yet</div>
   }
   return (
     <div className="rounded-b bg-white">
-      {Object.keys(mergedByHotel).map((hotelId: string) => {
-        const quoteHotels = mergedByHotel[hotelId]
-        if (!quoteHotels.length) return null
-        const quoteHotel = quoteHotels[0]
+      {mergedByHotel.map(mergedQuoteHotels => {
+        if (!mergedQuoteHotels.length) return null
+        const quoteHotel = mergedQuoteHotels[0]
         const { hotel } = quoteHotel
-        const total_given_price = quoteHotels.reduce(
+        const total_given_price = mergedQuoteHotels.reduce(
           (price, quoteHotel) => price + Number(quoteHotel.given_price),
           0
         )
+        const mergedQuoteHotelsByCheckinCheckout = groupByCheckinCheckout(
+          mergedQuoteHotels
+        )
         return (
-          <div key={hotelId} className="p-4 border-b">
+          <div key={hotel.id} className="p-4 border-b">
             <Grid>
               <Col>
                 <div className="mb-4">
@@ -192,7 +524,18 @@ export default function HotelBookings({ trip }: IHotelBookings) {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <QuoteHotelBookingStage quoteHotels={quoteHotels} />
+                  <QuoteHotelBookingStage quoteHotels={mergedQuoteHotels} />
+                </div>
+                <div className="btn-group">
+                  <ComposeEmail
+                    quoteHotels={mergedQuoteHotelsByCheckinCheckout}
+                    trip={trip}
+                  />
+                  <GenerateVoucher
+                    hotel={hotel}
+                    quoteId={latest_given_quote.quote.id}
+                    isBooked={!!quoteHotel.booked_at}
+                  />
                 </div>
               </Col>
               <Col>
@@ -201,61 +544,77 @@ export default function HotelBookings({ trip }: IHotelBookings) {
                     striped
                     bordered
                     responsive
-                    headers={["Date", "Meal Plan", "Rooms", "Price"]}
-                    alignCols={{ 4: "right", 5: "center" }}
-                    rows={quoteHotels.map(quoteHotel => {
-                      const {
-                        checkin,
-                        checkout,
-                        meal_plan,
-                        room_type,
-                        no_of_rooms,
-                        comments,
-                        given_price,
-                        adults_with_extra_bed,
-                        children_with_extra_bed,
-                        children_without_extra_bed,
-                      } = quoteHotel
-                      return [
-                        <span className="whitespace-pre">
-                          {moment
-                            .utc(checkin)
-                            .local()
-                            .format("DD MMM YYYY")}
-                          <br />
-                          <small>
-                            {moment
-                              .utc(checkout)
-                              .diff(moment.utc(checkin), "days") + 1}{" "}
-                            Nights
-                          </small>
-                        </span>,
-                        <div>
-                          {meal_plan.name}
-                          {comments ? (
-                            <blockquote>{comments}</blockquote>
-                          ) : null}
-                        </div>,
-                        <div>
-                          {joinAttributes(
-                            `${no_of_rooms} ${room_type.name}`,
-                            [
-                              !!adults_with_extra_bed,
-                              `${adults_with_extra_bed} AWEB`,
-                            ],
-                            [
-                              !!children_with_extra_bed,
-                              `${children_with_extra_bed} CWEB`,
-                            ],
-                            [
-                              !!children_without_extra_bed,
-                              `${children_without_extra_bed} CWoEB`,
-                            ]
-                          )}
-                        </div>,
-                        numberToLocalString(given_price),
-                      ]
-                    })}
+                    headers={["Date", "Meal Plan and Rooms", "Given Price"]}
+                    alignCols={{ 2: "right" }}
+                    rows={mergedQuoteHotelsByCheckinCheckout.map(
+                      quoteHotels => {
+                        if (!quoteHotels.length) return []
+                        const quoteHotel = quoteHotels[0]
+                        const checkin = moment.utc(quoteHotel.checkin).local()
+                        const checkout = moment.utc(quoteHotel.checkout).local()
+                        const no_of_nights = checkout.diff(checkin, "days") + 1
+                        const formatedCheckin = checkin.format("Do MMM, YYYY")
+                        const total_given_price = quoteHotels.reduce<number>(
+                          (total_given_price, quoteHotel) =>
+                            total_given_price + Number(quoteHotel.given_price),
+                          0
+                        )
+                        return [
+                          <span className="whitespace-pre">
+                            {formatedCheckin}
+                            <br />
+                            <small>
+                              {pluralize("Night", no_of_nights, true)}
+                            </small>
+                          </span>,
+                          <div>
+                            {quoteHotels.map((quoteHotel, i) => {
+                              const {
+                                meal_plan,
+                                room_type,
+                                no_of_rooms,
+                                comments,
+                                given_price,
+                                adults_with_extra_bed,
+                                children_with_extra_bed,
+                                children_without_extra_bed,
+                              } = quoteHotel
+                              return (
+                                <div
+                                  key={`${
+                                    quoteHotel.id
+                                  }-${formatedCheckin}-${i}`}
+                                >
+                                  <div>
+                                    {joinAttributes(
+                                      meal_plan.name,
+                                      `${no_of_rooms} ${room_type.name}`,
+                                      [
+                                        !!adults_with_extra_bed,
+                                        `${adults_with_extra_bed} AWEB`,
+                                      ],
+                                      [
+                                        !!children_with_extra_bed,
+                                        `${children_with_extra_bed} CWEB`,
+                                      ],
+                                      [
+                                        !!children_without_extra_bed,
+                                        `${children_without_extra_bed} CWoEB`,
+                                      ]
+                                    )}{" "}
+                                    ({numberToLocalString(given_price)})
+                                  </div>
+                                  {comments ? (
+                                    <blockquote>{comments}</blockquote>
+                                  ) : null}
+                                </div>
+                              )
+                            })}
+                          </div>,
+                          numberToLocalString(total_given_price),
+                        ]
+                      }
+                    )}
                   />
                 </div>
               </Col>

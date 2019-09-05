@@ -4,6 +4,7 @@ import { AxiosInstance } from "axios"
 import moment from "moment"
 import Helmet from "react-helmet-async"
 import { Table, Icons, Paginate, Button, Badge } from "@tourepedia/ui"
+import pluralize from "pluralize"
 
 import { ITrip, IStateWithKey, actions, selectors } from "./store"
 import { ThunkAction } from "./../types"
@@ -12,7 +13,7 @@ import Listable from "./../Shared/List"
 import { Grid, Col } from "../Shared/Layout"
 import { IPaginate } from "../model"
 import { useSelector } from "react-redux"
-import { useThunkDispatch, numberToLocalString } from "../utils"
+import { useThunkDispatch, numberToLocalString, joinAttributes } from "../utils"
 import { SelectTripStages, store as tripStageStore } from "../TripStages"
 import { SelectTags, store as tagStore } from "../Tags"
 import { Formik, Form } from "formik"
@@ -168,14 +169,12 @@ export default function List({  }: RouteComponentProps) {
               striped
               bordered
               responsive
-              headers={["Destinations", "Dates", "Traveler", "Stage", "Teams"]}
-              rows={trips.map(
-                ({
+              headers={["Destinations", "Dates", "Traveler", "Stage", "Owners"]}
+              rows={trips.map(trip => {
+                const {
                   id,
                   trip_source,
                   trip_id,
-                  start_date,
-                  end_date,
                   locations,
                   no_of_adults,
                   children,
@@ -186,36 +185,46 @@ export default function List({  }: RouteComponentProps) {
                   latest_given_quote,
                   sales_team = [],
                   operations_team = [],
-                }) => [
+                  converted_at,
+                } = trip
+                const start_date = moment.utc(trip.start_date)
+                const end_date = moment.utc(trip.end_date)
+                const no_of_nights = end_date.diff(start_date, "days")
+                return [
                   <div>
                     <div>
                       <Link to={id.toString()}>
-                        {trip_id || id}-{trip_source.short_name}
+                        <span>
+                          {locations.map(l => l.short_name).join(" • ")}
+                        </span>
+                        {latest_given_quote &&
+                        latest_given_quote.locations.length ? (
+                          <span className="text-gray-600">
+                            <br />
+                            <small>
+                              (
+                              {latest_given_quote.locations
+                                .map(l => l.short_name)
+                                .join("-")}
+                              )
+                            </small>
+                          </span>
+                        ) : null}
+                        <br />
+                        <span className="text-black">
+                          {trip_id || id}-{trip_source.short_name}
+                        </span>
                       </Link>
-                    </div>
-                    <div>
-                      {locations.map(l => l.short_name).join(" • ")}
-                      {latest_given_quote ? (
-                        <small>
-                          {" "}
-                          (
-                          {latest_given_quote.locations
-                            .map(l => l.short_name)
-                            .join("-")}
-                          )
-                        </small>
-                      ) : null}
                     </div>
                   </div>,
                   <div>
                     <div>
-                      {moment
-                        .utc(start_date)
-                        .local()
-                        .format("Do MMM, YYYY")}{" "}
-                      • {moment(end_date).diff(start_date, "days")} Nights
+                      {joinAttributes(
+                        start_date.format("Do MMM, YYYY"),
+                        pluralize("Night", no_of_nights, true)
+                      )}
                     </div>
-                    <small>
+                    <small className="text-gray-600">
                       (
                       {moment.utc().isBefore(start_date)
                         ? `${moment
@@ -230,22 +239,32 @@ export default function List({  }: RouteComponentProps) {
                   </div>,
                   contact ? (
                     <div>
-                      <div>{contact.name}</div>
+                      <div>
+                        {pluralize("Adult", no_of_adults, true)}
+                        {children ? ` with ${children} children` : ""}
+                      </div>
+                      <div className="text-gray-600">{contact.name}</div>
                       <small>
-                        {no_of_adults} Adults
-                        {children ? " with " + children : ""}
-                        {contact.phone_number || contact.email ? " • " : ""}
-                        {contact.phone_number ? (
-                          <a href={`tel:${contact.phone_number}`}>
-                            {contact.phone_number}
-                          </a>
-                        ) : null}
-                        {contact.phone_number && contact.email ? " • " : ""}
-                        {contact.email ? (
-                          <a href={`mailto:${contact.email}`}>
-                            {contact.email}
-                          </a>
-                        ) : null}
+                        {joinAttributes(
+                          [
+                            contact.phone_number,
+                            <a
+                              href={`tel:${contact.phone_number}`}
+                              className="text-gray-600"
+                            >
+                              {contact.phone_number}
+                            </a>,
+                          ],
+                          [
+                            contact.email,
+                            <a
+                              href={`mailto:${contact.email}`}
+                              className="text-gray-600"
+                            >
+                              {contact.email}
+                            </a>,
+                          ]
+                        )}
                       </small>
                     </div>
                   ) : null,
@@ -254,7 +273,7 @@ export default function List({  }: RouteComponentProps) {
                     <small>
                       {latest_given_quote ? (
                         <span>
-                          <Badge primary>
+                          <Badge primary={!!converted_at}>
                             <Icons.RupeeIcon />{" "}
                             {numberToLocalString(
                               latest_given_quote.given_price
@@ -279,17 +298,13 @@ export default function List({  }: RouteComponentProps) {
                     </small>
                   </div>,
                   <div>
-                    <div>
-                      Sales Team:{" "}
-                      {sales_team.map(user => user.name).join(" • ")}
-                    </div>
-                    <div>
-                      Ops Team:{" "}
-                      {operations_team.map(user => user.name).join(" • ")}
-                    </div>
+                    {sales_team
+                      .concat(operations_team)
+                      .map(user => user.name)
+                      .join(" • ")}
                   </div>,
                 ]
-              )}
+              })}
             />
           </Listable>
         </Col>

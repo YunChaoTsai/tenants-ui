@@ -24,6 +24,31 @@ import { Grid, Col } from "../Shared/Layout"
 import DatePicker from "../Shared/DatePicker"
 import { EmptyNumberValidator } from "../utils"
 
+type TChildrenArray = Array<{ count: number; age: number }>
+
+export function childrenToString(children: TChildrenArray) {
+  return children
+    .map(({ count, age }) => [count, age].join("-"))
+    .map(str => `${str}yo`)
+    .join(",")
+}
+
+/**
+ * Create an array of children with count and ages
+ * @param string children - String of children with ages e.g. 1-3yo,4-5yo
+ * @return - An array with count and age for each part of string e.g. [{ count: 1, age: 3}, {count: 4, age: 5}]
+ */
+export function childrenToArray(children: string): TChildrenArray {
+  return children
+    .split(",")
+    .map(str => str.slice(0, -2))
+    .map(str => str.split("-"))
+    .map(([count, age]) => ({
+      count: Number(count),
+      age: Number(age),
+    }))
+}
+
 const validationSchema = Validator.object().shape({
   trip_id: Validator.string(),
   start_date: Validator.string().required("Start date is required"),
@@ -69,7 +94,7 @@ interface NewItemSchema {
   destinations: locationStore.ILocation[]
   no_of_adults: number
   trip_source?: tripSourceStore.ITripSource
-  children: { count: number; age: number }[]
+  children: TChildrenArray
   contact: {
     name: string
     email: string

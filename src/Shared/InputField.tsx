@@ -93,7 +93,7 @@ export interface InputFieldProps extends InputProps {
 export function InputField({
   label,
   name,
-  type = "text",
+  type,
   className,
   labelPlacement,
   noGroup,
