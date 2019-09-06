@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.15.0...v1.16.0) (2019-09-06)
+
+
+### Features
+
+* **hotel-booking-filters:** add location and booking stage filters ([505da5f](https://github.com/tourepedia/tp-admin-ui/commit/505da5f))
+
 # [1.15.0](https://github.com/tourepedia/tp-admin-ui/compare/v1.14.1...v1.15.0) (2019-09-05)
 
 
