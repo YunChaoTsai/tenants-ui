@@ -11,13 +11,20 @@ import { Grid, Col } from "../Shared/Layout"
 import { numberToLocalString, joinAttributes } from "../utils"
 import { SelectTags, store as tagStore } from "../Tags"
 import { Formik, Form } from "formik"
-import { FormikFormGroup, OnFormChange } from "../Shared/InputField"
+import { FormikFormGroup, OnFormChange, InputField } from "../Shared/InputField"
 import { useTrips } from "./List"
 import { groupByHotel, QuoteHotelBookingStage } from "./HotelBookings"
+import {
+  SelectHotelBookingStages,
+  store as hotelBookingStageStore,
+} from "../HotelBookingStages"
+import { SelectLocations, store as locationStore } from "../Locations"
 
 interface IFilters {
   q?: string
   tags?: Array<tagStore.ITag>
+  hotel_booking_stages?: Array<hotelBookingStageStore.IHotelBookingStage>
+  locations?: Array<locationStore.ILocation>
 }
 
 export default function HotelsBookingPendingList({  }: RouteComponentProps) {
@@ -39,9 +46,16 @@ export default function HotelsBookingPendingList({  }: RouteComponentProps) {
     [fetchTrips]
   )
   useEffect(() => {
-    const { tags = [], ...otherParams } = params
+    const {
+      tags = [],
+      hotel_booking_stages = [],
+      locations = [],
+      ...otherParams
+    } = params
     getTrips({
       tags: tags.map(t => t.name),
+      hotel_booking_stages: hotel_booking_stages.map(t => t.name),
+      locations: locations.map(t => t.name),
       hotels_not_booked: 1,
       ...otherParams,
       page: 1,
@@ -56,34 +70,18 @@ export default function HotelsBookingPendingList({  }: RouteComponentProps) {
         <h2>Pending Hotel Bookings</h2>
       </div>
       <hr />
-      <Grid>
-        <Col>
-          <Search
-            placeholder="Search by id, destination..."
-            onSearch={newParams => {
-              setParams({ ...params, ...newParams })
-            }}
-          />
-        </Col>
-        <Col className="text-right">
-          <Paginate
-            total={total}
-            from={from}
-            to={to}
-            currentPage={currentPage}
-            lastPage={lastPage}
-            isFetching={isFetching}
-            onChange={page => getTrips({ ...params, page })}
-          />
-        </Col>
-      </Grid>
+      <Search
+        placeholder="Search by id, destination..."
+        onSearch={newParams => {
+          setParams({ ...params, ...newParams })
+        }}
+      />
       <Grid>
         <Col md="auto">
           <Filters
-            onChange={({ tags = [], ...otherParams }) => {
+            onChange={otherParams => {
               setParams({
                 ...params,
-                tags,
                 ...otherParams,
               })
             }}
@@ -266,6 +264,17 @@ export default function HotelsBookingPendingList({  }: RouteComponentProps) {
               })}
             />
           </Listable>
+          <div className="text-right mt-8">
+            <Paginate
+              total={total}
+              from={from}
+              to={to}
+              currentPage={currentPage}
+              lastPage={lastPage}
+              isFetching={isFetching}
+              onChange={page => getTrips({ ...params, page })}
+            />
+          </div>
         </Col>
       </Grid>
     </Fragment>
@@ -285,8 +294,31 @@ function Filters({ label = "Filters", onChange }: FilterProps) {
         onChange(values)
       }}
       render={({ setFieldValue }) => (
-        <Form noValidate>
+        <Form noValidate style={{ minWidth: "250px" }}>
           <h5 className="mb-4 border-b">{label}</h5>
+          <FormikFormGroup
+            name="hotel_booking_stages"
+            render={({ field }) => (
+              <SelectHotelBookingStages
+                {...field}
+                fetchOnMount
+                label="Hotel Booking Stages"
+                placeholder="Search and select stages..."
+                onChange={(value, name) => setFieldValue(name, value)}
+              />
+            )}
+          />
+          <FormikFormGroup
+            name="locations"
+            render={({ field }) => (
+              <SelectLocations
+                {...field}
+                label="Locations"
+                placeholder="Search for locations..."
+                onChange={(value, name) => setFieldValue(name, value)}
+              />
+            )}
+          />
           <FormikFormGroup
             name="tags"
             render={({ field }) => (

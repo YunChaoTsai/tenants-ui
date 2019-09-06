@@ -144,7 +144,7 @@ export const Header = function Header() {
             </ul>
           </Dropdown>
           <Dropdown as="li" className="inline-block" alignRight>
-            <Link to="/transport-services">Transportation</Link>
+            <Link to="/transport-services">Transport</Link>
             <ul>
               <NavLink to="/transport-services">Transport Services</NavLink>
               <NavLink to="/cab-types">Cab Types</NavLink>

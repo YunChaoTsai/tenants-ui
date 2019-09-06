@@ -30,7 +30,7 @@ export function Search({
       onSubmit={values => onSearch(values)}
       render={() => (
         <Form noValidate style={{ marginBottom: "1em" }}>
-          <InputGroup>
+          <InputGroup style={{ minWidth: "280px" }}>
             <InputField
               name="q"
               noGroup
