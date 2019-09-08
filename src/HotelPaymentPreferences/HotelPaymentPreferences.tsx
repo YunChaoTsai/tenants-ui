@@ -14,7 +14,7 @@ export default function TripStagesModule(_: RouteComponentProps) {
           <h2 className="white-space-pre">Hotel Payment Preferences</h2>
         </Col>
         <Col className="d-flex align-items-center justify-content-end">
-          <Link to="new" className="btn">
+          <Link to="new" className="btn btn-primary branded">
             New Hotel Payment Preference
           </Link>
         </Col>

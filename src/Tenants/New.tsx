@@ -121,8 +121,8 @@ export function NewTenant({ xhr, navigate, location }: NewTenantProps) {
                 checked={values.send_invite}
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Submit
+                <Button type="submit" disabled={isSubmitting}>
+                  Save{values.send_invite ? " and Invite" : ""} Agent
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

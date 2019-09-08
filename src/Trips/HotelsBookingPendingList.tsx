@@ -336,7 +336,10 @@ function Filters({ label = "Filters", onChange }: FilterProps) {
               onChange(values)
             }}
           />
-          <Button type="submit">Filter</Button>
+          <hr />
+          <Button type="submit" secondary>
+            Apply Filters
+          </Button>
         </Form>
       )}
     />

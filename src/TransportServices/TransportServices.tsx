@@ -9,13 +9,13 @@ export default function TransportServicesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <div className="float-right button-group">
-        <Link to="/transport-service-prices" className="btn">
+        <Link to="/transport-service-prices" className="btn branded">
           Prices
         </Link>
         <Link to="/transport-service-prices/upload-prices" className="btn">
           Upload Prices
         </Link>
-        <Link to="new" className="btn">
+        <Link to="new" className="btn btn-primary branded">
           New Transport Service
         </Link>
       </div>

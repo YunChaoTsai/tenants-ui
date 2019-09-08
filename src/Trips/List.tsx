@@ -117,7 +117,7 @@ export default function List({  }: RouteComponentProps) {
         <title>List of trips</title>
       </Helmet>
       <div>
-        <Link to="new" className="float-right btn">
+        <Link to="new" className="float-right btn branded">
           Add New Trip
         </Link>
         <h2>List of Trips</h2>
@@ -362,7 +362,10 @@ function Filters({ label = "Filters", onChange }: FilterProps) {
               onChange(values)
             }}
           />
-          <Button type="submit">Filter</Button>
+          <hr />
+          <Button type="submit" secondary>
+            Apply Filters
+          </Button>
         </Form>
       )}
     />

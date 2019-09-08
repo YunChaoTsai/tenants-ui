@@ -239,7 +239,7 @@ export default function App() {
 
 function Footer() {
   return (
-    <footer className="border-t mt-8">
+    <footer className="border-t">
       <Container fluid>
         <div className="py-4">
           <span>&copy; 2019 Tourepedia. All rights reserved</span>

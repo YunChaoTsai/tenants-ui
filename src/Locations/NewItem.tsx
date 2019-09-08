@@ -16,6 +16,7 @@ import { withXHR, XHRProps } from "./../xhr"
 import { InputField, FormikFormGroup } from "./../Shared/InputField"
 import { SelectCountries, SelectStates, SelectCities } from "./List"
 import { ICountry, ICountryState, ICity } from "./store"
+import { Grid, Col } from "../Shared/Layout"
 
 const validationSchema = Validator.object().shape({
   country: Validator.object().required("Country field is required"),
@@ -85,59 +86,71 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             {status ? <div>{status}</div> : null}
             <fieldset>
               <legend>Add New Location</legend>
-              <FormikFormGroup
-                name="country"
-                render={({ field }: FieldProps<NewItemCredentials>) => (
-                  <SelectCountries
-                    {...field}
-                    multiple={false}
-                    label="Country"
-                    placeholder="Type to search.. (e.g. India)"
-                    onChange={(value, name) => {
-                      setFieldValue(name, value)
-                    }}
+              <Grid>
+                <Col sm="auto">
+                  <FormikFormGroup
+                    name="city"
+                    render={({ field }: FieldProps<NewItemCredentials>) => (
+                      <SelectCities
+                        {...field}
+                        multiple={false}
+                        label="City"
+                        onChange={(value, name) => setFieldValue(name, value)}
+                        placeholder="Type to search.. (e.g. Jaipur)"
+                        creatable
+                      />
+                    )}
                   />
-                )}
-              />
-              <FormikFormGroup
-                name="state"
-                render={({ field }: FieldProps<NewItemCredentials>) => (
-                  <SelectStates
-                    {...field}
-                    multiple={false}
-                    label="State"
-                    onChange={(value, name) => setFieldValue(name, value)}
-                    placeholder="Type to search.. (e.g. Rajasthan)"
-                    creatable
+                </Col>
+                <Col sm="auto">
+                  <FormikFormGroup
+                    name="state"
+                    render={({ field }: FieldProps<NewItemCredentials>) => (
+                      <SelectStates
+                        {...field}
+                        multiple={false}
+                        label="State"
+                        onChange={(value, name) => setFieldValue(name, value)}
+                        placeholder="Type to search.. (e.g. Rajasthan)"
+                        creatable
+                      />
+                    )}
                   />
-                )}
-              />
-              <FormikFormGroup
-                name="city"
-                render={({ field }: FieldProps<NewItemCredentials>) => (
-                  <SelectCities
-                    {...field}
-                    multiple={false}
-                    label="City"
-                    onChange={(value, name) => setFieldValue(name, value)}
-                    placeholder="Type to search.. (e.g. Jaipur)"
-                    creatable
+                </Col>
+                <Col sm="auto">
+                  <FormikFormGroup
+                    name="country"
+                    render={({ field }: FieldProps<NewItemCredentials>) => (
+                      <SelectCountries
+                        {...field}
+                        multiple={false}
+                        label="Country"
+                        placeholder="Type to search.. (e.g. India)"
+                        onChange={(value, name) => {
+                          setFieldValue(name, value)
+                        }}
+                      />
+                    )}
                   />
-                )}
-              />
-              <InputField
-                name="latitude"
-                label="Latitude"
-                placeholder="27° 2' 9.6252'' N"
-              />
-              <InputField
-                name="longitude"
-                label="Longitude"
-                placeholder="88° 15' 45.6192'' E"
-              />
+                </Col>
+                <Col sm="auto">
+                  <InputField
+                    name="latitude"
+                    label="Latitude"
+                    placeholder="27° 2' 9.6252'' N"
+                  />
+                </Col>
+                <Col sm="auto">
+                  <InputField
+                    name="longitude"
+                    label="Longitude"
+                    placeholder="88° 15' 45.6192'' E"
+                  />
+                </Col>
+              </Grid>
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Location
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

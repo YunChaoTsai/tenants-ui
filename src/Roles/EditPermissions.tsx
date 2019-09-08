@@ -90,8 +90,8 @@ export function EditPermissions({
                 )}
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Permissions
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

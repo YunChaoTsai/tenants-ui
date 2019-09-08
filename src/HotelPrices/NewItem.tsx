@@ -325,8 +325,8 @@ function AddPrices({ xhr, navigate }: AddPricesProps) {
                 )}
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Hotel Prices
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

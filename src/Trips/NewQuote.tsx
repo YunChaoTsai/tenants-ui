@@ -417,7 +417,7 @@ function NewQuote({ xhr, navigate, trip, location }: NewQuoteProps) {
             )}
           </mark>
         </div>
-        <Button className="w-full py-2 text-lg" primary onClick={saveQuote}>
+        <Button className="py-2 text-lg" primary branded onClick={saveQuote}>
           Create Quote
         </Button>
         {errors ? <p className="text-red-700 my-2">{errors.message}</p> : null}

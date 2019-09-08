@@ -109,8 +109,8 @@ function ChangePassword({ xhr, navigate }: ChangePasswordProps) {
                 autoComplete="new-password"
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Update
+                <Button type="submit" disabled={isSubmitting}>
+                  Update Password
                 </Button>
               </footer>
             </fieldset>

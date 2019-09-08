@@ -13,6 +13,7 @@ import { getUserAction } from "./User"
 import { searchToQuery, useThunkDispatch } from "./../utils"
 import { InputField } from "./../Shared/InputField"
 import config from "../config"
+import { ReactComponent as DashboardImage } from "./undraw_dashboard_nklg.svg"
 
 // schemas
 export interface ILoginCredentials {
@@ -83,81 +84,91 @@ export default function Login({ location }: LoginProps) {
       <Helmet>
         <title>Sign in to TAD</title>
       </Helmet>
-      <div className="min-h-screen">
-        <div className="text-center">
-          <img
-            src={config.publicUrl + "/logo.png"}
-            className="inline-block mt-16 w-20 rounded-full shadow"
-          />
+      <div
+        className="min-h-screen flex"
+        style={{ marginLeft: "-15px", marginRight: "-15px" }}
+      >
+        <div className="md:w-1/2 hidden md:block self-center">
+          <div className="px-12 py-10">
+            <DashboardImage className="max-w-full h-auto" />
+          </div>
         </div>
-        <h1 className="text-center my-4">Sign in to TAD</h1>
-        <div className="max-w-sm mx-auto">
-          <Formik
-            initialValues={initialValues}
-            onSubmit={(
-              values: ILoginCredentials,
-              actions: FormikActions<ILoginCredentials>
-            ) => {
-              actions.setStatus()
-              login(values).catch(error => {
-                actions.setStatus(error.message)
-                actions.setSubmitting(false)
-              })
-            }}
-            validationSchema={loginCredentialsSchema}
-            render={({
-              isSubmitting,
-              status,
-            }: FormikProps<ILoginCredentials>) => (
-              <Form noValidate>
-                <fieldset>
-                  {status ? (
-                    <p className="text-red-700" role="alert">
-                      {status}
-                    </p>
-                  ) : null}
-                  <InputField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    autoFocus={!initialValues.email}
-                    id="email"
-                    placeholder="username@domain.com"
-                    autoComplete="username email"
-                    required
-                    tabIndex={1}
-                  />
-                  <Link
-                    to="/forgot-password"
-                    className="float-right text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    Forgot Password ?
-                  </Link>
-                  <InputField
-                    label="Password"
-                    name="password"
-                    type="password"
-                    id="password"
-                    required
-                    autoComplete="current-password"
-                    autoFocus={!!initialValues.email}
-                    tabIndex={2}
-                  />
-                  <footer>
-                    <Button
-                      primary
-                      tabIndex={3}
-                      type="submit"
-                      className="w-full"
-                      disabled={isSubmitting}
-                    >
-                      Sign in
-                    </Button>
-                  </footer>
-                </fieldset>
-              </Form>
-            )}
-          />
+        <div className="bg-white w-full md:w-1/2 py-8">
+          <div className="mx-auto" style={{ maxWidth: "250px" }}>
+            <div className="flex items-center">
+              <img
+                src={config.publicUrl + "/logo.png"}
+                className="inline-block w-12 rounded-full mr-4"
+              />
+              <h1 className="text-2xl m-0">Tourepedia</h1>
+            </div>
+            <h2 className="mt-32 mb-12 text-2xl">Login to Dashboard</h2>
+            <div>
+              <Formik
+                initialValues={initialValues}
+                onSubmit={(
+                  values: ILoginCredentials,
+                  actions: FormikActions<ILoginCredentials>
+                ) => {
+                  actions.setStatus()
+                  login(values).catch(error => {
+                    actions.setStatus(error.message)
+                    actions.setSubmitting(false)
+                  })
+                }}
+                validationSchema={loginCredentialsSchema}
+                render={({
+                  isSubmitting,
+                  status,
+                }: FormikProps<ILoginCredentials>) => (
+                  <Form noValidate>
+                    {status ? (
+                      <p className="text-red-700" role="alert">
+                        {status}
+                      </p>
+                    ) : null}
+                    <InputField
+                      label="Email"
+                      name="email"
+                      type="email"
+                      autoFocus={!initialValues.email}
+                      id="email"
+                      placeholder="username@domain.com"
+                      autoComplete="username email"
+                      required
+                      tabIndex={1}
+                      className="mb-10"
+                    />
+                    <InputField
+                      label="Password"
+                      name="password"
+                      type="password"
+                      id="password"
+                      required
+                      autoComplete="current-password"
+                      autoFocus={!!initialValues.email}
+                      tabIndex={2}
+                      className="mb-10"
+                    />
+                    <footer>
+                      <Button
+                        tabIndex={3}
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-4"
+                      >
+                        Login
+                      </Button>
+                    </footer>
+                  </Form>
+                )}
+              />
+            </div>
+            <div className="mt-12 text-gray-600">
+              Forgot Password ?{" "}
+              <Link to="/forgot-password">Click here to reset.</Link>
+            </div>
+          </div>
         </div>
       </div>
     </RedirectIfAuthenticated>

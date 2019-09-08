@@ -82,8 +82,8 @@ export function EditUser({ xhr, navigate, userId }: EditUserProps) {
                 required
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Submit
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Details
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

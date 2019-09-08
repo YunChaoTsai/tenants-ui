@@ -9,7 +9,7 @@ import NewItem from "./New"
 export default function TenantsModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="btn float-right">
+      <Link to="new" className="btn float-right btn-primary branded">
         Add New Agent
       </Link>
       <h2>Agents</h2>

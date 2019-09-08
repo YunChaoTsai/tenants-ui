@@ -153,12 +153,8 @@ export function Item({
                 </li>
               ))}
             </ul>
-            <Dialog
-              open={isVisibleAddContact}
-              onClose={hideAddContact}
-              closeButton
-            >
-              <Dialog.Header>
+            <Dialog open={isVisibleAddContact} onClose={hideAddContact}>
+              <Dialog.Header closeButton>
                 <Dialog.Title>Add Contact</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>

@@ -8,7 +8,7 @@ import NewItem from "./NewItem"
 export default function TripStagesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="float-right btn">
+      <Link to="new" className="float-right btn btn-primary branded">
         New Trip Stage
       </Link>
       <h2>Trip Stages</h2>

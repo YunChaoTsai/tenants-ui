@@ -299,8 +299,8 @@ const LogTransaction = withXHR(function LogTransaction({
   return (
     <>
       <Button onClick={open}>Add</Button>
-      <Dialog open={dialogOpen} onClose={close} closeButton>
-        <Dialog.Header>
+      <Dialog open={dialogOpen} onClose={close}>
+        <Dialog.Header closeButton>
           <Dialog.Title>Log Transaction</Dialog.Title>
         </Dialog.Header>
         <Dialog.Body>
@@ -363,7 +363,7 @@ const LogTransaction = withXHR(function LogTransaction({
                   placeholder="Any comments consisting reference id or payment details"
                 />
                 <Dialog.Footer>
-                  <Button primary disabled={isSubmitting} type="submit">
+                  <Button disabled={isSubmitting} type="submit">
                     Update
                   </Button>
                   <Button onClick={close}>Cancel</Button>

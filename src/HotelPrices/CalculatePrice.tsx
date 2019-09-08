@@ -615,7 +615,12 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                     <Icons.RupeeIcon /> {hotel.calculated_price}
                                   </Badge>
                                 ) : (
-                                  <Button type="submit" disabled={isSubmitting}>
+                                  <Button
+                                    type="submit"
+                                    secondary
+                                    branded
+                                    disabled={isSubmitting}
+                                  >
                                     Get Price
                                   </Button>
                                 )}
@@ -702,25 +707,22 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                           </Grid>
                         </Col>
                         <Col md={1} className="text-right md:border-l py-3">
-                          <Button
-                            className="btn--secondary w-full"
-                            onClick={() => push(hotel)}
-                          >
-                            + Duplicate
+                          <Button fullWidth onClick={() => push(hotel)}>
+                            Duplicate
                           </Button>
-                          <br />
-                          <Button
-                            className="btn--secondary w-full"
-                            onClick={() => remove(index)}
-                          >
-                            &times; Remove
+                          <Button fullWidth onClick={() => remove(index)}>
+                            Remove
                           </Button>
                         </Col>
                       </Grid>
                     </div>
                   ))}
                   <div className="pt-4">
-                    <Button onClick={() => push(INITIAL_VALUES.hotels[0])}>
+                    <Button
+                      secondary
+                      branded
+                      onClick={() => push(INITIAL_VALUES.hotels[0])}
+                    >
                       + Add {values.hotels.length ? "Another" : ""} Hotel Query
                     </Button>
                   </div>

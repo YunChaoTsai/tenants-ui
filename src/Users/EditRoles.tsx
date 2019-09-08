@@ -86,8 +86,8 @@ export function EditRoles({ xhr, navigate, userId }: EditRolesProps) {
                 )}
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Assign Role
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

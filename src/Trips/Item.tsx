@@ -396,7 +396,7 @@ export function BasicDetails({ trip }: { trip: ITrip }) {
               <span className="text-gray-600">Operations Team: </span>
               <div className="ml-2">
                 <div className="flex items-center">
-                  <span>{sales_team.map(user => user.name)}</span>
+                  <span>{operations_team.map(user => user.name)}</span>
                   {hasPermission(PERMISSIONS.MANAGE_TRIP_OWNERS) ? (
                     <Component initialState={false}>
                       {({ state: isEditing, setState: setIsEditing }) => (

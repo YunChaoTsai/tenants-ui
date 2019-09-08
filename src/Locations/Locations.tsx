@@ -8,7 +8,7 @@ import NewItem from "./NewItem"
 export default function LocationsModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="float-right btn">
+      <Link to="new" className="float-right btn branded btn-primary">
         New Location
       </Link>
       <h2>Locations</h2>

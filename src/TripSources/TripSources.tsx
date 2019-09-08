@@ -8,7 +8,7 @@ import NewItem from "./NewItem"
 export default function TripSourcesModule(props: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
-      <Link to="new" className="float-right btn">
+      <Link to="new" className="float-right btn btn-primary branded">
         New Trip Source
       </Link>
       <h2>Trip Sources</h2>

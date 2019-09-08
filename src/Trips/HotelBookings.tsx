@@ -210,8 +210,8 @@ function ComposeEmail({
       {({ state, setState }) => (
         <Fragment>
           <Button onClick={() => setState(true)}>Compose Email</Button>
-          <Dialog closeButton open={state} onClose={() => setState(false)}>
-            <Dialog.Header>
+          <Dialog open={state} onClose={() => setState(false)}>
+            <Dialog.Header closeButton>
               <h4 className="mb-2 font-semibold">{hotel.name}</h4>
               <div className="text-sm text-gray-600">
                 {joinAttributes(
@@ -413,10 +413,10 @@ function GenerateVoucher({
       {({ state, setState }) => {
         return (
           <Fragment>
-            <Button onClick={() => setState(true)} primary={isBooked}>
+            <Button onClick={() => setState(true)} branded={isBooked}>
               Generate Voucher
             </Button>
-            <Dialog open={state} onClose={() => setState(false)} closeButton>
+            <Dialog open={state} onClose={() => setState(false)}>
               <Formik
                 initialValues={{
                   hotel_confirmation_number: "",
@@ -425,7 +425,7 @@ function GenerateVoucher({
                 onSubmit={() => {}}
                 render={({ values }) => (
                   <Fragment>
-                    <Dialog.Header>
+                    <Dialog.Header closeButton>
                       <Dialog.Title>
                         Generate Voucher for {hotel.name}
                       </Dialog.Title>

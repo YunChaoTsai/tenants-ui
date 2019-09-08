@@ -174,8 +174,8 @@ function NewItem({ xhr, navigate }: NewItemProps) {
               />
               {status ? <div className="text--error">{status}</div> : null}
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Preference
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

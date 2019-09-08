@@ -17,13 +17,13 @@ export default function CabTypesModule(_: RouteComponentProps) {
         </Col>
         <Col className="text-right d-flex align-items-center justify-content-end">
           <div className="button-group">
-            <Link to="upload-prices" className="btn">
+            <Link to="upload-prices" className="btn branded">
               Upload Prices
             </Link>
             <Link to="new" className="btn">
               Add Prices
             </Link>
-            <Link to="calculate-price" className="btn">
+            <Link to="calculate-price" className="btn branded btn-primary">
               Calculate Price
             </Link>
           </div>

@@ -10,13 +10,13 @@ export default function HotelsModule(_: RouteComponentProps) {
   return (
     <RedirectUnlessAuthenticated>
       <div className="float-right button-group">
-        <Link to="/hotel-prices" className="btn">
+        <Link to="/hotel-prices" className="btn branded">
           Hotel Prices
         </Link>
         <Link to="/hotel-prices/upload-prices" className="btn">
           Upload Prices
         </Link>
-        <Link to="new" className="btn">
+        <Link to="new" className="btn btn-primary branded">
           New Hotel
         </Link>
       </div>

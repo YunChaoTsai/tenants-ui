@@ -78,11 +78,15 @@ export function EditRole({ xhr, navigate, roleId }: EditRoleProps) {
                 placeholder="Manager"
                 required
               />
-              <Button type="submit" disabled={isSubmitting}>
-                Save
-              </Button>
+              <footer>
+                <Button type="submit" disabled={isSubmitting}>
+                  Update Role
+                </Button>
+                <Link className="btn" to="..">
+                  Cancel
+                </Link>
+              </footer>
             </fieldset>
-            <Link to="..">Cancel</Link>
           </Form>
         )}
       />

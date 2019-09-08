@@ -284,16 +284,10 @@ export const ExtraServicesForm = withXHR(function ExtraServicesForm({
                         </Col>
                         <Col className="pt-4 border-l text-right">
                           <ButtonGroup>
-                            <Button
-                              className="btn--secondary"
-                              onClick={() => push(transport_extra)}
-                            >
+                            <Button onClick={() => push(transport_extra)}>
                               + Duplicate
                             </Button>
-                            <Button
-                              className="btn--secondary"
-                              onClick={() => remove(index)}
-                            >
+                            <Button onClick={() => remove(index)}>
                               &times; Remove
                             </Button>
                           </ButtonGroup>

@@ -7,6 +7,7 @@ import * as Validator from "yup"
 
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField } from "./../Shared/InputField"
+import { Grid, Col } from "../Shared/Layout"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
@@ -53,21 +54,27 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             {status ? <div>{status}</div> : null}
             <fieldset>
               <legend>Add New Room Type</legend>
-              <InputField
-                label="Name"
-                name="name"
-                placeholder="Delux"
-                required
-              />
-              <InputField
-                label="Description"
-                name="description"
-                placeholder="Luxury room"
-                required
-              />
+              <Grid>
+                <Col sm="auto">
+                  <InputField
+                    label="Name"
+                    name="name"
+                    placeholder="Delux"
+                    required
+                  />
+                </Col>
+                <Col sm="auto">
+                  <InputField
+                    label="Description"
+                    name="description"
+                    placeholder="Luxury room"
+                    required
+                  />
+                </Col>
+              </Grid>
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Room Type
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

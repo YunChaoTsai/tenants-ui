@@ -7,6 +7,7 @@ import * as Validator from "yup"
 
 import { withXHR, XHRProps } from "./../xhr"
 import { InputField } from "./../Shared/InputField"
+import { Grid, Col } from "../Shared/Layout"
 
 const validationSchema = Validator.object().shape({
   name: Validator.string().required("Name field is required"),
@@ -53,20 +54,26 @@ function NewItem({ xhr, navigate }: NewItemProps) {
             {status ? <div>{status}</div> : null}
             <fieldset>
               <legend>Add New Source of Trips</legend>
-              <InputField
-                label="Name"
-                name="name"
-                placeholder="Travel Triangle"
-                required
-              />
-              <InputField
-                label="Short name"
-                name="short_name"
-                placeholder="TT"
-                required
-              />
+              <Grid>
+                <Col sm="auto">
+                  <InputField
+                    label="Name"
+                    name="name"
+                    placeholder="Travel Triangle"
+                    required
+                  />
+                </Col>
+                <Col sm="auto">
+                  <InputField
+                    label="Short name"
+                    name="short_name"
+                    placeholder="TT"
+                    required
+                  />
+                </Col>
+              </Grid>
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting}>
                   Save
                 </Button>
                 <Link to=".." className="btn">

@@ -6,6 +6,7 @@ import { Button } from "@tourepedia/ui"
 
 import { InputField } from "./../Shared/InputField"
 import { withXHR, XHRProps } from "./../xhr"
+import { Grid, Col } from "../Shared/Layout"
 
 export interface NewUserCredentials {
   name: string
@@ -67,21 +68,27 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
             {status ? <div>{status}</div> : null}
             <fieldset>
               <legend>Invite New User</legend>
-              <InputField
-                label="Name"
-                name="name"
-                required
-                placeholder="John Tourepedia"
-                autoComplete="name"
-              />
-              <InputField
-                label="Email"
-                type="email"
-                name="email"
-                autoComplete="username"
-                placeholder="username@tourepedia.com"
-                required
-              />
+              <Grid>
+                <Col sm="auto">
+                  <InputField
+                    label="Name"
+                    name="name"
+                    required
+                    placeholder="John Tourepedia"
+                    autoComplete="name"
+                  />
+                </Col>
+                <Col sm="auto">
+                  <InputField
+                    label="Email"
+                    type="email"
+                    name="email"
+                    autoComplete="username"
+                    placeholder="username@tourepedia.com"
+                    required
+                  />
+                </Col>
+              </Grid>
               <input
                 hidden
                 type="hidden"
@@ -89,8 +96,8 @@ export function NewUser({ xhr, navigate, location }: NewUserProps) {
                 value={values.invited_signup_link}
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Submit
+                <Button type="submit" disabled={isSubmitting}>
+                  Invite User
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

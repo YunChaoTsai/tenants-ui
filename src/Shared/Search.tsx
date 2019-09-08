@@ -37,7 +37,7 @@ export function Search({
               placeholder={placeholder}
               type="search"
             />
-            <Button type="submit">
+            <Button type="submit" secondary>
               <Icons.SearchIcon />
             </Button>
           </InputGroup>

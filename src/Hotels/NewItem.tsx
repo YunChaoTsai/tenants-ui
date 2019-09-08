@@ -284,8 +284,8 @@ function NewItem({ xhr, navigate }: NewItemProps) {
                   </Col>
                 </Grid>
                 <footer>
-                  <Button primary type="submit" disabled={isSubmitting}>
-                    Save
+                  <Button type="submit" disabled={isSubmitting}>
+                    Save Hotel Details
                   </Button>
                   <Link to=".." className="btn">
                     Cancel

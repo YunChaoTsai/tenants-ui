@@ -60,8 +60,8 @@ export function NewRole({ xhr, navigate }: NewRoleProps) {
                 placeholder="Manager"
               />
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Submit
+                <Button type="submit" disabled={isSubmitting}>
+                  Create Role
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

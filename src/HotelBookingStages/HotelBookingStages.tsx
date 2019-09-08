@@ -14,7 +14,7 @@ export default function MealPlansModule(_: RouteComponentProps) {
           <h2 className="white-space-pre">Hotel Booking Stages</h2>
         </Col>
         <Col className="d-flex align-items-center justify-content-end">
-          <Link to="new" className="btn">
+          <Link to="new" className="btn branded">
             New Hotel Booking Stage
           </Link>
         </Col>

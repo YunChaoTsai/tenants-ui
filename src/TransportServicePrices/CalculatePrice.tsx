@@ -398,7 +398,12 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                                   <Icons.RupeeIcon /> {cab.calculated_price}
                                 </Badge>
                               ) : (
-                                <Button type="submit" disabled={isSubmitting}>
+                                <Button
+                                  type="submit"
+                                  secondary
+                                  branded
+                                  disabled={isSubmitting}
+                                >
                                   Get Price
                                 </Button>
                               )}
@@ -463,24 +468,22 @@ export const CalculatePriceForm = withXHR(function CalculatePriceForm({
                         </Grid>
                       </Col>
                       <Col md={1} className="text-right md:border-l py-3">
-                        <Button
-                          className="btn--secondary w-full"
-                          onClick={() => push(cab)}
-                        >
-                          + Duplicate
+                        <Button fullWidth onClick={() => push(cab)}>
+                          Duplicate
                         </Button>
-                        <Button
-                          className="btn--secondary w-full"
-                          onClick={() => remove(index)}
-                        >
-                          &times; Remove
+                        <Button fullWidth onClick={() => remove(index)}>
+                          Remove
                         </Button>
                       </Col>
                     </Grid>
                   </div>
                 ))}
                 <div className="pt-4">
-                  <Button onClick={() => push(INITIAL_VALUES.cabs[0])}>
+                  <Button
+                    secondary
+                    branded
+                    onClick={() => push(INITIAL_VALUES.cabs[0])}
+                  >
                     + Add More Price Queries
                   </Button>
                 </div>

@@ -307,7 +307,7 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                           />
                         </Col>
                       </Grid>
-                      <div className="button-group">
+                      <div className="button-group mt-4">
                         <Button
                           className="btn--secondary"
                           onClick={() => push(price)}
@@ -327,7 +327,10 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
                   ))}
                   <div className="form-group">
                     <hr />
-                    <Button onClick={() => push(initialValues.prices[0])}>
+                    <Button
+                      branded
+                      onClick={() => push(initialValues.prices[0])}
+                    >
                       + Add More Transport Prices
                     </Button>
                   </div>
@@ -336,8 +339,8 @@ function AddPrice({ xhr, navigate }: AddPriceProps) {
             />
             {status ? <div>{status}</div> : null}
             <footer>
-              <Button primary type="submit" disabled={isSubmitting}>
-                Save
+              <Button type="submit" disabled={isSubmitting}>
+                Save Prices
               </Button>
               <Link to={".."} className="btn">
                 Cancel

@@ -111,20 +111,20 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
                             )}
                           />
                           {locations.length > 1 ? (
-                            <Button onClick={_ => remove(index)}>
+                            <Button tertiary onClick={_ => remove(index)}>
                               &times; Remove
                             </Button>
                           ) : null}
                         </Col>
                       ))}
                     </Grid>
-                    <hr />
                     <Button onClick={_ => push(undefined)}>
                       + Add More Destinations
                     </Button>
                   </div>
                 )}
               />
+              <hr />
               <Grid>
                 <Col>
                   <InputField
@@ -151,8 +151,8 @@ function NewServices({ xhr, navigate }: NewServicesProps) {
                 </Col>
               </Grid>
               <footer>
-                <Button primary type="submit" disabled={isSubmitting}>
-                  Save
+                <Button type="submit" disabled={isSubmitting}>
+                  Save Service
                 </Button>
                 <Link to=".." className="btn">
                   Cancel

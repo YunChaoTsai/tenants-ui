@@ -71,8 +71,8 @@ const UploadPrices = withXHR(function UploadPrices({
                 }}
               />
               <footer>
-                <Button type="submit" disabled={isSubmitting} primary>
-                  Upload
+                <Button type="submit" disabled={isSubmitting}>
+                  Upload CSV
                 </Button>
                 <Link className="btn" to="..">
                   Cancel
