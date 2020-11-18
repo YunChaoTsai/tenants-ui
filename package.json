@@ -95,7 +95,7 @@
     "lint-staged": "8.2.0",
     "prettier": "1.16.4",
     "redux-devtools-extension": "2.13.8",
-    "semantic-release": "15.13.12"
+    "semantic-release": "17.2.3"
   },
   "prettier": {
     "semi": false,
