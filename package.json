@@ -32,7 +32,7 @@
     "moment": "2.24.0",
     "pluralize": "8.0.0",
     "pusher-js": "5.0.0",
-    "qs": "6.6.0",
+    "qs": "6.6.1",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-helmet-async": "0.2.0",
